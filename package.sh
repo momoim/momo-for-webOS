@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Packagefile for nl.sinds1984.hotspot
+# Packagefile for momo.im.app
 # Helps to set up a custom packaging process
 # Run from this directory, may require to create a bin
 
