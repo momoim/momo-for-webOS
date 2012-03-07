@@ -1,3 +1,4 @@
+body{font-size:12px}
 .dashboard-icon-momo {
     background: url(../icon.png) center center no-repeat;
 }
@@ -61,3 +62,8 @@
 .stuck.smileButton.selected {
     background: url(../images/sender/smiles-button-active.png) top left no-repeat;
 }
+#mojo-scene-login-scene-scroller{padding:105px 10px 0;background:url(../images/login_bg.jpg) no-repeat #111;background-size:cover}
+.palm-row-wrapper{padding:4px 8px}
+.palm-button.affirmative,#palm-dialog-box .palm-button.affirmative{color:#fff;-webkit-border-image: url(../images/palm-button-blue.png) 0 17 104 17 repeat repeat;}
+.palm-button.affirmative.selected,#palm-dialog-box .palm-button.affirmative.selected {-webkit-border-image: url(../images/palm-button-blue.png) 52 17 52 17 repeat repeat;}
+.palm-button.affirmative.disabled,#palm-dialog-box .palm-button.affirmative.disabled {-webkit-border-image: url(../images/palm-button-blue.png) 104 17 0 17 repeat repeat;}
