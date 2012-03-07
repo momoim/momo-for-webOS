@@ -28,9 +28,5 @@
     {
         "scenes": "conv-detail",
         "source": "app/assistants/conv-detail-assistant.js"
-    },
-    {
-        "scenes": "recorder",
-        "source": "app/assistants/recorder-assistant.js"
     }
 ]
