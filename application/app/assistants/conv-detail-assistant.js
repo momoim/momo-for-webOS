@@ -40,16 +40,17 @@ var ConvDetailAssistant = Class.create({
 		},
 		this.modelComment);
 		this.commentContent = this.controller.get('comment-content');
-		
+
 		//recorder button
 		this.controller.setupWidget('audio-recorder', {
-            type: Mojo.Widget.defaultButton 
-        }, this.modelSignin = {
-            buttonLabel: $L("按住录音"),
-            buttonClass: 'affirmative',
-            disabled: false
-        });
-		
+			type: Mojo.Widget.defaultButton
+		},
+		this.modelSignin = {
+			buttonLabel: $L("按住录音"),
+			buttonClass: 'affirmative',
+			disabled: false
+		});
+
 		this.audioRecorder = this.controller.get('audio-recorder');
 		this.controller.listen("audio-recorder", 'mousedown', this.onRecordStart.bind(this));
 
@@ -66,13 +67,15 @@ var ConvDetailAssistant = Class.create({
 			that.list.mojo.revealItem(result.length - 1, false);
 		});
 
+		//发送已读
 		Global.sendRoger();
-		
+
+		//录音辅助类
 		this.captureHelper = new CaptureHelper();
 		this.audioFile = '';
 		this.elTextField = this.controller.document.getElementById('comment-content');
 		this.elButtonRecord = this.controller.document.getElementById('audio-recorder');
-		if(Global.lastSwitcher == 'sound') {
+		if (Global.lastSwitcher == 'sound') {
 			this.switchToSound();
 		} else {
 			this.switchToText();
@@ -154,10 +157,15 @@ var ConvDetailAssistant = Class.create({
 					},
 					onSuccess: function(resp) {
 						Mojo.Log.info('Success : ' + Object.toJSON(resp));
-						total.data.content.picture = {
-							url: JSON.parse(resp.responseString).src
-						};
-						onPrepared(total);
+						var imgUrl = JSON.parse(resp.responseString).src;
+						if (imgUrl == null || imgUrl == '') {
+							onPrepareFail(total);
+						} else {
+							total.data.content.picture = {
+								url: imgUrl
+							};
+							onPrepared(total);
+						}
 					}.bind(this),
 					onFailure: function(e) {
 						Mojo.Log.info('Failure : ' + Object.toJSON(e));
@@ -204,11 +212,16 @@ var ConvDetailAssistant = Class.create({
 					},
 					onSuccess: function(resp) {
 						Mojo.Log.info('Success : ' + Object.toJSON(resp));
-						total.data.content.audio = {
-							url: JSON.parse(resp.responseString).src,
-							duration: 0
-						};
-						onPrepared(total);
+						var audioUrl = JSON.parse(resp.responseString).src;
+						if (audioUrl == null || imgUrl == '') {
+							onPrepareFail(total)
+						} else {
+							total.data.content.audio = {
+								url: audioUrl,
+								duration: 0
+							};
+							onPrepared(total);
+						}
 					}.bind(this),
 					onFailure: function(e) {
 						Mojo.Log.info('Failure : ' + Object.toJSON(e));
@@ -275,7 +288,7 @@ var ConvDetailAssistant = Class.create({
 				break;
 			}
 		}
-		
+
 		var self = this; //Retain the reference for the callback
 		if (target.id == 'attachButton') {
 			var params = {
@@ -292,8 +305,8 @@ var ConvDetailAssistant = Class.create({
 
 			Mojo.FilePicker.pickFile(params, this.controller.stageController);
 
-		} else if(target.id == 'sendButton') {
-			if(this.elTextField.style.display == 'none') {
+		} else if (target.id == 'sendButton') {
+			if (this.elTextField.style.display == 'none') {
 				this.switchToText();
 			} else {
 				this.switchToSound();
@@ -315,29 +328,29 @@ var ConvDetailAssistant = Class.create({
 	},
 	onRecordStart: function() {
 		var self = this;
-		
+
 		//start recording
 		self.audioFile = 'temply_' + guidGenerator();
-		this.captureHelper.startRecording(self.audioFile, function (response) {
+		this.captureHelper.startRecording(self.audioFile, function(response) {
 			Mojo.Log.info(self.TAG, 'startAudioCapture.');
 		});
 	},
 	onRecordEnd: function() {
 		var self = this;
-		
+
 		this.captureHelper.stopRecording();
 		self.sendChat({
-				audio: {
-					url: VR_FOLDER + self.audioFile + VR_EXTENSION,
-					duration: 0
-				}
-			});
+			audio: {
+				url: VR_FOLDER + self.audioFile + VR_EXTENSION,
+				duration: 0
+			}
+		});
 		self.audioFile = '';
-		
+
 		this.audioRecorder.mojo.deactivate();
 	},
 	onMouseUp: function() {
-		if(this.audioFile != '') {
+		if (this.audioFile != '') {
 			this.onRecordEnd();
 		}
 	},
