@@ -1,0 +1,23 @@
+[
+	{
+		"library": {
+			"name": "foundations",
+			"version": "1.0"
+		}
+	},
+	{
+		"source": "utils/oauth.js"
+	},
+	{
+		"source": "global/Setting.js"
+	},
+	{
+		"source": "global/rabbit-db.js"
+	},
+	{
+		"source": "NodeService.js"
+	},
+	{
+		"source": "ChatAssistant.js"
+	}
+]

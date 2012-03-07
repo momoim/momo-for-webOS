@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=momo.im.app.service.node
+Exec=/var/usr/bin/run-homebrew-js-service /media/cryptofs/apps/usr/palm/services/momo.im.app.service.node

@@ -1,0 +1,12 @@
+{
+	"id": "momo.im.app",
+	"app": "momo.im.app",
+	"package_format_version": 2,
+	"loc_name": "momo",
+	"version": "1.0.0",
+	"icon": "icon.png",
+	"miniicon": "icon.png",
+	"vendor": "Tsung Wu",
+	"vendorurl": "http://momo.im",
+	"services": ["momo.im.app.service.node"]
+}

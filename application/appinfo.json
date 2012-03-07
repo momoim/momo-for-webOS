@@ -1,0 +1,11 @@
+{
+	"id": "momo.im.app",
+	"version": "1.0.0",
+	"vendor": "Tsung W.",
+	"type": "web",
+	"main": "index.html",
+	"title": "momo",
+	"icon": "icon.png",
+	"miniicon": "icon32.png",
+	"noWindow": true
+}

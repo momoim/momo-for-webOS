@@ -1,0 +1,41 @@
+{
+	"id": "momo.im.app.service.node",
+	"description": "momo.im Service",
+	"engine": "node",
+	"services": [
+		{
+			"name": "momo.im.app.service.node",
+			"description": "momo.im Service",
+			"commands": [
+				{
+					"name": "keepAlive",
+					"assistant": "onKeepAlive",
+					"subscribe": true,
+					"public": true
+				},
+				{
+					"name": "chatSubscribe",
+					"assistant": "onChatSubscribe",
+					"subscribe": true,
+					"public": true
+				},
+				{
+					"name": "chatInit",
+					"assistant": "onChatInit",
+					"public": true
+				},
+				{
+					"name": "chatSend",
+					"assistant": "onChatSend",
+					"public": true
+				},
+				{
+					"name": "fileUpload",
+					"assistant": "onFileUpload",
+					"subscribe": true,
+					"public": true
+				}
+			]
+		}
+	]
+}
