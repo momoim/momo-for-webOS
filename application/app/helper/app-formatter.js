@@ -16,8 +16,9 @@ var AppFormatter = {
 	user: function(n, model) {
 		return '';
 	},
-    sender: function(n, model) {
-        if(n.id == Global.authInfo.user.id){
+    sender: function(sender, model) {
+		if(!sender) return '';
+        if(sender['id'] == model['other']['id']) { 
             return "issaid";
         }else{
             return "othersaid";
