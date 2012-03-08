@@ -33,15 +33,13 @@ var MainAssistant = Class.create({
 			parameters: Global.authInfo,
 			onSuccess: that.onInitSuccess.bind(that),
 			onFailure: function(fail) {
-				//that.controller.get('hello').update('init service fail');
 			}
 		});
+
+		this.onClickReal = this.onClick.bind(this);
 	},
 	onInitSuccess: function(result) {
 		var that = this;
-		//this.controller.get('hello').update(result.hello);
-		//Mojo.Log.info('trying to register callback');
-		//that.modelList.setItems(result.data);
 		that.controller.modelChanged(that.modelList);
 	},
 	listWasTapped: function(event) {
@@ -69,8 +67,42 @@ var MainAssistant = Class.create({
 		that.controller.modelChanged(that.modelList);
 		that.list.mojo.revealItem(0, true);
 	},
+	refreshClick: function(event) {
+		var that = this;
+		Mojo.Log.info('refreshClick: trying to refresh unread');
+		new interfaces.Momo().getIMAll({
+			onSuccess: function(response) {
+				Mojo.Log.info('refreshClick: trying to refresh unread: ' + response.responseText);
+				new Mojo.Service.Request("palm://com.palm.applicationManager", {
+					method: "launch",
+					parameters: {
+						id: Mojo.appInfo.id,
+						params: {
+							"action": "onUnreadList",
+							"data": response.responseText
+						}
+					},
+					onSuccess: function(response) {},
+					onFailure: function(response) {}
+				});
+			}.bind(that),
+			onFailure: function(response) {
+				Mojo.Log.info('refreshClick: trying to refresh unread fail: ' + response.responseText);
+			}.bind(that)
+		});
+	},
+	onClick: function(event) {
+		var target = event.target;
+		Mojo.Log.info('onclick========--' + target.id);
+		if(target.id == 'refreshBtn') {
+			this.refreshClick(event);
+		} else if(target.id == 'addBtn') {
+			this.itemAdd(event);
+		}
+	},
 	activate: function(event) {
 		var that = this;
+		this.controller.document.addEventListener("click", this.onClickReal, true);
 		if (event != null && event.hasOwnProperty('phoneNumbers')) {
 			Mojo.Log.info('people: ' + JSON.stringify(event.phoneNumbers));
 			if (event.phoneNumbers.length > 0) {
@@ -116,7 +148,9 @@ var MainAssistant = Class.create({
 			});
 		}
 	},
-	deactivate: function(event) {},
+	deactivate: function(event) {
+		this.controller.document.removeEventListener("click", this.onClickReal, true);
+	},
 	cleanup: function(event) {
 		this.cleaning = true;
 		//remove callback

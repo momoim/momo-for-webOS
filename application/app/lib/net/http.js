@@ -115,5 +115,5 @@ net.Http = function() {
   }
 };
 
-net.Http.DEFAULT_TIMEOUT_IN_SECONDS = 30;
+net.Http.DEFAULT_TIMEOUT_IN_SECONDS = 60;
 

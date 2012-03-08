@@ -2,6 +2,7 @@ interfaces.Momo = function() {
 	var http = new net.Http();
 	var hostUrl = 'http://v3.api.momo.im';
 
+	// 登陆
 	this.postUserLogin = function(user, callbacks) {
 		return http.post(hostUrl + '/user/login.json', JSON.stringify(user), '', callbacks);
 	};
@@ -41,13 +42,20 @@ interfaces.Momo = function() {
 		if (method == 'POST') {
 			return http.post(fullUrl, JSON.stringify(params), headers, callbacks);
 		} else {
-			return http.get(fullUrl, headers, callbacks);
+			return http.get(fullUrl, '', headers, callbacks);
 		}
 	};
 
 
+	// 根据手机号获取用户信息
 	this.postUserShowByMobile = function(people, callbacks) {
 		return this.post('/user/show_by_mobile.json', people, callbacks);
+	};
+
+	// 获取未读私聊数据
+	this.getIMAll = function(callbacks) {
+		//Mojo.Log.info('getIMAll------------');
+		return this.get('/im/all.json', callbacks);
 	};
 }
 
