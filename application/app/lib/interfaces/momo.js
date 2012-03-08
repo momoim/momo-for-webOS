@@ -46,7 +46,6 @@ interfaces.Momo = function() {
 		}
 	};
 
-
 	// 根据手机号获取用户信息
 	this.postUserShowByMobile = function(people, callbacks) {
 		return this.post('/user/show_by_mobile.json', people, callbacks);
@@ -57,5 +56,10 @@ interfaces.Momo = function() {
 		//Mojo.Log.info('getIMAll------------');
 		return this.get('/im/all.json', callbacks);
 	};
+
+	// 创建帐号
+	this.postRegisterCreate = function(user, callbacks) {
+		return this.post('/register/create.json', user, callbacks);
+	}
 }
 
