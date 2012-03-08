@@ -1,10 +1,14 @@
-<li class="#{-senderFormatted}">
-	  <span class="time">#{timestampFormatted}</span>
-	  <div class="mo-chat-detail-item">
-	  	<a href="#" class="avatar">
-	  	    <img src="#{sender.avatar}"/>
-	    </a>
-	    <a href="#"><span>#{sender.name}</span></a>
-		<p>#{-contentFormatted}</p>
-	  </div>
+<li class="#{-senderFormatted} conv-list-detail-item">
+    <span class="time">#{timestampFormatted}</span>
+    <div class="mo-chat-detail-item">
+        <div class="mo-chat-detail-item-avatar">
+            <a href="#" class="avatar"><img src="#{sender.avatar}" alt="" /></a>
+        </div>
+        <div class="detail-content">
+            <span class="arrow"></span>
+            <p>#{-contentFormatted}</p>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div class="clear"></div>
 </li>
