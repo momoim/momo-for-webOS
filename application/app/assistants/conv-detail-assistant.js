@@ -52,6 +52,10 @@ var ConvDetailAssistant = Class.create({
 			disabled: false
 		});
 
+		//录音辅助类
+		this.captureHelper = new CaptureHelper();
+		this.audioFile = '';
+
 		this.audioRecorder = this.controller.get('audio-recorder');
 		this.controller.listen("audio-recorder", 'mousedown', this.onRecordStart.bind(this));
 
@@ -71,9 +75,6 @@ var ConvDetailAssistant = Class.create({
 		//发送已读
 		Global.sendRoger();
 
-		//录音辅助类
-		this.captureHelper = new CaptureHelper();
-		this.audioFile = '';
 		this.elTextField = this.controller.document.getElementById('comment-content');
 		this.elButtonRecord = this.controller.document.getElementById('audio-recorder');
 		if (Global.lastSwitcher == 'sound') {
@@ -212,9 +213,10 @@ var ConvDetailAssistant = Class.create({
 						"subscribe": true
 					},
 					onSuccess: function(resp) {
-						Mojo.Log.info('Success : ' + Object.toJSON(resp));
+						Mojo.Log.info('Success : ' + ' --' + resp.httpCode + '==' + Object.toJSON(resp));
+						if(resp.httpCode != 200) return;
 						var audioUrl = JSON.parse(resp.responseString).src;
-						if (audioUrl == null || imgUrl == '') {
+						if (audioUrl == null || audioUrl == '') {
 							onPrepareFail(total)
 						} else {
 							total.data.content.audio = {
@@ -347,8 +349,6 @@ var ConvDetailAssistant = Class.create({
 			}
 		});
 		self.audioFile = '';
-
-		this.audioRecorder.mojo.deactivate();
 	},
 	onMouseUp: function() {
 		if (this.audioFile != '') {
