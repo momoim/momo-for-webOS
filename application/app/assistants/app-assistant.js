@@ -109,7 +109,7 @@ AppAssistant.prototype = {
 				this.onNewIncome(launchParams.data);
 				break;
 			case 'keep-alive':
-				//this.onKeepAlive();
+				this.onKeepAlive();
 				break;
 			default:
 				Mojo.Log.info('unknown launch params');
