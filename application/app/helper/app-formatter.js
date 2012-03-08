@@ -18,10 +18,10 @@ var AppFormatter = {
 	},
     sender: function(sender, model) {
 		if(!sender) return '';
-        if(sender['id'] == model['other']['id']) { 
-            return "issaid";
+        if(sender['id'] != model['other']['id']) { 
+            return "is-said";
         }else{
-            return "othersaid";
+            return "other-said";
         }
     },
 	content: function(n, model) {

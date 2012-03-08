@@ -356,6 +356,7 @@ var ConvDetailAssistant = Class.create({
 		}
 	},
 	activate: function(event) {
+
 		this.controller.document.addEventListener("keyup", this.keyUpHandlerReal, true);
 		this.controller.document.addEventListener("click", this.onClickReal, true);
 		this.controller.document.addEventListener("mouseup", this.onMouseUpReal, true);
