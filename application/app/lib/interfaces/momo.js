@@ -8,7 +8,7 @@ interfaces.Momo = function() {
 	};
 
 	this.get = function(url, callbacks) {
-		return this.action('GET', url, callbacks);
+		return this.action('GET', url, '', callbacks);
 	};
 
 	this.post = function(url, params, callbacks) {
