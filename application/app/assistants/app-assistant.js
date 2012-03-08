@@ -56,7 +56,6 @@ AppAssistant.prototype = {
 			Global.authInfo = info;
 			that.onKeepAlive();
 			//that.setWakeup();
-			//that.controller.pushScene('main');
 		};
 		DBHelper.instance().get('authInfo', success, fail);
 		DBHelper.instance().get('lastSwitcher', function(s) {
@@ -96,7 +95,6 @@ AppAssistant.prototype = {
 				this.controller.createStageWithCallback(stageArguments, pushMainScene.bind(this), "card");
 			}
 			else {
-				//this.controller.launch("com.superinhuman.badkitty", {}, false, false) ;                                        
 				cardStageController.activate();
 			}
 		}
@@ -123,22 +121,6 @@ AppAssistant.prototype = {
 		//Mojo.Log.info('keeping alive');
 		var that = this;
 
-		/*
-         var data = {
-         message: {
-         kind: 'sms',
-         data: {
-         sender: {
-         name: 'keepalive'
-         },
-         content: {
-         text: 'keeping'
-         }
-         }
-         }
-         }
-         this.onNewIncome(data);
-         */
 		new Mojo.Service.Request("palm://momo.im.app.service.node/", {
 			method: "keepAlive",
 			parameters: {
@@ -173,10 +155,6 @@ AppAssistant.prototype = {
 				}
 			},
 			onSuccess: function(response) {
-				//var cardStageController = this.controller.getStageController(Global.mainStage);              
-				//cardStageController.delegateToSceneAssistant("ShowAlert", "setWakeup Success");
-				//Mojo.Log.error("Alarm Set Success", response.returnValue);
-				this.wakeupTaskId = Object.toJSON(response.taskId);
 			},
 			onFailure: function(response) {}
 		});

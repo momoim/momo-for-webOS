@@ -3,8 +3,6 @@ var Login = function(){
 
 Login.prototype = {
     auth: function(mobile, password, onSuccess, onFailure){
-        var base = 'http://v3.api.momo.im';
-        //var base = "http://api.simulate.momo.im";
         if (Global.deviceID == null) {
 			var bannerParams = {
                 messageText: '获取设备ID失败',
@@ -16,29 +14,14 @@ Login.prototype = {
             }, 'momo');
             return;
         }
-        var url = base + "/user/login.json";
         var postParams = {
             mobile: mobile,
             password: password,
             device_id: Global.deviceID,
             client_id: 7
         };
-        var postBody = '';
-        for (var name in postParams) {
-            if (postBody == '') {
-                postBody = name + '=' + postParams[name];
-            }
-            else {
-                postBody = postBody + '&' + name + '=' + postParams[name];
-            }
-        }
         Mojo.Log.info('posting', JSON.stringify(postParams));
-        new Ajax.Request(url, {
-            method: 'post',
-            postBody: JSON.stringify(postParams),
-            onSuccess: onSuccess,
-            onFailure: onFailure
-        });
+		new interfaces.Momo().postUserLogin(postParams, {onSuccess: onSuccess, onFailure: onFailure});
     }
 }
 

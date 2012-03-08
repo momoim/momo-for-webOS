@@ -1,0 +1,2 @@
+var net = {};
+var interfaces = {};
