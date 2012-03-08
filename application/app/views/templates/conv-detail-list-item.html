@@ -1,8 +1,8 @@
-<li>
-	  <span>#{timestampFormatted}</span>
-	  <div>
-	  	<a href="#">
-	  	    <img src="#{sender.avatar}" class='avatar'/>
+<li class="#{-senderFormatted}">
+	  <span class="time">#{timestampFormatted}</span>
+	  <div class="mo-chat-detail-item">
+	  	<a href="#" class="avatar">
+	  	    <img src="#{sender.avatar}"/>
 	    </a>
 	    <a href="#"><span>#{sender.name}</span></a>
 		<p>#{-contentFormatted}</p>

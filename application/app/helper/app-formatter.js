@@ -16,6 +16,13 @@ var AppFormatter = {
 	user: function(n, model) {
 		return '';
 	},
+    sender: function(n, model) {
+        if(n.id == Global.authInfo.user.id){
+            return "issaid";
+        }else{
+            return "othersaid";
+        }
+    },
 	content: function(n, model) {
 		for(var now in n) {
 			//Mojo.Log.info('content now: ' + now);

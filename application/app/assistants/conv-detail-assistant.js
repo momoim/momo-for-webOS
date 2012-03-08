@@ -16,6 +16,7 @@ var ConvDetailAssistant = Class.create({
 			//dividerTemplate: 'templates/photo-list-divider',
 			formatters: {
 				content: AppFormatter.contentDetail.bind(that),
+				sender: AppFormatter.sender.bind(that),
 				timestamp: AppFormatter.time.bind(that)
 			},
 			uniquenessProperty: 'id',

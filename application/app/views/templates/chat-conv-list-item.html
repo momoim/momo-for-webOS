@@ -1,10 +1,11 @@
 <li class="row removable" x-mojo-gesture='Mojo.Gesture.HorizontalDrag'>
-	  <span>#{timestampFormatted}</span>
-	  <div>
-	  	<a href="#">
-	  	    <img src="#{other.avatar}" class='avatar'/>
-	    </a>
-	    <a href="#"><span>#{other.name}</span></a>
-		<p>#{-contentFormatted}</p>
-	  </div>
+    <div class="mo-chat-item-avatar">
+        <a href="#" class="avatar"><img src="#{other.avatar}"/></a>
+    </div>
+    <div class="mo-chat-item">
+        <span class="time">#{timestampFormatted}</span>
+        <a href="#" class="name"><span>#{other.name}</span></a>
+        <p class="detail">#{-contentFormatted}</p>
+    </div>
+    <div class="clear"></div>
 </li>

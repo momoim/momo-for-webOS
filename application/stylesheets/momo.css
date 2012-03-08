@@ -1,13 +1,12 @@
-body{font-size:12px}
-.dashboard-icon-momo {
-    background: url(../icon.png) center center no-repeat;
-}
-
-.avatar {
-    width: 64px;
-    height: 64px;
-}
-
+*{margin:0;padding:0}
+body.palm-default{font-size:12px;background:#fafafa}
+a{color:#212121;font-size:14px;font-weight:700;text-decoration:none}
+p{color:#404547}
+.palm-body-text{padding:0;margin:0}
+.palm-row-wrapper{padding:4px 8px}
+.dashboard-icon-momo {background: url(../icon.png) center center no-repeat;}
+.avatar {width: 64px;height: 64px;border-radius:5px}
+.avatar img{width: 64px;height: 64px;border-radius:5px}
 .stuck.sendButton {
     background: url(../images/sender/msg-send-airplane-press.png) top left no-repeat;
     background: url(../images/sender/msg-send-airplane.png) top left no-repeat;
@@ -67,3 +66,21 @@ body{font-size:12px}
 .palm-button.affirmative,#palm-dialog-box .palm-button.affirmative{color:#fff;-webkit-border-image: url(../images/palm-button-blue.png) 0 17 104 17 repeat repeat;}
 .palm-button.affirmative.selected,#palm-dialog-box .palm-button.affirmative.selected {-webkit-border-image: url(../images/palm-button-blue.png) 52 17 52 17 repeat repeat;}
 .palm-button.affirmative.disabled,#palm-dialog-box .palm-button.affirmative.disabled {-webkit-border-image: url(../images/palm-button-blue.png) 104 17 0 17 repeat repeat;}
+.appHeader{position: fixed;top:0;left:0;color:#fff;height:48px;width:320px;padding-top:0px;background:url(../images/title_background.png) repeat-x}
+.headerShadow{position: fixed;top:48px;left:0;color:#fff;height:5px;width:320px;background:url(../images/top_shadow.png) no-repeat;z-index: 100}
+.atitle{width:100%;padding-top:8px;font-weight:bold;text-align:center;font-size:20px}
+.btn_title_left{float:left;width:60px;height:48px;background:url(../images/btn_left.png) no-repeat}
+.btn_title_left:active{background:url(../images/btn_left_active.png) no-repeat}
+.btn_title_right{float:left;width:60px;height:48px;background:url(../images/btn_right.png) no-repeat}
+.btn_title_right:active{background:url(../images/btn_right_active.png) no-repeat}
+.conv-list{width:100%;margin-top:53px}
+/*#mojo-scene-main-scene-scroller{padding:10px 20px}*/
+/*ul li{position:relative;list-style:none;padding:10px;margin-bottom:20px;-webkit-border-image:url(../images/message_bg.png) 10 stretch repeat;border-radius:5px}*/
+.clear{clear:both}
+ul li{padding:8px 0;width:100%;height:64px;list-style:none;vertical-align:top;border-bottom:1px solid #bbb;background:#FFF}
+ul li .mo-chat-item-avatar{width:70px;float:left;padding:0 10px 0 10px}
+ul li .mo-chat-item{padding:2px 0 0 2px;}
+ul li .mo-chat-item .name{font-size:20px;line-height:24px;font-weight:700}
+ul li .mo-chat-item .detail{font-size:16px;line-height:16px;font-weight:400;color:#888}
+ul li .time{float:right;padding-right:10px;color:#ccc}
+
