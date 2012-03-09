@@ -1,11 +1,18 @@
-<li class="row conv-list-item removable" x-mojo-gesture='Mojo.Gesture.HorizontalDrag'>
-    <div class="mo-chat-item-avatar">
-        <a href="#" class="avatar"><img src="#{other.avatar}"/></a>
-    </div>
-    <div class="mo-chat-item">
-        <span class="time">#{timestampFormatted}</span>
-        <a href="#" class="name"><span>#{other.name}</span></a>
-        <p class="detail">#{-contentFormatted}</p>
-    </div>
-    <div class="clear"></div>
-</li>
+<div class="status-row removable" x-mojo-gesture='Mojo.Gesture.HorizontalDrag' x-mojo-tap-highlight='immediate'>
+	<div class="palm-row-wrapper">
+		<table width="100%" border="0">
+			<tr>
+				<td valign="top" width="40">
+                    <div class="mo-avatar" style="background-image: url(#{other.avatar});"></div>
+				</td>
+				<td>
+					<div class="content-wrapper">
+						<div class="mo-time">#{timestampFormatted}</div>
+						<div class="mo-name">#{other.name}</div>
+						<div class="mo-text">#{-contentFormatted}</div>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>

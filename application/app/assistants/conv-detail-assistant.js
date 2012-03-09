@@ -34,7 +34,7 @@ var ConvDetailAssistant = Class.create({
 
 		//comment content textarea
 		this.controller.setupWidget('comment-content', {
-			hintText: $L("快说~"),
+            hintText: $L('快说~'),
 			multiline: true,
 			modelProperty: 'content',
 			enterSubmits: true
