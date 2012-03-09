@@ -35,6 +35,7 @@ p{color:#404547;word-wrap: break-word; word-break: break-all;}
 /*ul li.conv-list-item .time{float:right;padding-right:10px;color:#ccc}*/
 .status-row{margin:0px;padding:0;color:#d2d2d2;clear:both}
 .status-row.selected{background: url(../images/low/tweet-highlight.png) center top repeat-x, url(../images/low/tweet-highlight-bottom.png) center bottom repeat-x;}
+.status-row.palm-delete-element{background: url(../images/low/tweet-highlight.png) center top repeat-x, url(../images/low/tweet-highlight-bottom.png) center bottom repeat-x;background-color:#273138}
 .mo-name{font-weight:bold;display:inline-block}
 .mo-time{float:right;margin-right:20px;display:inline-block}
 .mo-text{padding-top:5px;font-size:16px;line-height:16px;font-weight:400;color:#888;height:18px;width:200px;white-space:nowrap;overflow:hidden;text-overflow: ellipsis;}

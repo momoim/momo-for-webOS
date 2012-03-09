@@ -26,6 +26,7 @@ var MainAssistant = Class.create({
 		Mojo.Event.listen(this.list, Mojo.Event.listTap, this.listWasTapped.bind(this));
 		Mojo.Event.listen(this.list, Mojo.Event.listDelete, this.itemDelete.bind(this));
 		Mojo.Event.listen(this.list, Mojo.Event.listAdd, this.itemAdd.bind(this));
+		Mojo.Event.listen(this.list, Mojo.Event.dragStart, this.dragStart.bind(this));
 
 		//start service
 		that.controller.serviceRequest("palm://momo.im.app.service.node/", {
@@ -42,6 +43,20 @@ var MainAssistant = Class.create({
 		var that = this;
 		that.controller.modelChanged(that.modelList);
 	},
+    dragStart: function(event) {
+        if (Math.abs(event.filteredDistance.x) > Math.abs(event.filteredDistance.y) * 2) {
+            var node = event.target.up(".palm-row");
+            Mojo.Drag.setupDropContainer(node, this);
+
+            node._dragObj = Mojo.Drag.startDragging(this.controller, node, event.down, {
+                    preventVertical: true,
+                    draggingClass: "palm-delete-element",
+                    preventDropReset: false
+                });
+
+            event.stop();             
+        }
+    },
 	listWasTapped: function(event) {
 		Mojo.Log.info('listWasTapped');
 		this.controller.stageController.pushScene('conv-detail', {
