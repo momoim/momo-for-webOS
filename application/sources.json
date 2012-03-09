@@ -9,7 +9,8 @@
     {"source": "app/helper/db-helper.js"},
     {"source": "app/helper/audio-controller.js"},
     {"source": "app/helper/app-formatter.js"},
-	{"source": "app/helper/CaptureHelper.js"},
+    {"source": "app/helper/notify-helper.js"},
+		{"source": "app/helper/CaptureHelper.js"},
     {"source": "app/assistants/app-assistant.js"},
     {"source": "app/assistants/stage-assistant.js"},
     {

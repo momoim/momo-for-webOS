@@ -18,14 +18,8 @@ DashboardAssistant.prototype = {
         
         var bannerMessage = this.title + ': ' + this.message;
         
-        var bannerParams = {
-            messageText: bannerMessage,
-            soundClass: 'notifications'
-        };
-        
-        Mojo.Controller.getAppController().showBanner(bannerParams, {
-            source: "notification"
-        }, 'momo');
+		NotifyHelper.instance().bannerNewMsg();
+		//NotifyHelper.instance().banner(bannerMessage);
         
         var info = {
             title: this.title,
@@ -71,14 +65,7 @@ DashboardAssistant.prototype = {
 				app.closeStage(Global.dashStage);
             },
             onFailure: function(response){
-				var bannerParams = {
-		            messageText: response,
-		            soundClass: 'notifications'
-		        };
-		        
-		        Mojo.Controller.getAppController().showBanner(bannerParams, {
-		            source: "notification"
-		        }, 'momo');
+				NotifyHelper.instance().banner(response);
 		    }
         });
     },

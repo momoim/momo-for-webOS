@@ -204,15 +204,8 @@ AppAssistant.prototype = {
 					f, 'dashboard');
 				}
 			} else {
-				var bannerParams = {
-					messageText: income.sender.name + ': ' + AppFormatter.content(income.content),
-					soundClass: 'notifications'
-				};
-
-				Mojo.Controller.getAppController().showBanner(bannerParams, {
-					source: "notification"
-				},
-				'momo');
+				NotifyHelper.instance().bannerNewMsg();
+				//NotifyHelper.instance().banner(income.sender.name + ': ' + AppFormatter.content(income.content));
 			}
 
 			Global.hasNewUnread = true;
