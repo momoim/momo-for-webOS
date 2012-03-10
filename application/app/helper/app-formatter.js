@@ -48,7 +48,7 @@ var AppFormatter = {
 		for(var now in n) {
 			//Mojo.Log.info('content now: ' + now);
 			if(now == 'text' || now == 'text_long') {
-				return n[now];
+				return linkify(n[now]);
 			} else if (now == 'picture') {
 				var pUrl = n[now]['url'];
 				if(pUrl == null) {

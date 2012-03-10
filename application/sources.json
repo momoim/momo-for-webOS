@@ -1,6 +1,7 @@
 [
     {"source": "vendors/oauth.js"},
     {"source": "vendors/date.js"},
+    {"source": "vendors/ba-linkify.min.js"},
     {"source": "global/Setting.js"},
     {"source": "global/rabbit-db.js"},
     {"source": "app/lib/namespace.js"},
