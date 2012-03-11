@@ -16,8 +16,28 @@ MomoMQ.prototype.isAlive = function() {
 	return this.connection != null && this.connection.readyState != 'closed' && this.connection.writable;
 };
 
+MomoMQ.prototype.logUI = function(msg) {
+			PalmCall.call('palm://com.palm.applicationManager', 'open', {
+				'id': 'momo.im.app',
+				'params': {
+					'action': 'onConnError',
+					'data': msg
+				}
+			});
+};
+
 MomoMQ.prototype.connect = function() {
 	var that = this;
+	var now = new Date();
+	if (!that.connectTime) {
+		that.connectTime = now;
+	} else {
+		if ((now.getTime() - that.connectTime.getTime()) < 20000) {
+			return;
+		} else {
+			that.logUI('on connection retrying after 20 seconds');
+		}
+	}
 	var config = {
 		heartbeat: 30,
 		host: Setting.mq.host,
@@ -46,6 +66,7 @@ MomoMQ.prototype.connect = function() {
 		});
 		connection.on('error', function() {
 			console.log('on connection error');
+			that.logUI('on connection error');
 		});
 		connection.addListener('ready', function() {
 			console.log('connection ready');
@@ -92,7 +113,12 @@ MomoMQ.prototype.connect = function() {
 							};
 							if (chat.sender.id != that.nodeService.authInfo.user.id) {
 								console.log('sending roger');
-								exc.publish(chat.sender.id + '', JSON.stringify({kind: 'roger', data: roger}), {contentType: 'text/plain'});
+								exc.publish(chat.sender.id + '', JSON.stringify({
+									kind: 'roger',
+									data: roger
+								}), {
+									contentType: 'text/plain'
+								});
 							}
 						}
 					}
@@ -120,21 +146,28 @@ MomoMQ.prototype.connect = function() {
 
 	connection.addListener('closed', function() {
 		console.log('connection closed');
+		that.logUI('on connection closed');
 		that.connect();
 	});
 
 	connection.addListener('end', function() {
 		console.log('connection close');
+		//that.logUI('on connection end');
 		that.connect();
 	});
 }
 
 MomoMQ.prototype.sendMsg = function(to, msg) {
 	console.log('sending: ' + msg);
+	var that = this;
 	if (this.isAlive() && this.exc != null) {
-		this.exc.publish(to, msg, {contentType: 'text/plain'});
+		this.exc.publish(to, msg, {
+			contentType: 'text/plain'
+		});
 	} else {
 		console.log('send msg------failed! no connection now');
+		that.logUI('on connection send fail');
+		this.connect();
 	}
 }
 
