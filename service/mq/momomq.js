@@ -26,18 +26,18 @@ MomoMQ.prototype.logUI = function(msg) {
 			});
 };
 
-MomoMQ.prototype.connect = function() {
+MomoMQ.prototype.connect = function(imm) {
 	var that = this;
 	var now = new Date();
-	if (!that.connectTime) {
-		that.connectTime = now;
+	if (!that.connectTime || imm) {
 	} else {
 		if ((now.getTime() - that.connectTime.getTime()) < 20000) {
 			return;
 		} else {
-			that.logUI('on connection retrying after 20 seconds');
+			//that.logUI('on connection retrying after 20 seconds');
 		}
 	}
+	that.connectTime = now;
 	var config = {
 		heartbeat: 30,
 		host: Setting.mq.host,
@@ -147,13 +147,13 @@ MomoMQ.prototype.connect = function() {
 	connection.addListener('closed', function() {
 		console.log('connection closed');
 		that.logUI('on connection closed');
-		that.connect();
+		that.connect(true);
 	});
 
 	connection.addListener('end', function() {
 		console.log('connection close');
 		//that.logUI('on connection end');
-		that.connect();
+		that.connect(true);
 	});
 }
 
@@ -167,7 +167,7 @@ MomoMQ.prototype.sendMsg = function(to, msg) {
 	} else {
 		console.log('send msg------failed! no connection now');
 		that.logUI('on connection send fail');
-		this.connect();
+		this.connect(true);
 	}
 }
 
