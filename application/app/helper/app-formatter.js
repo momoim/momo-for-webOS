@@ -62,7 +62,7 @@ var AppFormatter = {
 				var latlng = location['latitude'] + ',' + location['longitude'];
 				var gmap = "http://maps.googleapis.com/maps/api/staticmap?center="
                 + latlng + "&markers=color:blue|" + latlng
-                + "&zoom=16&size=" + 240 + "x" + 120 + "&sensor=false";
+                + "&zoom=16&size=" + 200 + "x" + 120 + "&sensor=false";
 				return '<img src="' + gmap + '"/>';
 			} else if (now == 'audio') {
 				var audio = n[now];
