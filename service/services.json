@@ -34,6 +34,30 @@
 					"assistant": "onFileUpload",
 					"subscribe": true,
 					"public": true
+				},
+				{
+					"name": "onFileDel",
+					"assistant": "onFileDel",
+					"subscribe": true,
+					"public": true
+				},
+				{
+					"name": "onFileInfo",
+					"assistant": "onFileInfo",
+					"subscribe": true,
+					"public": true
+				},
+				{
+					"name": "onFileDownload",
+					"assistant": "onFileDownload",
+					"subscribe": true,
+					"public": true
+				},
+				{
+					"name": "onFileRename",
+					"assistant": "onFileRename",
+					"subscribe": true,
+					"public": true
 				}
 			]
 		}

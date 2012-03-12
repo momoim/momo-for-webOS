@@ -4,7 +4,6 @@ var libraries = MojoLoader.require({
 });
 var Future = libraries["foundations"].Control.Future;
 var DB = libraries["foundations"].Data.DB;
-var AjaxCall = libraries["foundations"].Comms.AjaxCall;
 var PalmCall = libraries["foundations"].Comms.PalmCall;
 
 //node.js orig require style
@@ -44,11 +43,6 @@ NodeService.prototype = {
 		var that = this;
 
 		//read database config or something
-		// start receive message
-		this.interval = setInterval(function ping() {
-			//that.receive();
-		},
-		3000);
 	},
 	getID: function() {
 		return guidGenerator();
@@ -176,32 +170,6 @@ NodeService.prototype = {
 				errorCode: status
 			};
 		});
-
-		return;
-		/*
-		//new age node.js, dunt know if that works
-		http.get(opts, function(res) {
-				f.result = {
-					hello: 'get im data failed' + url + authHeader
-				}
-				return;
-			var status = res.statusCode;
-			if (status == 200) {
-				f.result = {
-					hello: 'get im data success' + res,
-					data: res
-				};
-			} else {
-				f.result = {
-					hello: 'get im data failed' + status + url + authHeader
-				}
-			}
-		}).on('error', function(e) {
-			f.result = {
-				hello: 'get im data failed' + e + url + authHeader
-			}
-		});
-		*/
 	},
 	httpReq: function(method, path, json, onSuccess, onFail) {
 		var params = '';
@@ -232,7 +200,6 @@ NodeService.prototype = {
 		var authHeader = OAuth.getAuthorizationHeader("", message.parameters);
 
 		//get data with node.js
-		//var base = 'api.simulate.momo.im';
 		var opts = {
 			host: Setting.api,
 			port: 80,

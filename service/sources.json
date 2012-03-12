@@ -19,5 +19,8 @@
 	},
 	{
 		"source": "ChatAssistant.js"
+	},
+	{
+		"source": "FileAssistant.js"
 	}
 ]

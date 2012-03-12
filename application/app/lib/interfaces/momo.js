@@ -1,6 +1,6 @@
 interfaces.Momo = function() {
 	var http = new net.Http();
-	var hostUrl = 'http://v3.api.momo.im';
+	var hostUrl = Setting.api;
 
 	// 登陆
 	this.postUserLogin = function(user, callbacks) {
@@ -101,7 +101,7 @@ interfaces.Momo = function() {
 				'url': url,
 				//'contentType': 'image/jpg',
 				"postParameters": [],
-				customHttpHeaders: ['HOST:' + Setting.api, 'Authorization:' + authHeader],
+				customHttpHeaders: ['HOST:' + hostUrl, 'Authorization:' + authHeader],
 				"subscribe": true
 			},
 			onSuccess: function(resp) {

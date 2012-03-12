@@ -121,7 +121,8 @@ var ConvDetailAssistant = Class.create({
 				onPrepared(total);
 			} else if (content.hasOwnProperty('picture')) {
 				Mojo.Log.info(this.TAG, 'prepare picture ====' + content.picture.url);
-				new interfaces.Momo().postPhotoUpload(content.picture.url, {
+				var localUrl = content.pirture.url;
+				new interfaces.Momo().postPhotoUpload(localUrl, {
 					onSuccess: function(resp) {
 						Mojo.Log.info('Success : ' + Object.toJSON(resp));
 						var imgUrl = JSON.parse(resp.responseString).src;
@@ -141,33 +142,50 @@ var ConvDetailAssistant = Class.create({
 				});
 			} else if (content.hasOwnProperty('audio')) {
 				Mojo.Log.info(this.TAG, 'prepare audio ====' + content.audio.url);
-				new interfaces.Momo().postFileUpload(content.audio.url, {
-					onSuccess: function(resp) {
-						Mojo.Log.info('Success : ' + ' --' + resp.httpCode + '==' + Object.toJSON(resp));
-						if (resp.httpCode != 200) return;
-						var audioUrl = JSON.parse(resp.responseString).src;
-						if (audioUrl == null || audioUrl == '') {
-							onPrepareFail(total)
-						} else {
-							total.data.content.audio = {
-								url: audioUrl,
-								duration: 0
-							};
-							onPrepared(total);
-						}
-					}.bind(this),
-					onFailure: function(e) {
-						Mojo.Log.info('Failure : ' + Object.toJSON(e));
-						onPrepareFail(total);
-					}.bind(this)
+				var localUrl = content.audio.url;
+				var idUrl = '/media/internal/momo/' + total.data.id + '.amr';
+				new Mojo.Service.Request("palm://momo.im.app.service.node/", {
+					method: "onFileRename",
+					parameters: {
+						path1: localUrl,
+						path2: idUrl
+					},
+					onSuccess: function() {
+						//NotifyHelper.instance().banner('audio renamed!===');
+						new interfaces.Momo().postFileUpload(idUrl, {
+							onSuccess: function(resp) {
+								Mojo.Log.info('Success : ' + ' --' + resp.httpCode + '==' + Object.toJSON(resp));
+								if (resp.httpCode != 200) return;
+								NotifyHelper.instance().banner('audio success:' + Object.toJSON(resp));
+								var audioUrl = JSON.parse(resp.responseString).src;
+								if (audioUrl == null || audioUrl == '') {
+									onPrepareFail(total)
+								} else {
+									total.data.content.audio = {
+										url: audioUrl,
+										duration: 0
+									};
+									onPrepared(total);
+								}
+							}.bind(this),
+							onFailure: function(e) {
+								Mojo.Log.info('Failure : ' + Object.toJSON(e));
+								onPrepareFail(total);
+							}.bind(this)
+						});
+					},
+					onFailure: function(fail) {
+						NotifyHelper.instance().banner('audio:' + Object.toJSON(fail));
+					}
 				});
-			} else if(content.hasOwnProperty('file')) {
+				return;
+			} else if (content.hasOwnProperty('file')) {
 				new interfaces.Momo().postFileUpload(content.file.url, {
 					onSuccess: function(resp) {
 						Mojo.Log.info('file upload success: ' + Object.toJSON(resp));
 						if (resp.httpCode != 200) return;
 						var result = JSON.parse(resp.responseString);
-						if(result.src && result.src != '') {
+						if (result.src && result.src != '') {
 							total.data.content.file = {
 								url: result.src,
 								mime: result.mime,
@@ -235,11 +253,60 @@ var ConvDetailAssistant = Class.create({
 				if (Global.audioPlayer == null) {
 					Global.audioPlayer = new Audio();
 				}
-				Global.audioPlayer.volume = 1;
-				Global.audioPlayer.pause();
-				Global.audioPlayer.src = audioSrc;
-				Global.audioPlayer.load();
-				Global.audioPlayer.play();
+				var idUrl = '/media/internal/momo/' + dataID + '.amr';
+				function fileFailed() {
+					Global.audioPlayer.volume = 1;
+					Global.audioPlayer.pause();
+					Global.audioPlayer.src = audioSrc;
+					Global.audioPlayer.load();
+					Global.audioPlayer.play();
+				};
+				new Mojo.Service.Request("palm://momo.im.app.service.node/", {
+					method: "onFileInfo",
+					parameters: {
+						path: idUrl
+					},
+					onSuccess: function(response) {
+						if (response.error) {
+							//fileFailed();
+							//NotifyHelper.instance().banner(Object.toJSON(response.error));
+							new Mojo.Service.Request("palm://momo.im.app.service.node/", {
+								method: "onFileDownload",
+								parameters: {
+									path: idUrl,
+									url: audioSrc
+								},
+								onSuccess: function(response) {
+									if (response.error) {
+										fileFailed();
+										NotifyHelper.instance().banner(Object.toJSON(response.error));
+									} else {
+										Global.audioPlayer.volume = 1;
+										Global.audioPlayer.pause();
+										Global.audioPlayer.src = idUrl;
+										Global.audioPlayer.load();
+										Global.audioPlayer.play();
+										//NotifyHelper.instance().banner('cache success');
+									}
+								},
+								onFailure: function(fail) {
+									fileFailed();
+									//NotifyHelper.instance().banner('cache service fail');
+								}
+							});
+						} else {
+							Global.audioPlayer.volume = 1;
+							Global.audioPlayer.pause();
+							Global.audioPlayer.src = idUrl;
+							Global.audioPlayer.load();
+							Global.audioPlayer.play();
+							//NotifyHelper.instance().banner('cache get success');
+						}
+					},
+					onFailure: function(fail) {
+						fileFailed();
+					}
+				});
 				break;
 			default:
 				break;
