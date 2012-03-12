@@ -84,7 +84,9 @@ var MainAssistant = Class.create({
 	},
 	refreshClick: function(event) {
 		var that = this;
+        var loading = this.controller.document.getElementById('loading');
 		Mojo.Log.info('refreshClick: trying to refresh unread');
+        loading.className = "show";
 		new interfaces.Momo().getIMAll({
 			onSuccess: function(response) {
 				Mojo.Log.info('refreshClick: trying to refresh unread: ' + response.responseText);
@@ -100,9 +102,11 @@ var MainAssistant = Class.create({
 					onSuccess: function(response) {},
 					onFailure: function(response) {}
 				});
+                loading.className = "ignore";
 			}.bind(that),
 			onFailure: function(response) {
 				Mojo.Log.info('refreshClick: trying to refresh unread fail: ' + response.responseText);
+                loading.className = "ignore";
 			}.bind(that)
 		});
 	},
