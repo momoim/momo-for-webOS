@@ -279,7 +279,7 @@ var ConvDetailAssistant = Class.create({
 								onSuccess: function(response) {
 									if (response.error) {
 										fileFailed();
-										NotifyHelper.instance().banner(Object.toJSON(response.error));
+										//NotifyHelper.instance().banner(Object.toJSON(response.error));
 									} else {
 										Global.audioPlayer.volume = 1;
 										Global.audioPlayer.pause();
