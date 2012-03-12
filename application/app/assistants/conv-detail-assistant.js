@@ -34,7 +34,7 @@ var ConvDetailAssistant = Class.create({
 
 		//comment content textarea
 		this.controller.setupWidget('comment-content', {
-            hintText: $L('快说~'),
+			hintText: $L('快说~'),
 			multiline: true,
 			modelProperty: 'content',
 			enterSubmits: true
@@ -121,42 +121,7 @@ var ConvDetailAssistant = Class.create({
 				onPrepared(total);
 			} else if (content.hasOwnProperty('picture')) {
 				Mojo.Log.info(this.TAG, 'prepare picture ====' + content.picture.url);
-				var url = Setting.protocol + Setting.api + "/photo/upload.json";
-				var timestamp = OAuth.timestamp();
-				var nonce = OAuth.nonce(20);
-				var accessor = {
-					consumerSecret: "b2734cdb56e00b01ca19d6931c6f9f30",
-					tokenSecret: Global.authInfo.tokenSecret
-				};
-				var message = {
-					method: 'POST',
-					action: url,
-					parameters: OAuth.decodeForm('')
-				};
-				message.parameters.push(['oauth_consumer_key', "15f0fd5931f17526873bf8959cbfef2a04dda2d84"]);
-				message.parameters.push(['oauth_nonce', nonce]);
-				message.parameters.push(['oauth_signature_method', 'HMAC-SHA1']);
-				message.parameters.push(['oauth_timestamp', timestamp]);
-				message.parameters.push(['oauth_token', Global.authInfo.oauthToken]);
-				message.parameters.push(['oauth_version', '1.0']);
-				message.parameters.sort()
-				OAuth.SignatureMethod.sign(message, accessor);
-				var authHeader = OAuth.getAuthorizationHeader("", message.parameters);
-
-				//get local url
-				var localUrl = content.picture.url;
-
-				this.controller.serviceRequest('palm://com.palm.downloadmanager/', {
-					method: 'upload',
-					parameters: {
-						'fileName': localUrl,
-						'fileLabel': 'media',
-						'url': url,
-						'contentType': 'image/jpg',
-						"postParameters": [],
-						customHttpHeaders: ['HOST:' + Setting.api, 'Authorization:' + authHeader],
-						"subscribe": true
-					},
+				new interfaces.Momo().postPhotoUpload(content.picture.url, {
 					onSuccess: function(resp) {
 						Mojo.Log.info('Success : ' + Object.toJSON(resp));
 						var imgUrl = JSON.parse(resp.responseString).src;
@@ -176,45 +141,10 @@ var ConvDetailAssistant = Class.create({
 				});
 			} else if (content.hasOwnProperty('audio')) {
 				Mojo.Log.info(this.TAG, 'prepare audio ====' + content.audio.url);
-				var url = Setting.protocol + Setting.api + "/file/upload.json";
-				var timestamp = OAuth.timestamp();
-				var nonce = OAuth.nonce(20);
-				var accessor = {
-					consumerSecret: "b2734cdb56e00b01ca19d6931c6f9f30",
-					tokenSecret: Global.authInfo.tokenSecret
-				};
-				var message = {
-					method: 'POST',
-					action: url,
-					parameters: OAuth.decodeForm('')
-				};
-				message.parameters.push(['oauth_consumer_key', "15f0fd5931f17526873bf8959cbfef2a04dda2d84"]);
-				message.parameters.push(['oauth_nonce', nonce]);
-				message.parameters.push(['oauth_signature_method', 'HMAC-SHA1']);
-				message.parameters.push(['oauth_timestamp', timestamp]);
-				message.parameters.push(['oauth_token', Global.authInfo.oauthToken]);
-				message.parameters.push(['oauth_version', '1.0']);
-				message.parameters.sort()
-				OAuth.SignatureMethod.sign(message, accessor);
-				var authHeader = OAuth.getAuthorizationHeader("", message.parameters);
-
-				//get local url
-				var localUrl = content.audio.url;
-
-				this.controller.serviceRequest('palm://com.palm.downloadmanager/', {
-					method: 'upload',
-					parameters: {
-						'fileName': localUrl,
-						'fileLabel': 'media',
-						'url': url,
-						'contentType': 'image/jpg',
-						"postParameters": [],
-						customHttpHeaders: ['HOST:' + Setting.api, 'Authorization:' + authHeader],
-						"subscribe": true
-					},
+				new interfaces.Momo().postFileUpload(content.audio.url, {
 					onSuccess: function(resp) {
 						Mojo.Log.info('Success : ' + ' --' + resp.httpCode + '==' + Object.toJSON(resp));
-						if(resp.httpCode != 200) return;
+						if (resp.httpCode != 200) return;
 						var audioUrl = JSON.parse(resp.responseString).src;
 						if (audioUrl == null || audioUrl == '') {
 							onPrepareFail(total)
@@ -230,6 +160,29 @@ var ConvDetailAssistant = Class.create({
 						Mojo.Log.info('Failure : ' + Object.toJSON(e));
 						onPrepareFail(total);
 					}.bind(this)
+				});
+			} else if(content.hasOwnProperty('file')) {
+				new interfaces.Momo().postFileUpload(content.file.url, {
+					onSuccess: function(resp) {
+						Mojo.Log.info('file upload success: ' + Object.toJSON(resp));
+						if (resp.httpCode != 200) return;
+						var result = JSON.parse(resp.responseString);
+						if(result.src && result.src != '') {
+							total.data.content.file = {
+								url: result.src,
+								mime: result.mime,
+								name: result.name,
+								size: result.size
+							};
+							onPrepared(total);
+						} else {
+							onPrepareFail(total);
+						}
+					},
+					onFailure: function(e) {
+						Mojo.Log.info('file upload fail: ' + Object.toJSON(e));
+						onPrepareFail(total);
+					}
 				});
 			} else {
 				Mojo.Log.info(this.TAG, 'prepare picture ====' + content.picture.url);
@@ -299,11 +252,19 @@ var ConvDetailAssistant = Class.create({
 				defaultKind: 'image',
 				onSelect: function(file) {
 					Mojo.Log.info(self.TAG, JSON.stringify(file) + '------------' + file.fullPath);
-					self.sendChat({
-						picture: {
-							url: file.fullPath
-						}
-					});
+					if (file.attachmentType == 'image') {
+						self.sendChat({
+							picture: {
+								url: file.fullPath
+							}
+						});
+					} else {
+						self.sendChat({
+							file: {
+								url: file.fullPath
+							}
+						});
+					}
 				}
 			}
 
