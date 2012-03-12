@@ -282,6 +282,7 @@ var ConvDetailAssistant = Class.create({
 				if (Global.audioPlayer == null) {
 					Global.audioPlayer = new Audio();
 				}
+				Global.audioPlayer.volume = 1;
 				Global.audioPlayer.pause();
 				Global.audioPlayer.src = audioSrc;
 				Global.audioPlayer.load();
