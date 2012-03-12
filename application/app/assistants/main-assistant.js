@@ -170,6 +170,11 @@ var MainAssistant = Class.create({
 	deactivate: function(event) {
 		this.controller.document.removeEventListener("click", this.onClickReal, true);
 	},
+    handleCommand: function(event) {
+        if(event.type === Mojo.Event.forward){
+            this.refreshClick();
+        }
+    },
 	cleanup: function(event) {
 		this.cleaning = true;
 		//remove callback
