@@ -21,6 +21,11 @@ function Develop(){
 var Setting = new Release();
 Setting.protocol = 'http://';
 Setting.clientID = 1;
+Setting.CACHE_FOLDER = '/media/internal/.momo';
+Setting.cache = {
+	audio: Setting.CACHE_FOLDER + '/audio/',
+	photo: Setting.CACHE_FOLDER + '/photo/'
+};
 function guidGenerator(){
     var S4 = function(){
         return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);

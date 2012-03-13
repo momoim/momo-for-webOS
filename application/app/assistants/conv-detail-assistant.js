@@ -143,7 +143,7 @@ var ConvDetailAssistant = Class.create({
 			} else if (content.hasOwnProperty('audio')) {
 				Mojo.Log.info(this.TAG, 'prepare audio ====' + content.audio.url);
 				var localUrl = content.audio.url;
-				var idUrl = '/media/internal/momo/' + total.data.id + '.amr';
+				var idUrl = Setting.cache.audio + total.data.id + '.amr';
 				new Mojo.Service.Request("palm://momo.im.app.service.node/", {
 					method: "onFileRename",
 					parameters: {
@@ -253,11 +253,18 @@ var ConvDetailAssistant = Class.create({
 				if (Global.audioPlayer == null) {
 					Global.audioPlayer = new Audio();
 				}
-				var idUrl = '/media/internal/momo/' + dataID + '.amr';
+				var idUrl = Setting.cache.audio + dataID + '.amr';
 				function fileFailed() {
 					Global.audioPlayer.volume = 1;
 					Global.audioPlayer.pause();
 					Global.audioPlayer.src = audioSrc;
+					Global.audioPlayer.load();
+					Global.audioPlayer.play();
+				};
+				function fileSuccess() {
+					Global.audioPlayer.volume = 1;
+					Global.audioPlayer.pause();
+					Global.audioPlayer.src = idUrl;
 					Global.audioPlayer.load();
 					Global.audioPlayer.play();
 				};
@@ -281,11 +288,7 @@ var ConvDetailAssistant = Class.create({
 										fileFailed();
 										//NotifyHelper.instance().banner(Object.toJSON(response.error));
 									} else {
-										Global.audioPlayer.volume = 1;
-										Global.audioPlayer.pause();
-										Global.audioPlayer.src = idUrl;
-										Global.audioPlayer.load();
-										Global.audioPlayer.play();
+										fileSuccess();
 										//NotifyHelper.instance().banner('cache success');
 									}
 								},
@@ -295,11 +298,7 @@ var ConvDetailAssistant = Class.create({
 								}
 							});
 						} else {
-							Global.audioPlayer.volume = 1;
-							Global.audioPlayer.pause();
-							Global.audioPlayer.src = idUrl;
-							Global.audioPlayer.load();
-							Global.audioPlayer.play();
+							fileSuccess();
 							//NotifyHelper.instance().banner('cache get success');
 						}
 					},

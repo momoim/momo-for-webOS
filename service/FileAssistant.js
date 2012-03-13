@@ -40,7 +40,9 @@ onFileDownload.prototype = {
 		var filePath = this.controller.args.path;
 		var fileUrl = this.controller.args.url;
 
-		fs.mkdir('/media/internal/momo', 0755);
+		fs.mkdir(Setting.CACHE_FOLDER, 0755);
+		fs.mkdir(Setting.cache.audio, 0755);
+		fs.mkdir(Setting.cache.photo, 0755);
 
 		var host = url.parse(fileUrl).hostname;
 
