@@ -112,7 +112,7 @@ AppAssistant.prototype = {
 				this.onKeepAlive();
 				break;
 			case 'onConnError':
-				NotifyHelper.instance().banner(launchParams.data);
+				//NotifyHelper.instance().banner(launchParams.data);
 				break;
 			default:
 				Mojo.Log.info('unknown launch params');
