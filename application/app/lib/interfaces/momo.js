@@ -1,10 +1,10 @@
 interfaces.Momo = function() {
 	var http = new net.Http();
-	var hostUrl = Setting.api;
+	var hostUrl = Setting.protocol + Setting.api;
 
 	// 登陆
 	this.postUserLogin = function(user, callbacks) {
-		var url = Setting.protocol + hostUrl + '/user/login.json';
+		var url = hostUrl + '/user/login.json';
 		return http.post(url, JSON.stringify(user), [], callbacks);
 	};
 
