@@ -107,6 +107,7 @@ var ConvDetailAssistant = Class.create({
 		}
 	},
 	prepareChat: function(total, onPrepared, onPrepareFail) {
+		var that = this;
 		Mojo.Log.info(this.TAG, 'prepareChat------+');
 		var chat;
 		if (total == null) {
@@ -120,11 +121,13 @@ var ConvDetailAssistant = Class.create({
 			if (content.hasOwnProperty('text')) {
 				onPrepared(total);
 			} else if (content.hasOwnProperty('picture')) {
-				Mojo.Log.info(this.TAG, 'prepare picture ====' + content.picture.url);
-				var localUrl = content.pirture.url;
-				new interfaces.Momo().postPhotoUpload(localUrl, {
+				var localUrl = content.picture.url;
+				Mojo.Log.warn(this.TAG, 'prepare picture ====' + localUrl);
+				new interfaces.Momo().postPhotoUpload(this.controller, localUrl, {
 					onSuccess: function(resp) {
-						Mojo.Log.info('Success : ' + Object.toJSON(resp));
+						//Mojo.Log.warn('Success : ' + Object.toJSON(resp));
+						if (resp.httpCode != 200) return;
+						//NotifyHelper.instance().banner('image success:' + Object.toJSON(resp));
 						var imgUrl = JSON.parse(resp.responseString).src;
 						if (imgUrl == null || imgUrl == '') {
 							onPrepareFail(total);
@@ -136,7 +139,8 @@ var ConvDetailAssistant = Class.create({
 						}
 					}.bind(this),
 					onFailure: function(e) {
-						Mojo.Log.info('Failure : ' + Object.toJSON(e));
+						NotifyHelper.instance().banner('image fail:' + Object.toJSON(e));
+						Mojo.Log.error('Failure : ' + Object.toJSON(e));
 						onPrepareFail(total);
 					}.bind(this)
 				});
@@ -152,11 +156,11 @@ var ConvDetailAssistant = Class.create({
 					},
 					onSuccess: function() {
 						//NotifyHelper.instance().banner('audio renamed!===');
-						new interfaces.Momo().postFileUpload(idUrl, {
+						new interfaces.Momo().postFileUpload(that.controller, idUrl, {
 							onSuccess: function(resp) {
-								Mojo.Log.info('Success : ' + ' --' + resp.httpCode + '==' + Object.toJSON(resp));
+								Mojo.Log.warn('Success : ' + ' --' + resp.httpCode + '==' + Object.toJSON(resp));
 								if (resp.httpCode != 200) return;
-								NotifyHelper.instance().banner('audio success:' + Object.toJSON(resp));
+								//NotifyHelper.instance().banner('audio success:' + Object.toJSON(resp));
 								var audioUrl = JSON.parse(resp.responseString).src;
 								if (audioUrl == null || audioUrl == '') {
 									onPrepareFail(total)
@@ -178,11 +182,10 @@ var ConvDetailAssistant = Class.create({
 						NotifyHelper.instance().banner('audio:' + Object.toJSON(fail));
 					}
 				});
-				return;
 			} else if (content.hasOwnProperty('file')) {
-				new interfaces.Momo().postFileUpload(content.file.url, {
+				new interfaces.Momo().postFileUpload(that.controller, content.file.url, {
 					onSuccess: function(resp) {
-						Mojo.Log.info('file upload success: ' + Object.toJSON(resp));
+						Mojo.Log.warn('file upload success: ' + Object.toJSON(resp));
 						if (resp.httpCode != 200) return;
 						var result = JSON.parse(resp.responseString);
 						if (result.src && result.src != '') {
@@ -198,7 +201,7 @@ var ConvDetailAssistant = Class.create({
 						}
 					},
 					onFailure: function(e) {
-						Mojo.Log.info('file upload fail: ' + Object.toJSON(e));
+						Mojo.Log.error('file upload fail: ' + Object.toJSON(e));
 						onPrepareFail(total);
 					}
 				});
@@ -317,7 +320,7 @@ var ConvDetailAssistant = Class.create({
 			var params = {
 				defaultKind: 'image',
 				onSelect: function(file) {
-					Mojo.Log.info(self.TAG, JSON.stringify(file) + '------------' + file.fullPath);
+					Mojo.Log.warn(self.TAG, JSON.stringify(file) + '------------' + file.fullPath);
 					if (file.attachmentType == 'image') {
 						self.sendChat({
 							picture: {
@@ -347,7 +350,9 @@ var ConvDetailAssistant = Class.create({
 	switchToText: function() {
 		this.elButtonRecord.style.display = 'none';
 		this.elTextField.style.display = 'block';
-		this.commentContent.mojo.focus();
+		if(this.commentContent.mojo) {
+			this.commentContent.mojo.focus();
+		}
 		Global.lastSwitcher = 'text';
 		DBHelper.instance().add('lastSwitcher', Global.lastSwitcher);
 	},

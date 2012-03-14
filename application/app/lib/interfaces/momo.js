@@ -24,12 +24,14 @@ interfaces.Momo = function() {
 		return this.post('/register/create.json', user, callbacks);
 	}
 
-	this.postPhotoUpload = function(file, callbacks) {
-		return this.upload('/photo/upload.json', file, callbacks);
+	// 上传照片
+	this.postPhotoUpload = function(controller, file, callbacks) {
+		return this.upload(controller, '/photo/upload.json', file, callbacks);
 	};
 
-	this.postFileUpload = function(file, callbacks) {
-		return this.upload('/file/upload.json', file, callbacks);
+	// 上传文件
+	this.postFileUpload = function(controller, file, callbacks) {
+		return this.upload(controller, '/file/upload.json', file, callbacks);
 	};
 
 	this.get = function(url, callbacks) {
@@ -71,7 +73,7 @@ interfaces.Momo = function() {
 		}
 	};
 
-	this.upload = function(urlChild, localUrl, callbacks) {
+	this.upload = function(controller, urlChild, localUrl, callbacks) {
 		var url = hostUrl + urlChild;
 		var timestamp = OAuth.timestamp();
 		var nonce = OAuth.nonce(20);
@@ -94,7 +96,8 @@ interfaces.Momo = function() {
 		OAuth.SignatureMethod.sign(message, accessor);
 		var authHeader = OAuth.getAuthorizationHeader("", message.parameters);
 
-		new Mojo.Service.Request('palm://com.palm.downloadmanager/', {
+		controller.serviceRequest('palm://com.palm.downloadmanager/', {
+		//new Mojo.Service.Request('palm://com.palm.downloadmanager/', {
 			method: 'upload',
 			parameters: {
 				'fileName': localUrl,
@@ -102,19 +105,22 @@ interfaces.Momo = function() {
 				'url': url,
 				//'contentType': 'image/jpg',
 				"postParameters": [],
-				customHttpHeaders: ['HOST:' + hostUrl, 'Authorization:' + authHeader],
+				customHttpHeaders: ['HOST:' + Setting.api, 'Authorization:' + authHeader],
 				"subscribe": true
 			},
 			onSuccess: function(resp) {
+				Mojo.Log.warn(url + ' upload success: ' + localUrl);
+				Mojo.Log.warn('upload success: ' + JSON.stringify(resp));
 				if(callbacks.onSuccess) {
 					callbacks.onSuccess(resp);
 				}
 			},
 			onFailure: function(e) {
+				Mojo.Log.error(localUrl + ' upload fail: ' + JSON.stringify(e));
 				if(callbacks.onFailure) {
 					callbacks.onFailure(e);
 				}
-			}.bind(this)
+			}
 		});
 	}
 }
