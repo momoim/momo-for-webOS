@@ -4,7 +4,8 @@ interfaces.Momo = function() {
 
 	// 登陆
 	this.postUserLogin = function(user, callbacks) {
-		return http.post(hostUrl + '/user/login.json', JSON.stringify(user), '', callbacks);
+		var url = Setting.protocol + hostUrl + '/user/login.json';
+		return http.post(url, JSON.stringify(user), [], callbacks);
 	};
 
 	// 根据手机号获取用户信息

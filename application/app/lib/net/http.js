@@ -60,6 +60,7 @@ net.Http = function() {
     return function(response) {
       window.clearTimeout(timeout.id);
       if (onComplete) {
+		Mojo.Log.info('complete:' + JSON.stringify(response));
         onComplete(response);
       }
     }
