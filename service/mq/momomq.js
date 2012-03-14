@@ -64,9 +64,9 @@ MomoMQ.prototype.connect = function(imm) {
 		connection.on('heartbeat', function() {
 			console.log('on heartbeat');
 		});
-		connection.on('error', function() {
-			console.log('on connection error');
-			that.logUI('on connection error');
+		connection.on('error', function(err) {
+			console.log('on connection error: ' + JSON.stringify(err));
+			that.logUI('connection error:' + JSON.stringify(err));
 		});
 		connection.addListener('ready', function() {
 			console.log('connection ready');
