@@ -12,12 +12,12 @@
 		"source": "global/Setting.js"
 	},
 	{
-		"source": "NodeService.js"
+		"source": "assistants/NodeService.js"
 	},
 	{
-		"source": "ChatAssistant.js"
+		"source": "assistants/ChatAssistant.js"
 	},
 	{
-		"source": "FileAssistant.js"
+		"source": "assistants/FileAssistant.js"
 	}
 ]
