@@ -219,6 +219,13 @@ AppAssistant.prototype = {
 		if (mainStage != null) {
 			mainStage.delegateToSceneAssistant('update', income);
 		}
-	}
+	},
+    handleCommand: function(event) {
+        var stage = this.controller.getActiveStageController();
+        if (event.command === 'cmdLogout') {
+		    DBHelper.instance().remove('authInfo');
+            stage.pushScene('login');
+        }
+    } 
 };
 

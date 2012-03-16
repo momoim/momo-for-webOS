@@ -144,7 +144,7 @@ LoginAssistant.prototype = {
 		}
 	},
 	onSignup: function() {
-		this.buttonSignup.mojo.deactivate();
+		//this.buttonSignup.mojo.deactivate();
 		this.controller.stageController.pushScene('signup');
 	},
 	activate: function(event) {},
