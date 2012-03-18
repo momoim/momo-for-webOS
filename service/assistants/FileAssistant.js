@@ -51,7 +51,7 @@ onFileDownload.prototype = {
 	run: function(future) {
 		var http = IMPORTS.require('http');
 		var fs = IMPORTS.require('fs');
-		var url = IMPORTS.require('url'); 
+		var url = IMPORTS.require('url');
 		var path = IMPORTS.require('path');
 
 		var filePath = this.controller.args.path;
@@ -75,7 +75,7 @@ onFileDownload.prototype = {
 				'flags': 'a'
 			});
 			response.on('data', function(chunk) {
-				downloadfile.write(chunk, encoding='binary');
+				downloadfile.write(chunk, encoding = 'binary');
 			});
 			response.on('end', function() {
 				downloadfile.end();
@@ -94,10 +94,13 @@ onFileUpload.prototype = {
 	run: function(future) {
 		console.log('on file upload');
 		var that = this;
-		var localPath = this.controller.args.path;
+		var localPath = this.controller.args.file;
 		that.authInfo = this.controller.args.authInfo;
+		var path = this.controller.args.path;
 
-		var path = '/file/upload.json';
+		if (!path) {
+			path = '/file/upload.json';
+		}
 		var url = Setting.protocol + Setting.api + path;
 		var method = 'POST';
 
@@ -122,35 +125,21 @@ onFileUpload.prototype = {
 		OAuth.SignatureMethod.sign(message, accessor);
 		var authHeader = OAuth.getAuthorizationHeader("", message.parameters);
 
+		var boundaryKey = Math.random().toString(16);
+
 		var opts = {
 			host: Setting.api,
 			port: 80,
 			path: path,
 			headers: {
 				'HOST': Setting.api,
-				"Authorization": authHeader
+				"Authorization": authHeader,
+				'Content-Type': 'multipart/form-data; boundary=' + boundaryKey
 			}
 		};
 
 		var httpClient = http.createClient(opts.port, opts.host);
 		var request = httpClient.request(method, opts.path, opts.headers);
-
-		var fs = IMPORTS.require('fs');
-		fs.readFile(localPath, function(err, data) {
-			if(err) {
-				console.log('on file upload data errr' + JSON.stringify(err));
-			}
-			if(data) {
-				console.log('on file upload data:' + data.length);
-				request.write(data);
-				request.end();
-			} else {
-				console.log('on file upload data: ended');
-				request.end();
-			}
-		});
-		//request.write(fs.createReadStream(localPath));
-		//fs.createReadStream(localPath).pipe(request);
 
 		request.on('response', function(response) {
 			var status = response.statusCode;
@@ -158,9 +147,10 @@ onFileUpload.prototype = {
 				var reqResult = '';
 				response.on('data', function(chunk) {
 					reqResult += chunk;
-					console.log('on req chunk: ' + chunk.length + chunk);
+					console.log('on req fail chunk: ' + chunk.length + chunk);
 				});
 				response.on('end', function() {
+					console.log('on req fail chunk end');
 					future.result = {
 						errorCode: status,
 						data: reqResult
@@ -170,16 +160,76 @@ onFileUpload.prototype = {
 				var reqResult = '';
 				response.on('data', function(chunk) {
 					reqResult += chunk;
-					console.log('on req chunk: ' + chunk.length);
-				});
-				response.on('end', function() {
+					console.log('on req chunk: ' + chunk.length + chunk);
+					/*
 					future.result = {
 						data: reqResult
 					}
+					*/
+					var actionData = that.controller.args.data;
+					var json = JSON.parse(reqResult);
+					that.gonnaSending(json, that.controller.args.action, actionData, future);
+				});
+				// why end not called?
+				response.on('end', function() {
+					/*
+					future.result = {
+						data: reqResult
+					}
+					*/
 				});
 			}
 		});
 
-		//request.end();
+		var fs = IMPORTS.require('fs');
+		fs.readFile(localPath, function(err, data) {
+			if (err) {
+				console.log('on file upload data errr' + JSON.stringify(err));
+				return;
+			}
+			if (data) {
+				console.log('on file upload data:' + data.length);
+				var filename = localPath.replace(/^.*[\\\/]/, '');
+				var heading = '--' + boundaryKey + '\r\n' + 'Content-Disposition: form-data; name="media"; filename="' + filename + '"\r\n' + 'Content-Type: image/jpeg\r\n\r\n';
+				request.write(new Buffer(heading, 'ascii'));
+				request.write(data);
+				request.write(new Buffer('\r\n--' + boundaryKey + '--', 'ascii'));
+				request.end();
+			}
+		});
+		//fs.createReadStream(localPath).pipe(request);
+	},
+	gonnaSending: function(json, action, actionData, future) {
+		var that = this;
+		switch (action) {
+		case 'send-msg':
+			var chat = actionData.data;
+			if (chat.content) {
+				if (chat.content.picture) {
+					actionData.data.content.picture = {
+						url: json.src
+					};
+				} else if (chat.content.file) {
+					actionData.data.content.file = {
+						url: json.src,
+						mime: json.mime,
+						name: json.name,
+						size: json.size
+					};
+				} else if (chat.content.audio) {
+					actionData.data.content.audio = {
+						url: json.src,
+						duration: 1
+					};
+				}
+
+				NodeService.instance().send(future, {
+					chat: actionData,
+					info: that.authInfo
+				});
+			}
+			break;
+		}
 	}
 };
+

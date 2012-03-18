@@ -123,12 +123,14 @@ var ConvDetailAssistant = Class.create({
 			} else if (content.hasOwnProperty('picture')) {
 				var localUrl = content.picture.url;
 				Mojo.Log.warn(this.TAG, 'prepare picture ====' + localUrl);
-				/*
 				new Mojo.Service.Request("palm://momo.im.app.service.node/", {
 					method: "onFileUpload",
 					parameters: {
-						path: localUrl,
-						authInfo: Global.authInfo
+						file: localUrl,
+						path: '/photo/upload.json',
+						authInfo: Global.authInfo,
+						action: 'send-msg',
+						data: total
 					},
 					onSuccess: function(resp) {
 						Mojo.Log.warn('on file upload' + JSON.stringify(resp));
@@ -138,7 +140,6 @@ var ConvDetailAssistant = Class.create({
 					}
 				});
 				return;
-				*/
 				new interfaces.Momo().postPhotoUpload(this.controller, localUrl, {
 					onSuccess: function(resp) {
 						//Mojo.Log.warn('Success : ' + Object.toJSON(resp));
@@ -172,6 +173,22 @@ var ConvDetailAssistant = Class.create({
 					},
 					onSuccess: function() {
 						//NotifyHelper.instance().banner('audio renamed!===');
+						new Mojo.Service.Request("palm://momo.im.app.service.node/", {
+							method: "onFileUpload",
+							parameters: {
+								file: idUrl,
+								authInfo: Global.authInfo,
+								action: 'send-msg',
+								data: total
+							},
+							onSuccess: function(resp) {
+								Mojo.Log.warn('on file upload' + JSON.stringify(resp));
+							},
+							onFailure: function(e) {
+								Mojo.Log.warn('on file upload fail' + JSON.stringify(e));
+							}
+						});
+						return;
 						new interfaces.Momo().postFileUpload(that.controller, idUrl, {
 							onSuccess: function(resp) {
 								Mojo.Log.warn('Success : ' + ' --' + resp.httpCode + '==' + Object.toJSON(resp));
@@ -200,6 +217,22 @@ var ConvDetailAssistant = Class.create({
 					}
 				});
 			} else if (content.hasOwnProperty('file')) {
+				new Mojo.Service.Request("palm://momo.im.app.service.node/", {
+					method: "onFileUpload",
+					parameters: {
+						file: content.file.url,
+						authInfo: Global.authInfo,
+						action: 'send-msg',
+						data: total
+					},
+					onSuccess: function(resp) {
+						Mojo.Log.warn('on file upload' + JSON.stringify(resp));
+					},
+					onFailure: function(e) {
+						Mojo.Log.warn('on file upload fail' + JSON.stringify(e));
+					}
+				});
+				return;
 				new interfaces.Momo().postFileUpload(that.controller, content.file.url, {
 					onSuccess: function(resp) {
 						Mojo.Log.warn('file upload success: ' + Object.toJSON(resp));
