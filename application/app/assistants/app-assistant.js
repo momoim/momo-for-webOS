@@ -1,7 +1,8 @@
 var Global = {
 	mainStage: 'mainStage',
 	dashStage: 'dashboardStage',
-	hasNewUnread: false,	//是否有新未读，回到主列表跳转到第一条
+	hasNewUnread: false,
+	//是否有新未读，回到主列表跳转到第一条
 	lastSwitcher: 'sound',
 	keepAuth: function() {
 		function fail() {}
@@ -17,7 +18,7 @@ var Global = {
 		DBHelper.instance().get('authInfo', success, fail);
 	},
 	sendRoger: function() {
-		if(Global.talking == null || Global.talking == '') return;
+		if (Global.talking == null || Global.talking == '') return;
 		var roger = {
 			client_id: 7,
 			sender: Global.authInfo.user.id,
@@ -60,8 +61,8 @@ AppAssistant.prototype = {
 		DBHelper.instance().get('authInfo', success, fail);
 		DBHelper.instance().get('lastSwitcher', function(s) {
 			Global.lastSwitcher = s;
-		}, function() {
-		});
+		},
+		function() {});
 	},
 	handleLaunch: function(launchParams) {
 		Mojo.Log.info('handleLaunch');
@@ -111,6 +112,21 @@ AppAssistant.prototype = {
 			case 'keep-alive':
 				this.onKeepAlive();
 				break;
+			case 'onMsgSendError':
+				Mojo.Log.warn('on msg send error trying to send with http');
+				new interfaces.Momo().postSendMessage(JSON.parse(launchParams.data).data, {
+					onSuccess: function(resp) {
+					Mojo.Log.warn('on msg send error trying to send with http success');
+						that.onNewIncome({
+							kind: 'im',
+							data: resp.responseJSON
+						});
+					},
+					onFailure: function() {
+						Mojo.Log.warn('on msg send error trying to send with http fail');
+					}
+				});
+				break;
 			case 'onConnError':
 				Mojo.Log.info('onConnError: ' + launchParams.data);
 				//NotifyHelper.instance().banner(launchParams.data);
@@ -158,8 +174,7 @@ AppAssistant.prototype = {
 					}
 				}
 			},
-			onSuccess: function(response) {
-			},
+			onSuccess: function(response) {},
 			onFailure: function(response) {}
 		});
 	},

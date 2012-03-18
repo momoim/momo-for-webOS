@@ -123,6 +123,22 @@ var ConvDetailAssistant = Class.create({
 			} else if (content.hasOwnProperty('picture')) {
 				var localUrl = content.picture.url;
 				Mojo.Log.warn(this.TAG, 'prepare picture ====' + localUrl);
+				/*
+				new Mojo.Service.Request("palm://momo.im.app.service.node/", {
+					method: "onFileUpload",
+					parameters: {
+						path: localUrl,
+						authInfo: Global.authInfo
+					},
+					onSuccess: function(resp) {
+						Mojo.Log.warn('on file upload' + JSON.stringify(resp));
+					},
+					onFailure: function(e) {
+						Mojo.Log.warn('on file upload fail' + JSON.stringify(e));
+					}
+				});
+				return;
+				*/
 				new interfaces.Momo().postPhotoUpload(this.controller, localUrl, {
 					onSuccess: function(resp) {
 						//Mojo.Log.warn('Success : ' + Object.toJSON(resp));
@@ -179,6 +195,7 @@ var ConvDetailAssistant = Class.create({
 						});
 					},
 					onFailure: function(fail) {
+						Mojo.Log.warn('audio:' + Object.toJSON(fail));
 						NotifyHelper.instance().banner('audio:' + Object.toJSON(fail));
 					}
 				});
@@ -234,6 +251,7 @@ var ConvDetailAssistant = Class.create({
 				},
 				onSuccess: function() {},
 				onFailure: function(fail) {
+					Mojo.Log.info('send chat fail' + JSON.stringify(fail));
 					Global.keepAuth();
 				}
 			});
@@ -271,6 +289,7 @@ var ConvDetailAssistant = Class.create({
 					Global.audioPlayer.load();
 					Global.audioPlayer.play();
 				};
+				Mojo.Log.warn('try to get audio file to play');
 				new Mojo.Service.Request("palm://momo.im.app.service.node/", {
 					method: "onFileInfo",
 					parameters: {
@@ -278,6 +297,7 @@ var ConvDetailAssistant = Class.create({
 					},
 					onSuccess: function(response) {
 						if (response.error) {
+							Mojo.Log.warn('file not exists:' + idUrl);
 							//fileFailed();
 							//NotifyHelper.instance().banner(Object.toJSON(response.error));
 							new Mojo.Service.Request("palm://momo.im.app.service.node/", {
@@ -288,9 +308,11 @@ var ConvDetailAssistant = Class.create({
 								},
 								onSuccess: function(response) {
 									if (response.error) {
+										Mojo.Log.warn('file not exists donwload fail:' + idUrl);
 										fileFailed();
 										//NotifyHelper.instance().banner(Object.toJSON(response.error));
 									} else {
+										Mojo.Log.warn('file not exists donwload success:' + idUrl);
 										fileSuccess();
 										//NotifyHelper.instance().banner('cache success');
 									}
@@ -301,11 +323,13 @@ var ConvDetailAssistant = Class.create({
 								}
 							});
 						} else {
+							Mojo.Log.warn('file exists:' + idUrl);
 							fileSuccess();
 							//NotifyHelper.instance().banner('cache get success');
 						}
 					},
 					onFailure: function(fail) {
+						Mojo.Log.warn('file info get fail:' + JSON.stringify(fail));
 						fileFailed();
 					}
 				});
@@ -350,7 +374,7 @@ var ConvDetailAssistant = Class.create({
 	switchToText: function() {
 		this.elButtonRecord.style.display = 'none';
 		this.elTextField.style.display = 'block';
-		if(this.commentContent.mojo) {
+		if (this.commentContent.mojo) {
 			this.commentContent.mojo.focus();
 		}
 		Global.lastSwitcher = 'text';

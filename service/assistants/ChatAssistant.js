@@ -58,15 +58,6 @@ onChatSend.prototype = {
 	}
 };
 
-var onFileUpload = function() {};
-
-onFileUpload.prototype = {
-	run: function(future) {
-		console.log('on file upload');
-		NodeService.instance().uploadFile(future, this.controller.args);
-	}
-};
-
 var onChatSubscribe = function() {};
 
 onChatSubscribe.prototype = {

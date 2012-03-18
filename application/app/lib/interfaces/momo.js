@@ -8,6 +8,17 @@ interfaces.Momo = function() {
 		return http.post(url, JSON.stringify(user), [], callbacks);
 	};
 
+	// 发送消息
+	this.postSendMessage = function(chat, callbacks) {
+		var data;
+		if(!chat.kind) {
+			data = chat;
+		} else {
+			data = chat.data;
+		}
+		return this.post('/im/send_message.json', data, callbacks);
+	};
+
 	// 根据手机号获取用户信息
 	this.postUserShowByMobile = function(people, callbacks) {
 		return this.post('/user/show_by_mobile.json', people, callbacks);

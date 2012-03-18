@@ -30,12 +30,6 @@
 					"public": true
 				},
 				{
-					"name": "fileUpload",
-					"assistant": "onFileUpload",
-					"subscribe": true,
-					"public": true
-				},
-				{
 					"name": "onFileDel",
 					"assistant": "onFileDel",
 					"subscribe": true,
@@ -48,14 +42,20 @@
 					"public": true
 				},
 				{
-					"name": "onFileDownload",
-					"assistant": "onFileDownload",
+					"name": "onFileRename",
+					"assistant": "onFileRename",
 					"subscribe": true,
 					"public": true
 				},
 				{
-					"name": "onFileRename",
-					"assistant": "onFileRename",
+					"name": "onFileUpload",
+					"assistant": "onFileUpload",
+					"subscribe": true,
+					"public": true
+				},
+				{
+					"name": "onFileDownload",
+					"assistant": "onFileDownload",
 					"subscribe": true,
 					"public": true
 				}

@@ -72,6 +72,15 @@ NodeService.prototype = {
 			}
 		}
 	},
+	sendMsgFail: function(chat) {
+				PalmCall.call('palm://com.palm.applicationManager', 'open', {
+				'id': 'momo.im.app',
+				'params': {
+					'action': 'onMsgSendError',
+					'data': JSON.stringify(chat)
+				}
+			});
+	},
 	send: function(f, total) {
 		var that = this;
 		var info = total.auth;
@@ -79,7 +88,8 @@ NodeService.prototype = {
 
 		if (that.authInfo == null || that.authInfo.user == null) {
 			if(chat.kind == 'sms') {
-				that.sendMsgWithHttp(chat);
+				//that.sendMsgWithHttp(chat.data);
+				that.sendMsgFail(chat);
 			}
 			that.auth(f, info);
 		} else {
@@ -119,9 +129,6 @@ NodeService.prototype = {
 			var status = response.statusCode;
 			console.log('send msg fail ' + status);
 		});
-	},
-	uploadFile: function(f, file) {
-		var that = this;
 	},
 	auth: function(f, info) {
 		var that = this;
