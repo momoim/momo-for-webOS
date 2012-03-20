@@ -57,9 +57,9 @@ onFileDownload.prototype = {
 		var filePath = this.controller.args.path;
 		var fileUrl = this.controller.args.url;
 
-		fs.mkdir(Setting.CACHE_FOLDER, 0755);
-		fs.mkdir(Setting.cache.audio, 0755);
-		fs.mkdir(Setting.cache.photo, 0755);
+		fs.mkdir(Setting.CACHE_FOLDER, 755);
+		fs.mkdir(Setting.cache.audio, 755);
+		fs.mkdir(Setting.cache.photo, 755);
 
 		var host = url.parse(fileUrl).hostname;
 
@@ -121,7 +121,7 @@ onFileUpload.prototype = {
 		message.parameters.push(['oauth_timestamp', timestamp]);
 		message.parameters.push(['oauth_token', that.authInfo.oauthToken]);
 		message.parameters.push(['oauth_version', '1.0']);
-		message.parameters.sort()
+		message.parameters.sort();
 		OAuth.SignatureMethod.sign(message, accessor);
 		var authHeader = OAuth.getAuthorizationHeader("", message.parameters);
 
@@ -143,8 +143,8 @@ onFileUpload.prototype = {
 
 		request.on('response', function(response) {
 			var status = response.statusCode;
+			var reqResult = '';
 			if (status !== 200) {
-				var reqResult = '';
 				response.on('data', function(chunk) {
 					reqResult += chunk;
 					console.log('on req fail chunk: ' + chunk.length + chunk);
@@ -154,10 +154,9 @@ onFileUpload.prototype = {
 					future.result = {
 						errorCode: status,
 						data: reqResult
-					}
+					};
 				});
 			} else {
-				var reqResult = '';
 				response.on('data', function(chunk) {
 					reqResult += chunk;
 					console.log('on req chunk: ' + chunk.length + chunk);
@@ -229,6 +228,8 @@ onFileUpload.prototype = {
 					info: that.authInfo
 				});
 			}
+			break;
+		default:
 			break;
 		}
 	}
