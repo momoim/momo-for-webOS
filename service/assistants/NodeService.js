@@ -73,13 +73,13 @@ NodeService.prototype = {
 		}
 	},
 	sendMsgFail: function(chat) {
-				PalmCall.call('palm://com.palm.applicationManager', 'open', {
-				'id': 'momo.im.app',
-				'params': {
-					'action': 'onMsgSendError',
-					'data': JSON.stringify(chat)
-				}
-			});
+		PalmCall.call('palm://com.palm.applicationManager', 'open', {
+			'id': 'momo.im.app',
+			'params': {
+				'action': 'onMsgSendError',
+				'data': JSON.stringify(chat)
+			}
+		});
 	},
 	send: function(f, total) {
 		var that = this;
@@ -87,7 +87,7 @@ NodeService.prototype = {
 		var chat = total.chat;
 
 		if (that.authInfo == null || that.authInfo.user == null) {
-			if(chat.kind == 'sms') {
+			if (chat.kind == 'sms') {
 				//that.sendMsgWithHttp(chat.data);
 				that.sendMsgFail(chat);
 			}
@@ -98,11 +98,11 @@ NodeService.prototype = {
 				data: chat.data
 			}
 			var oid;
-			if(will.kind == 'sms') {
+			if (will.kind == 'sms') {
 				oid = chat.data.receiver[0].id;
 				that.mqClient.sendMsg(oid + '.' + that.authInfo.user.id, will);
 			}
-			if(will.kind == 'roger') {
+			if (will.kind == 'roger') {
 				oid = chat.data.receiver;
 				that.mqClient.sendMsg(oid + '', JSON.stringify(will));
 			}

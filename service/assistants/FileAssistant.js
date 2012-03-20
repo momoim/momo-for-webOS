@@ -190,7 +190,8 @@ onFileUpload.prototype = {
 			if (data) {
 				console.log('on file upload data:' + data.length);
 				var filename = localPath.replace(/^.*[\\\/]/, '');
-				var heading = '--' + boundaryKey + '\r\n' + 'Content-Disposition: form-data; name="media"; filename="' + filename + '"\r\n' + 'Content-Type: image/jpeg\r\n\r\n';
+				var heading = '--' + boundaryKey + '\r\n' + 'Content-Disposition: form-data; name="media"; filename="' + filename + '"\r\n\r\n';
+				//+ 'Content-Type: image/jpeg\r\n\r\n';
 				request.write(new Buffer(heading, 'ascii'));
 				request.write(data);
 				request.write(new Buffer('\r\n--' + boundaryKey + '--', 'ascii'));
