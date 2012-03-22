@@ -14,3 +14,6 @@ momo for webOS2.x
   - 发送录音
   - 发送照片
   - 发送文件
+
+**************
+[momo](http://momo.im)

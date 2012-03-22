@@ -4,8 +4,7 @@ interfaces.Momo = function() {
 
 	// 登陆
 	this.postUserLogin = function(user, callbacks) {
-		var url = hostUrl + '/user/login.json';
-		return http.post(url, JSON.stringify(user), [], callbacks);
+		return this.postWithoutAuth('/user/login.json', user, callbacks);
 	};
 
 	// 发送消息
@@ -32,8 +31,8 @@ interfaces.Momo = function() {
 
 	// 创建帐号
 	this.postRegisterCreate = function(user, callbacks) {
-		return this.post('/register/create.json', user, callbacks);
-	}
+		return this.postWithoutAuth('/register/create.json', user, callbacks);
+	};
 
 	// 上传照片
 	this.postPhotoUpload = function(controller, file, callbacks) {
@@ -43,6 +42,11 @@ interfaces.Momo = function() {
 	// 上传文件
 	this.postFileUpload = function(controller, file, callbacks) {
 		return this.upload(controller, '/file/upload.json', file, callbacks);
+	};
+
+	this.postWithoutAuth = function(path, thing, callbacks) {
+		var url = hostUrl + path;
+		return http.post(url, JSON.stringify(thing), [], callbacks);
 	};
 
 	this.get = function(url, callbacks) {
