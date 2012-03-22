@@ -124,34 +124,37 @@ var MainAssistant = Class.create({
 		if (event && event.hasOwnProperty('phoneNumbers')) {
 			Mojo.Log.info('people: ' + JSON.stringify(event.phoneNumbers));
 			if (event.phoneNumbers.length > 0) {
-				var people = {
-					name: event.name.familyName + event.name.givenName,
-					mobile: event.phoneNumbers[0].value
-				};
-				Mojo.Log.info(this.TAG, 'getting people uid ====' + people.mobile);
-
-				new interfaces.Momo().postRegisterCreateAt([people], {
-					onSuccess: function(hey) {
-						//NotifyHelper.instance().banner('create success' + hey.responseText);
-						new interfaces.Momo().postUserShowByMobile(people, {
-							onSuccess: function(response) {
-								var res = response.responseJSON;
-								var willTalk = {
-									id: res.user_id,
-									name: res.name,
-									avatar: res.avatar
-								};
-								this.controller.stageController.pushScene('conv-detail', {
-									item: willTalk
-								});
-							}.bind(that),
-							onFailure: function(response) {
-								NotifyHelper.instance().banner('create success' + response.responseText);
-							}.bind(that)
+				if (event.phoneNumbers.length == 1) {
+					var people = {
+						name: event.name.familyName + event.name.givenName,
+						mobile: event.phoneNumbers[0].value
+					};
+					that.talkTo(people);
+				} else {
+					var choices = [];
+					for (var i = 0; i < event.phoneNumbers.length; ++i) {
+						var num = event.phoneNumbers[i].value;
+						choices.push({
+							label: num,
+							value: num,
+							type: 'affirmative'
 						});
-					}.bind(that),
-					onFailure: function() {}
-				});
+					}
+					this.controller.showAlertDialog({
+						onChoose: function(what) {
+							//NotifyHelper.instance().banner(what);
+							var people = {
+								name: event.name.familyName + event.name.givenName,
+								mobile: what
+							};
+							that.talkTo(people);
+						}.bind(that),
+						title: '选择一个手机号',
+						message: '选择您的消息要发给的号码',
+						choices: choices
+					});
+				}
+
 			}
 		} else {
 			RabbitDB.instance().getConvList(function(result) {
@@ -164,6 +167,36 @@ var MainAssistant = Class.create({
 				}
 			});
 		}
+	},
+	talkTo: function(people) {
+		var that = this;
+		Mojo.Log.info(this.TAG, 'getting people uid ====' + people.mobile);
+		//NotifyHelper.instance().banner('getting people: ' + people.mobile);
+		//FIXME phone number with + will cause 401 error
+		new interfaces.Momo().postRegisterCreateAt([people], {
+			onSuccess: function(hey) {
+				//NotifyHelper.instance().banner('create success' + hey.responseText);
+				new interfaces.Momo().postUserShowByMobile(people, {
+					onSuccess: function(response) {
+						var res = response.responseJSON;
+						var willTalk = {
+							id: res.user_id,
+							name: res.name,
+							avatar: res.avatar
+						};
+						this.controller.stageController.pushScene('conv-detail', {
+							item: willTalk
+						});
+					}.bind(that),
+					onFailure: function(response) {
+						NotifyHelper.instance().banner('get user info fail' + response.responseText);
+					}.bind(that)
+				});
+			}.bind(that),
+			onFailure: function(hell) {
+				NotifyHelper.instance().banner('create failure:' + hell.responseText);
+			}
+		});
 	},
 	deactivate: function(event) {
 		this.controller.document.removeEventListener("click", this.onClickReal, true);
