@@ -76,7 +76,7 @@ interfaces.Momo = function() {
 		message.parameters.push(['oauth_timestamp', timestamp]);
 		message.parameters.push(['oauth_token', Global.authInfo.oauthToken]);
 		message.parameters.push(['oauth_version', '1.0']);
-		message.parameters.sort()
+		message.parameters.sort();
 		OAuth.SignatureMethod.sign(message, accessor);
 		var authHeader = OAuth.getAuthorizationHeader("", message.parameters);
 
@@ -107,7 +107,7 @@ interfaces.Momo = function() {
 		message.parameters.push(['oauth_timestamp', timestamp]);
 		message.parameters.push(['oauth_token', Global.authInfo.oauthToken]);
 		message.parameters.push(['oauth_version', '1.0']);
-		message.parameters.sort()
+		message.parameters.sort();
 		OAuth.SignatureMethod.sign(message, accessor);
 		var authHeader = OAuth.getAuthorizationHeader("", message.parameters);
 
@@ -137,6 +137,6 @@ interfaces.Momo = function() {
 				}
 			}
 		});
-	}
-}
+	};
+};
 
