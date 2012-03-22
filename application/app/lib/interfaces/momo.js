@@ -23,6 +23,11 @@ interfaces.Momo = function() {
 		return this.post('/user/show_by_mobile.json', people, callbacks);
 	};
 
+	// 根据姓名手机号码获取用户ID，不存在则创建
+	this.postRegisterCreateAt = function(people, callbacks) {
+		return this.post('/register/create_at.json', people, callbacks);
+	};
+
 	// 获取未读私聊数据
 	this.getIMAll = function(callbacks) {
 		//Mojo.Log.info('getIMAll------------');

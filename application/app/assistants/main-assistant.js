@@ -33,8 +33,7 @@ var MainAssistant = Class.create({
 			method: "chatInit",
 			parameters: Global.authInfo,
 			onSuccess: that.onInitSuccess.bind(that),
-			onFailure: function(fail) {
-			}
+			onFailure: function(fail) {}
 		});
 
 		this.onClickReal = this.onClick.bind(this);
@@ -43,20 +42,20 @@ var MainAssistant = Class.create({
 		var that = this;
 		that.controller.modelChanged(that.modelList);
 	},
-    dragStart: function(event) {
-        if (Math.abs(event.filteredDistance.x) > Math.abs(event.filteredDistance.y) * 2) {
-            var node = event.target.up(".palm-row");
-            Mojo.Drag.setupDropContainer(node, this);
+	dragStart: function(event) {
+		if (Math.abs(event.filteredDistance.x) > Math.abs(event.filteredDistance.y) * 2) {
+			var node = event.target.up(".palm-row");
+			Mojo.Drag.setupDropContainer(node, this);
 
-            node._dragObj = Mojo.Drag.startDragging(this.controller, node, event.down, {
-                    preventVertical: true,
-                    draggingClass: "palm-delete-element",
-                    preventDropReset: false
-                });
+			node._dragObj = Mojo.Drag.startDragging(this.controller, node, event.down, {
+				preventVertical: true,
+				draggingClass: "palm-delete-element",
+				preventDropReset: false
+			});
 
-            event.stop();             
-        }
-    },
+			event.stop();
+		}
+	},
 	listWasTapped: function(event) {
 		Mojo.Log.info('listWasTapped');
 		this.controller.stageController.pushScene('conv-detail', {
@@ -84,9 +83,9 @@ var MainAssistant = Class.create({
 	},
 	refreshClick: function(event) {
 		var that = this;
-        var loading = this.controller.document.getElementById('loading');
+		var loading = this.controller.document.getElementById('loading');
 		Mojo.Log.info('refreshClick: trying to refresh unread');
-        loading.className = "show";
+		loading.className = "show";
 		new interfaces.Momo().getIMAll({
 			onSuccess: function(response) {
 				Mojo.Log.info('refreshClick: trying to refresh unread: ' + response.responseText);
@@ -102,27 +101,27 @@ var MainAssistant = Class.create({
 					onSuccess: function(response) {},
 					onFailure: function(response) {}
 				});
-                loading.className = "ignore";
+				loading.className = "ignore";
 			}.bind(that),
 			onFailure: function(response) {
 				Mojo.Log.info('refreshClick: trying to refresh unread fail: ' + response.responseText);
-                loading.className = "ignore";
+				loading.className = "ignore";
 			}.bind(that)
 		});
 	},
 	onClick: function(event) {
 		var target = event.target;
 		Mojo.Log.info('onclick========--' + target.id);
-		if(target.id == 'refreshBtn') {
+		if (target.id == 'refreshBtn') {
 			this.refreshClick(event);
-		} else if(target.id == 'addBtn') {
+		} else if (target.id == 'addBtn') {
 			this.itemAdd(event);
 		}
 	},
 	activate: function(event) {
 		var that = this;
 		this.controller.document.addEventListener("click", this.onClickReal, true);
-		if (event != null && event.hasOwnProperty('phoneNumbers')) {
+		if (event && event.hasOwnProperty('phoneNumbers')) {
 			Mojo.Log.info('people: ' + JSON.stringify(event.phoneNumbers));
 			if (event.phoneNumbers.length > 0) {
 				var people = {
@@ -131,28 +130,27 @@ var MainAssistant = Class.create({
 				};
 				Mojo.Log.info(this.TAG, 'getting people uid ====' + people.mobile);
 
-				new interfaces.Momo().postUserShowByMobile(people, {
-					onSuccess: function(response) {
-						var res = response.responseJSON;
-						var willTalk = {
-							id: res.user_id,
-							name: res.name,
-							avatar: res.avatar
-						}
-						this.controller.stageController.pushScene('conv-detail', {
-							item: willTalk
+				new interfaces.Momo().postRegisterCreateAt([people], {
+					onSuccess: function(hey) {
+						//NotifyHelper.instance().banner('create success' + hey.responseText);
+						new interfaces.Momo().postUserShowByMobile(people, {
+							onSuccess: function(response) {
+								var res = response.responseJSON;
+								var willTalk = {
+									id: res.user_id,
+									name: res.name,
+									avatar: res.avatar
+								};
+								this.controller.stageController.pushScene('conv-detail', {
+									item: willTalk
+								});
+							}.bind(that),
+							onFailure: function(response) {
+								NotifyHelper.instance().banner('create success' + response.responseText);
+							}.bind(that)
 						});
 					}.bind(that),
-					onFailure: function(response) {
-						var bannerParams = {
-							messageText: 'fail get peopl' + response,
-							soundClass: 'notifications'
-						};
-						Mojo.Controller.getAppController().showBanner(bannerParams, {
-							source: "notification"
-						},
-						'momo');
-					}.bind(that)
+					onFailure: function() {}
 				});
 			}
 		} else {
@@ -170,11 +168,11 @@ var MainAssistant = Class.create({
 	deactivate: function(event) {
 		this.controller.document.removeEventListener("click", this.onClickReal, true);
 	},
-    handleCommand: function(event) {
-        if(event.type === Mojo.Event.forward){
-            this.refreshClick();
-        }
-    },
+	handleCommand: function(event) {
+		if (event.type === Mojo.Event.forward) {
+			this.refreshClick();
+		}
+	},
 	cleanup: function(event) {
 		this.cleaning = true;
 		//remove callback
