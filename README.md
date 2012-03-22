@@ -16,4 +16,4 @@ momo for webOS2.x
   - 发送文件
 
 **************
-[momo](http://momo.im)
+[`momo`](http://momo.im)
