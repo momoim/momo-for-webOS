@@ -1,15 +1,29 @@
 var Signup = function() {};
 
 Signup.prototype = {
-    
+    auth : function(mobile, zone_code, onSignupSuccess, onSignupFailure) {
+        if(Global.deviceID === null){
+            NotifyHelper.instance().banner('获取设备ID失败');
+            return;
+        }
+        var postParams = {
+            mobile: mobile,
+            zone_code: zone_code,
+            device_id: Global.deviceID,
+            source: 7
+        };
+        new interfaces.Momo().postRegisterCreate(postParams, {
+            onSuccess: onSignupSuccess,
+            onFailure: onSignupFailure
+        });
+    }
 }
 
 function SignupAssistant() {
     /*缓存注册人员信息*/
     this.modelUser = {
-        code : 86,
-        telephone : '',
-        verify_code : ''
+        zone_code : 86,
+        mobile : ''
     };
     this.flag = {
         get_verify_code : false
@@ -38,9 +52,9 @@ SignupAssistant.prototype = {
            this.model = this.selectorsModel);
         this.controller.listen('country-code', Mojo.Event.propertyChange, this.changed.bindAsEventListener(this));
         /*手机号输入框*/
-        this.controller.setupWidget('telephone', {
+        this.controller.setupWidget('mobile', {
             hintText: $L('13800000000'),
-            modelProperty: 'telephone',
+            modelProperty: 'mobile',
             textCase: Mojo.Widget.steModeLowerCase,
             enterSubmits: false
         }, this.modelUser);
@@ -50,39 +64,33 @@ SignupAssistant.prototype = {
                 type : Mojo.Widget.activityButton
             },
             this.model = {
-                buttonLabel: $L('获取验证码'),
+                buttonLabel: $L('注册并获取密码'),
                 buttonClass: 'affirmative',
                 disabled: false
             }
         );
 
+        this.buttonGetVerifyCode = this.controller.get('get-verify-code');
         this.controller.listen(this.controller.get('get-verify-code'), Mojo.Event.tap, this.onGetVerifyCodeTapped.bind(this));
 
     },
     changed: function(propertyChangeEvent) {
-        this.modelUser.code = this.selectorsModel.currentStatus;
+        this.modelUser.zone_code = this.selectorsModel.currentStatus;
         //NotifyHelper.instance().banner(this.controller.get('get-verify-code').getAttribute("id"));
         //Mojo.Log.info("The user's current status has changed to " + this.selectorsModel.currentStatus);
     },
     onGetVerifyCodeTapped: function(tapEvent) {
-        //NotifyHelper.instance().banner("button");
-        var _this = this;
-        var flag = _this.flag.get_verify_code;
-        var getVerifyCode = _this.controller.get('get-verify-code');
-        /*setTimeout(function() {*/
-                //Mojo.Log.warn(flag);
-            //getVerifyCode.mojo.deactivate();
-        /*}, 2000);*/
-        Mojo.Log.warn("flag=====>" + (!flag));
-        if(!flag){
-            Mojo.Log.warn("flag222222>>>" + flag);
-            _this.flag.get_verify_code = false;
-            setTimeout(function() {
-                getVerifyCode.mojo.deactivate();
-                _this.flag.get_verify_code = true;
-            }, 2000);
-        }
-        
-        //this.controller.get('get-verify-code').getAttribute("disabled") = true;
+        var that = this;
+		Mojo.Log.info(this.TAG, 'onLoginTapped');
+		if (!this.buttonGetVerifyCode.spinning) {
+			this.buttonGetVerifyCode.mojo.activate();
+			new Signup().auth(this.modelUser.mobile, this.modelUser.zone_code, that.onSignupSuccess.bind(that), that.onSignupFailure.bind(that));
+		}
+    },
+    onSignupSuccess: function() {
+		this.controller.stageController.pushScene('verify');
+    },
+    onSignupFailure: function(resp) {
+		NotifyHelper.instance().banner(JSON.stringify(resp));
     }
 }
