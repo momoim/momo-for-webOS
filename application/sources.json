@@ -11,7 +11,8 @@
     {"source": "app/helper/audio-controller.js"},
     {"source": "app/helper/app-formatter.js"},
     {"source": "app/helper/notify-helper.js"},
-		{"source": "app/helper/CaptureHelper.js"},
+	{"source": "app/helper/CaptureHelper.js"},
+	{"source": "app/helper/country-helper.js"},
     {"source": "app/assistants/app-assistant.js"},
     {"source": "app/assistants/stage-assistant.js"},
     {
@@ -33,5 +34,9 @@
     {
         "scenes": "conv-detail",
         "source": "app/assistants/conv-detail-assistant.js"
+    },
+    {
+        "scenes": "signup",
+        "source": "app/assistants/signup-assistant.js"
     }
 ]

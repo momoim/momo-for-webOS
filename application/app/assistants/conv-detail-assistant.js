@@ -6,7 +6,16 @@ var ConvDetailAssistant = Class.create({
 	},
 	setup: function() {
 		var that = this;
+        //Menu
+        var menuItems = [
+            Mojo.Menu.editItem,
+            {
+                label: '退出',
+                command: 'cmdLogout'
+            }
+        ];
 
+        this.controller.setupWidget(Mojo.Menu.appMenu, {omitDefaultItems: true}, {visible: true, items: menuItems});
 		//init ui
 		that.idList = 'conv-list';
 

@@ -1,4 +1,4 @@
-body.palm-default{font-size:12px;display: block;width: 100%;-webkit-transition: bottom .5s;background: url('../images/low/mo-bg.png') left top repeat-x;opacity: .95;color: #d2d2d2;}
+body.palm-default{font-size:12px;display: block;width: 100%;-webkit-transition: bottom .5s;background: url('../images/low/mo-bg.png') left top repeat-x;opacity: .95;}
 a{color:#212121;font-size:14px;font-weight:700;text-decoration:none}
 p{color:#404547;word-wrap: break-word; word-break: break-all;}
 .avatar {width: 48px;height: 48px;border-radius:5px}
@@ -30,7 +30,7 @@ p{color:#404547;word-wrap: break-word; word-break: break-all;}
 #messageContainer .messageTextWidget {margin: 0px;padding: 0px;margin-right: 52px;margin-left: 50px;padding-right:5px}
 .stuck.sendButton.selected {background: url(../images/sender/msg-send-airplane-press.png) top left no-repeat;}
 .stuck.smileButton.selected {background: url(../images/sender/smiles-button-active.png) top left no-repeat;}
-#mojo-scene-login-scene-scroller{padding:105px 10px 0;background:url(../images/login_bg.jpg) no-repeat #111;background-size:cover}
+#mojo-scene-login-scene-scroller{padding:85px 10px 0;background:url(../images/login_bg.jpg) no-repeat #111;background-size:cover}
 .palm-row-wrapper{padding:4px 8px}
 .palm-button.affirmative,#palm-dialog-box .palm-button.affirmative{color:#fff;-webkit-border-image: url(../images/palm-button-blue.png) 0 17 104 17 repeat repeat;}
 .palm-button.affirmative.selected,#palm-dialog-box .palm-button.affirmative.selected {-webkit-border-image: url(../images/palm-button-blue.png) 52 17 52 17 repeat repeat;}
@@ -59,7 +59,7 @@ p{color:#404547;word-wrap: break-word; word-break: break-all;}
 .conv-list-detail-item .time{float:left;color:#ccc;margin:0 0 5px 60px}
 .conv-list-detail-item .mo-chat-detail-item{clear:both}
 .conv-list-detail-item .mo-chat-detail-item .detail-content{position:relative;float:left;margin:0 10px;padding:2px 2px;max-width:230px;background:#E1E1E1;border-radius:5px;}
-.conv-list-detail-item .mo-chat-detail-item p{margin:0;padding:5px 5px}
+.conv-list-detail-item .mo-chat-detail-item p{margin:0;padding:5px 5px;min-height:12px}
 .other-said .mo-chat-detail-item .detail-content .arrow{position:absolute;top:10px;left:-11px;display:inline-block;width:11px;height:10px;background:url(../images/is_said.png) no-repeat}
 .is-said .mo-chat-detail-item-avatar{float:right;margin-left:2px}
 .is-said .time{float:right;margin:0 60px 5px 0;clear:both;color:#9C9C9C}
@@ -71,3 +71,4 @@ p{color:#404547;word-wrap: break-word; word-break: break-all;}
 #comment-content > *{color:#FFF;padding-left:5px}
 #comment-content .multiline-hint-text{padding-top:15px}
 
+#mojo-scene-signup-scene-scroller{color:#f60}
