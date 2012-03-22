@@ -11,3 +11,4 @@ doc/app
 .DS_Store
 *.ipk
 bin/*.ipk
+*Thumbs.db
