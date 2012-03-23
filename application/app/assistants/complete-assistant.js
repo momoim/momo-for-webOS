@@ -80,6 +80,7 @@ CompleteAssistant.prototype = {
     },
     onSubmitSuccess: function(resp) {
         var _this = this;
+        Global.authInfo.user.name = this.modelUser.realname;
         Global.authInfo.user.status = JSON.parse(resp.request.transport.responseText).user_status;
         DBHelper.instance().add('authInfo', Global.authInfo);
         _this.controller.stageController.swapScene('main');

@@ -2,7 +2,7 @@ body.palm-default{font-size:12px;display: block;width: 100%;-webkit-transition: 
 a{color:#212121;font-size:14px;font-weight:700;text-decoration:none}
 p{color:#404547;word-wrap: break-word; word-break: break-all;}
 .avatar {width: 48px;height: 48px;border-radius:5px}
-.avatar img{width: 48px;height: 48px;border-radius:5px}
+.avatar img{width: 48px;height: 48px;border-radius:5px;background:url(../images/low/default-avatar.png) no-repeat}
 .palm-body-text{padding:0;margin:0;}
 .palm-row-wrapper{padding:4px 8px}
 #loading{width: 100%;position: fixed;z-index: 100000;top: 0px;left: 0px;height: 40px;opacity:0;-webkit-transition: opacity .2s;-webkit-palm-mouse-target: ignore;background: url(../images/low/load-fade.png) left top repeat-x;}
@@ -53,7 +53,7 @@ p{color:#404547;word-wrap: break-word; word-break: break-all;}
 .mo-text{padding-top:5px;font-size:16px;line-height:16px;font-weight:400;color:#888;height:18px;width:200px;white-space:nowrap;overflow:hidden;text-overflow: ellipsis;}
 .content-wrapper{display:inline-block;width:100%;float:left}
 .conv-list-avatar{width:50px;vertical-align:top;float:left}
-.mo-avatar{height: 48px;width: 48px;background-size: 48px;display: inline-block;-webkit-border-radius: 4px;margin: 5px 8px 0px 0px;float: left;}
+.mo-avatar{height: 48px;width: 48px;background-size: 48px;display: inline-block;-webkit-border-radius: 4px;margin: 5px 8px 0px 0px;float: left;background:url(../images/low/default-avatar.png) no-repeat}
 .conv-list-detail-item{padding:5px 5px;list-style:none}
 .conv-list-detail-item .mo-chat-detail-item-avatar{float:left;margin-right:2px}
 .conv-list-detail-item .time{float:left;color:#ccc;margin:0 0 5px 60px}
