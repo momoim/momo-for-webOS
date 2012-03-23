@@ -132,6 +132,10 @@ var MainAssistant = Class.create({
 	},
 	activate: function(event) {
 		var that = this;
+        if(Global.authInfo.user.status < 3){
+		    this.controller.stageController.pushScene('complete');
+            return false;
+        }
 		this.controller.document.addEventListener("click", this.onClickReal, true);
 		if (event != null && event.hasOwnProperty('phoneNumbers')) {
 			Mojo.Log.info('people: ' + JSON.stringify(event.phoneNumbers));

@@ -21,12 +21,17 @@ Signup.prototype = {
 
 function SignupAssistant() {
     /*缓存注册人员信息*/
-    this.modelUser = {
+    Global['signupUser'] = {
+        uid : '',
+        realname : '',
         zone_code : 86,
-        mobile : ''
-    };
-    this.flag = {
-        get_verify_code : false
+        mobile : '',
+        password : '',
+        oauth_token : '',
+        oauth_token_secret : '',
+        qname : '',
+        user_status : 1,
+        get_verify_code_flag : false
     };
 }
 
@@ -56,8 +61,8 @@ SignupAssistant.prototype = {
             hintText: $L('13800000000'),
             modelProperty: 'mobile',
             textCase: Mojo.Widget.steModeLowerCase,
-            enterSubmits: false
-        }, this.modelUser);
+            enterSubmits: true
+        }, Global['signupUser']);
         /*获取验证码按钮*/
         this.controller.setupWidget('get-verify-code', 
             this.attributes = {
@@ -75,7 +80,7 @@ SignupAssistant.prototype = {
 
     },
     changed: function(propertyChangeEvent) {
-        this.modelUser.zone_code = this.selectorsModel.currentStatus;
+        Global['signupUser']['zone_code'] = this.selectorsModel.currentStatus;
         //NotifyHelper.instance().banner(this.controller.get('get-verify-code').getAttribute("id"));
         //Mojo.Log.info("The user's current status has changed to " + this.selectorsModel.currentStatus);
     },
@@ -84,13 +89,20 @@ SignupAssistant.prototype = {
 		Mojo.Log.info(this.TAG, 'onLoginTapped');
 		if (!this.buttonGetVerifyCode.spinning) {
 			this.buttonGetVerifyCode.mojo.activate();
-			new Signup().auth(this.modelUser.mobile, this.modelUser.zone_code, that.onSignupSuccess.bind(that), that.onSignupFailure.bind(that));
+			new Signup().auth(Global['signupUser']['mobile'], Global['signupUser']['zone_code'], that.onSignupSuccess.bind(that), that.onSignupFailure.bind(that));
 		}
     },
     onSignupSuccess: function() {
+        Global['signupUser']['get_verify_code_flag'] = true;
+		this.controller.stageController.popScene('signup');
 		this.controller.stageController.pushScene('verify');
     },
     onSignupFailure: function(resp) {
-		NotifyHelper.instance().banner(JSON.stringify(resp));
+        var tipArray = JSON.parse(resp.request.transport.responseText).error.split(':');
+        var tip = tipArray[0];
+        if(tipArray.length === 2){
+            tip = tipArray[1];
+        }
+        NotifyHelper.instance().banner(tip);
     }
 }

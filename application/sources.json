@@ -38,5 +38,13 @@
     {
         "scenes": "signup",
         "source": "app/assistants/signup-assistant.js"
+    },
+    {
+        "scenes": "verify",
+        "source": "app/assistants/verify-assistant.js"
+    },
+    {
+        "scenes": "complete",
+        "source": "app/assistants/complete-assistant.js"
     }
 ]

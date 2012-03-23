@@ -34,6 +34,21 @@ interfaces.Momo = function() {
 		return this.postWithoutAuth('/register/create.json', user, callbacks);
 	};
 
+    //手机验证码校验
+    this.postRegisterVerify = function(user, callbacks) {
+		return this.postWithoutAuth('/register/verify.json', user, callbacks);
+    };
+
+    //重发验证码
+    this.postResendVerifyCode = function(user, callbacks) {
+		return this.postWithoutAuth('/register/resend_verifycode.json', user, callbacks);
+    };
+
+    //完善个人信息
+    this.postUserPersonal = function(user, callbacks) {
+		return this.post('/user/personal.json', user, callbacks);
+    };
+
 	// 上传照片
 	this.postPhotoUpload = function(controller, file, callbacks) {
 		return this.upload(controller, '/photo/upload.json', file, callbacks);

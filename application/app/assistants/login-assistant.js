@@ -1,4 +1,5 @@
-var Login = function() {};
+var Login = function() {
+};
 
 Login.prototype = {
 	auth: function(mobile, password, onLoginSuccess, onLoginFailure) {
@@ -85,7 +86,7 @@ LoginAssistant.prototype = {
 		},
 		{
 			buttonLabel: $L("注册帐号"),
-			buttonClass: 'negative',
+			buttonClass: 'secondary',
 			disabled: false
 		});
 
@@ -107,7 +108,8 @@ LoginAssistant.prototype = {
 			user: {
 				id: response.uid,
 				name: response.name,
-				avatar: response.avatar
+				avatar: response.avatar,
+                status: response.status
 			},
 			oauthToken: response.oauth_token,
 			tokenSecret: response.oauth_token_secret,
@@ -118,13 +120,22 @@ LoginAssistant.prototype = {
 		Mojo.Log.info('store authInfo to db');
 		DBHelper.instance().add('authInfo', Global.authInfo);
 
+        if(Global.authInfo.user.status < 3){
+		    this.controller.stageController.popScene('login');
+		    this.controller.stageController.pushScene('complete');
+            return false;
+        }
 		//switch to main assistant
 		Mojo.Log.info('swap to main view');
 		that.controller.stageController.swapScene('main');
 	},
 	onLoginFailure: function(resp) {
-		NotifyHelper.instance().banner(JSON.stringify(resp));
-		// body...
+		var tipArray = JSON.parse(resp.request.transport.responseText).error.split(':');
+        var tip = tipArray[0];
+        if(tipArray.length === 2){
+            tip = tipArray[1];
+        }
+        NotifyHelper.instance().banner(tip);
 	},
 	onLoginTapped: function() {
 		var that = this;
@@ -144,10 +155,18 @@ LoginAssistant.prototype = {
 		}
 	},
 	onSignup: function() {
-		//this.buttonSignup.mojo.deactivate();
+        this.buttonSignup.mojo.deactivate();
 		this.controller.stageController.pushScene('signup');
 	},
-	activate: function(event) {},
+	activate: function(event) {
+        if(event && event.action == 'after-signup'){
+            this.modelUser.username = event.mobile;
+            this.modelUser.password = event.password;
+            Mojo.Log.warn('modelUser===>' + JSON.stringify(event));
+            this.buttonSignin.spinning = false;
+            this.onLoginTapped();
+        }
+    },
 	deactivate: function(event) {},
 	cleanup: function(event) {
 		Global.logining = false;
