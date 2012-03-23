@@ -1,8 +1,9 @@
 momo for webOS2.x
 ===
 
+*************
+
 ### TODO
- + 多个号码弹出选择
  + 发送文件优化（文件大于一定程度发送问题）
 
 ### 支持的特性
@@ -16,4 +17,4 @@ momo for webOS2.x
   - 发送文件
 
 **************
-[momo](http://momo.im)
+[`momo`](http://momo.im)

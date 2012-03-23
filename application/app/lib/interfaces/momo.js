@@ -23,6 +23,11 @@ interfaces.Momo = function() {
 		return this.post('/user/show_by_mobile.json', people, callbacks);
 	};
 
+	// 根据姓名手机号码获取用户ID，不存在则创建
+	this.postRegisterCreateAt = function(people, callbacks) {
+		return this.post('/register/create_at.json', people, callbacks);
+	};
+
 	// 获取未读私聊数据
 	this.getIMAll = function(callbacks) {
 		//Mojo.Log.info('getIMAll------------');
@@ -91,7 +96,7 @@ interfaces.Momo = function() {
 		message.parameters.push(['oauth_timestamp', timestamp]);
 		message.parameters.push(['oauth_token', Global.authInfo.oauthToken]);
 		message.parameters.push(['oauth_version', '1.0']);
-		message.parameters.sort()
+		message.parameters.sort();
 		OAuth.SignatureMethod.sign(message, accessor);
 		var authHeader = OAuth.getAuthorizationHeader("", message.parameters);
 
@@ -122,7 +127,7 @@ interfaces.Momo = function() {
 		message.parameters.push(['oauth_timestamp', timestamp]);
 		message.parameters.push(['oauth_token', Global.authInfo.oauthToken]);
 		message.parameters.push(['oauth_version', '1.0']);
-		message.parameters.sort()
+		message.parameters.sort();
 		OAuth.SignatureMethod.sign(message, accessor);
 		var authHeader = OAuth.getAuthorizationHeader("", message.parameters);
 
@@ -152,6 +157,6 @@ interfaces.Momo = function() {
 				}
 			}
 		});
-	}
-}
+	};
+};
 
