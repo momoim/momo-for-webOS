@@ -53,7 +53,7 @@ p{color:#404547;word-wrap: break-word; word-break: break-all;}
 .mo-text{padding-top:5px;font-size:16px;line-height:16px;font-weight:400;color:#888;height:18px;width:200px;white-space:nowrap;overflow:hidden;text-overflow: ellipsis;}
 .content-wrapper{display:inline-block;width:100%;float:left}
 .conv-list-avatar{width:50px;vertical-align:top;float:left}
-.mo-avatar{height: 48px;width: 48px;background-size: 48px;display: inline-block;-webkit-border-radius: 4px;margin: 5px 8px 0px 0px;float: left;background:url(../images/low/default-avatar.png) no-repeat}
+/*.mo-avatar{height: 48px;width: 48px;background-size: 48px;display: inline-block;-webkit-border-radius: 4px;margin: 5px 8px 0px 0px;float: left;background:url(../images/low/default-avatar.png) no-repeat}*/
 .conv-list-detail-item{padding:5px 5px;list-style:none}
 .conv-list-detail-item .mo-chat-detail-item-avatar{float:left;margin-right:2px}
 .conv-list-detail-item .time{float:left;color:#ccc;margin:0 0 5px 60px}
