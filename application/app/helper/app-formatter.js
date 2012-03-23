@@ -28,7 +28,10 @@ var AppFormatter = {
 		for(var now in n) {
 			//Mojo.Log.info('content now: ' + now);
 			if(now == 'text' || now == 'text_long') {
-				return n[now];
+				var htmling = n[now];
+				htmling = htmling.replace(/>/g, '&gt;');
+				htmling = htmling.replace(/</g, '&lt;');
+				return htmling;
 			} else {
 				var base = '发送了';
 				if(now == 'picture') {
@@ -48,10 +51,13 @@ var AppFormatter = {
 		for(var now in n) {
 			//Mojo.Log.info('content now: ' + now);
 			if(now == 'text' || now == 'text_long') {
-				return linkify(n[now]);
+				var htmling = n[now];
+				htmling = htmling.replace(/>/g, '&gt;');
+				htmling = htmling.replace(/</g, '&lt;');
+				return linkify(htmling);
 			} else if (now == 'picture') {
 				var pUrl = n[now]['url'];
-				if(pUrl == null) {
+				if(!pUrl) {
 					return '发送了错误的照片数据';
 				}
 				var regex = /_\d{2,4}.jpg/g;
