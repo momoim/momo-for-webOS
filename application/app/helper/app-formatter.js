@@ -8,7 +8,7 @@ var AppFormatter = {
         return d.toRelativeTime(1500);
     },
     location: function(n, model){
-        if (n != null) 
+        if (n) 
             return n['name'];
         else 
             return '';
@@ -28,10 +28,7 @@ var AppFormatter = {
 		for(var now in n) {
 			//Mojo.Log.info('content now: ' + now);
 			if(now == 'text' || now == 'text_long') {
-				var htmling = n[now];
-				htmling = htmling.replace(/>/g, '&gt;');
-				htmling = htmling.replace(/</g, '&lt;');
-				return htmling;
+				return linkify(AppFormatter.htmlSafe(n[now]));
 			} else {
 				var base = '发送了';
 				if(now == 'picture') {
@@ -47,14 +44,19 @@ var AppFormatter = {
 		}
 		return '未支持的类型';
 	},
+	htmlSafe: function(what) {
+		// FIXME: try this out: 
+		// http://stackoverflow.com/questions/3066574/converting-html-to-its-safe-entities-with-javascript
+		var htmling = what;
+		htmling = htmling.replace(/>/g, '&gt;');
+		htmling = htmling.replace(/</g, '&lt;');
+		return htmling;
+	},
 	contentDetail: function(n, model) {
 		for(var now in n) {
 			//Mojo.Log.info('content now: ' + now);
 			if(now == 'text' || now == 'text_long') {
-				var htmling = n[now];
-				htmling = htmling.replace(/>/g, '&gt;');
-				htmling = htmling.replace(/</g, '&lt;');
-				return linkify(htmling);
+				return linkify(AppFormatter.htmlSafe(n[now]));
 			} else if (now == 'picture') {
 				var pUrl = n[now]['url'];
 				if(!pUrl) {
