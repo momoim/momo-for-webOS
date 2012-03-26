@@ -116,7 +116,7 @@ AppAssistant.prototype = {
 				Mojo.Log.warn('on msg send error trying to send with http');
 				new interfaces.Momo().postSendMessage(JSON.parse(launchParams.data).data, {
 					onSuccess: function(resp) {
-					Mojo.Log.warn('on msg send error trying to send with http success');
+						Mojo.Log.warn('on msg send error trying to send with http success');
 						that.onNewIncome({
 							kind: 'im',
 							data: resp.responseJSON
@@ -184,14 +184,23 @@ AppAssistant.prototype = {
 		for (var i = 0; i < list.length; ++i) {
 			RabbitDB.instance().addTalk(list[i]);
 		}
+
+		if (list && list.length > 0) {
+			var appController = Mojo.Controller.getAppController();
+			var mainStage = appController.getStageProxy(Global.mainStage);
+
+			if (mainStage) {
+				mainStage.delegateToSceneAssistant('refreshDataFromDB');
+			}
+		}
 	},
 	onNewIncome: function(messageStr) {
 		var message = JSON.parse(messageStr);
 		var income = message.data;
-		if (income.other == null) {
+		if (!income.other) {
 			income.other = (income.sender.id == Global.authInfo.user.id ? income.receiver[0] : income.sender);
 		}
-		if (message == null || message.kind != 'sms') {
+		if (!message || message.kind != 'sms') {
 			return;
 		}
 		Mojo.Log.info('onNewIncome================:' + messageStr);
@@ -201,8 +210,8 @@ AppAssistant.prototype = {
 		//notify
 		var appController = Mojo.Controller.getAppController();
 		var mainStage = appController.getStageProxy(Global.mainStage);
-		if (income.sender.id != Global.authInfo.user.id && (mainStage == null || (Global.talking != income.other.id))) {
-			if (mainStage == null) {
+		if (income.sender.id != Global.authInfo.user.id && (!mainStage || (Global.talking != income.other.id))) {
+			if (!mainStage) {
 				var stageName = Global.dashStage;
 
 				var dashboardController = appController.getStageController(stageName);
@@ -231,16 +240,16 @@ AppAssistant.prototype = {
 		} else {
 			Global.sendRoger();
 		}
-		if (mainStage != null) {
+		if (mainStage) {
 			mainStage.delegateToSceneAssistant('update', income);
 		}
 	},
-    handleCommand: function(event) {
-        var stage = this.controller.getActiveStageController();
-        if (event.command === 'cmdLogout') {
-		    DBHelper.instance().remove('authInfo');
-            stage.pushScene('login');
-        }
-    } 
+	handleCommand: function(event) {
+		var stage = this.controller.getActiveStageController();
+		if (event.command === 'cmdLogout') {
+			DBHelper.instance().remove('authInfo');
+			stage.pushScene('login');
+		}
+	}
 };
 

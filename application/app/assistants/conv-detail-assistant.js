@@ -119,7 +119,7 @@ var ConvDetailAssistant = Class.create({
 			var content = this.controller.get('comment-content').mojo.getValue();
 			this.controller.get('comment-content').mojo.setValue('');
 			Mojo.Log.info(this.TAG, 'on comment area enter key: ' + content);
-			if (content != '') {
+			if (content !== '') {
 				this.sendChat({
 					text: content
 				});
@@ -133,12 +133,12 @@ var ConvDetailAssistant = Class.create({
 		var that = this;
 		Mojo.Log.info(this.TAG, 'prepareChat------+');
 		var chat;
-		if (total == null) {
+		if (!total) {
 			return;
 		} else {
 			chat = total.data;
 		}
-		if (chat != null && chat.content != null) {
+		if (chat && chat.content) {
 			Mojo.Log.info(this.TAG, 'prepareChat------+--+');
 			var content = chat.content;
 			if (content.hasOwnProperty('text')) {
@@ -162,6 +162,7 @@ var ConvDetailAssistant = Class.create({
 						Mojo.Log.warn('on file upload fail' + JSON.stringify(e));
 					}
 				});
+				/*
 				return;
 				new interfaces.Momo().postPhotoUpload(this.controller, localUrl, {
 					onSuccess: function(resp) {
@@ -169,7 +170,7 @@ var ConvDetailAssistant = Class.create({
 						if (resp.httpCode != 200) return;
 						//NotifyHelper.instance().banner('image success:' + Object.toJSON(resp));
 						var imgUrl = JSON.parse(resp.responseString).src;
-						if (imgUrl == null || imgUrl == '') {
+						if (!imgUrl || imgUrl === '') {
 							onPrepareFail(total);
 						} else {
 							total.data.content.picture = {
@@ -184,14 +185,14 @@ var ConvDetailAssistant = Class.create({
 						onPrepareFail(total);
 					}.bind(this)
 				});
+				*/
 			} else if (content.hasOwnProperty('audio')) {
 				Mojo.Log.info(this.TAG, 'prepare audio ====' + content.audio.url);
-				var localUrl = content.audio.url;
 				var idUrl = Setting.cache.audio + total.data.id + '.amr';
 				new Mojo.Service.Request("palm://momo.im.app.service.node/", {
 					method: "onFileRename",
 					parameters: {
-						path1: localUrl,
+						path1: content.audio.url,
 						path2: idUrl
 					},
 					onSuccess: function() {
@@ -211,6 +212,7 @@ var ConvDetailAssistant = Class.create({
 								Mojo.Log.warn('on file upload fail' + JSON.stringify(e));
 							}
 						});
+						/*
 						return;
 						new interfaces.Momo().postFileUpload(that.controller, idUrl, {
 							onSuccess: function(resp) {
@@ -218,8 +220,8 @@ var ConvDetailAssistant = Class.create({
 								if (resp.httpCode != 200) return;
 								//NotifyHelper.instance().banner('audio success:' + Object.toJSON(resp));
 								var audioUrl = JSON.parse(resp.responseString).src;
-								if (audioUrl == null || audioUrl == '') {
-									onPrepareFail(total)
+								if (!audioUrl || audioUrl === '') {
+									onPrepareFail(total);
 								} else {
 									total.data.content.audio = {
 										url: audioUrl,
@@ -233,6 +235,7 @@ var ConvDetailAssistant = Class.create({
 								onPrepareFail(total);
 							}.bind(this)
 						});
+						*/
 					},
 					onFailure: function(fail) {
 						Mojo.Log.warn('audio:' + Object.toJSON(fail));
@@ -255,13 +258,14 @@ var ConvDetailAssistant = Class.create({
 						Mojo.Log.warn('on file upload fail' + JSON.stringify(e));
 					}
 				});
+				/*
 				return;
 				new interfaces.Momo().postFileUpload(that.controller, content.file.url, {
 					onSuccess: function(resp) {
 						Mojo.Log.warn('file upload success: ' + Object.toJSON(resp));
 						if (resp.httpCode != 200) return;
 						var result = JSON.parse(resp.responseString);
-						if (result.src && result.src != '') {
+						if (result.src && result.src !== '') {
 							total.data.content.file = {
 								url: result.src,
 								mime: result.mime,
@@ -278,8 +282,9 @@ var ConvDetailAssistant = Class.create({
 						onPrepareFail(total);
 					}
 				});
+				*/
 			} else {
-				Mojo.Log.info(this.TAG, 'prepare picture ====' + content.picture.url);
+				Mojo.Log.info(this.TAG, 'prepare other ====');
 			}
 		}
 	},
@@ -294,7 +299,7 @@ var ConvDetailAssistant = Class.create({
 				receiver: [this.incomeItem],
 				content: content
 			}
-		}
+		};
 
 		Mojo.Log.info(this.TAG, 'sendChat=---+---===== ' + JSON.stringify(chat));
 
@@ -327,7 +332,7 @@ var ConvDetailAssistant = Class.create({
 			case 'chat-audio':
 				var audioSrc = target.getAttribute('audio-src');
 				Mojo.Log.info(this.TAG, 'chat audio click: ' + audioSrc);
-				if (Global.audioPlayer == null) {
+				if (!Global.audioPlayer) {
 					Global.audioPlayer = new Audio();
 				}
 				var idUrl = Setting.cache.audio + dataID + '.amr';
@@ -337,14 +342,14 @@ var ConvDetailAssistant = Class.create({
 					Global.audioPlayer.src = audioSrc;
 					Global.audioPlayer.load();
 					Global.audioPlayer.play();
-				};
+				}
 				function fileSuccess() {
 					Global.audioPlayer.volume = 1;
 					Global.audioPlayer.pause();
 					Global.audioPlayer.src = idUrl;
 					Global.audioPlayer.load();
 					Global.audioPlayer.play();
-				};
+				}
 				Mojo.Log.warn('try to get audio file to play');
 				new Mojo.Service.Request("palm://momo.im.app.service.node/", {
 					method: "onFileInfo",
@@ -415,7 +420,7 @@ var ConvDetailAssistant = Class.create({
 						});
 					}
 				}
-			}
+			};
 
 			Mojo.FilePicker.pickFile(params, this.controller.stageController);
 
@@ -464,7 +469,7 @@ var ConvDetailAssistant = Class.create({
 		self.audioFile = '';
 	},
 	onMouseUp: function() {
-		if (this.audioFile != '') {
+		if (this.audioFile !== '') {
 			this.onRecordEnd();
 		}
 	},
@@ -486,12 +491,12 @@ var ConvDetailAssistant = Class.create({
 
 function ConvAdapter() {
 	this.items = [];
-};
+}
 
 ConvAdapter.prototype = {
 	addItem: function(item) {
 		var that = this;
-		if (item.other == null) {
+		if (!item.other) {
 			item.other = (item.sender.id == Global.authInfo.user.id ? item.receiver[0] : item.sender);
 		}
 		that.items.push(item);
@@ -502,11 +507,11 @@ ConvAdapter.prototype = {
 		this.items = [];
 		for (var i = 0; i < items.length; ++i) {
 			var item = items[i];
-			if (item.other == null) {
+			if (!item.other) {
 				item.other = (item.sender.id == Global.authInfo.user.id ? item.receiver[0] : item.sender);
 			}
 			this.items.push(item);
 		}
 	}
-}
+};
 

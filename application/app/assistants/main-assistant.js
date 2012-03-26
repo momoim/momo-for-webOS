@@ -3,16 +3,20 @@ var MainAssistant = Class.create({
 	setup: function() {
 		var that = this;
 
-        //Menu
-        var menuItems = [
-            Mojo.Menu.editItem,
-            {
-                label: '退出',
-                command: 'cmdLogout'
-            }
-        ];
+		//Menu
+		var menuItems = [
+		Mojo.Menu.editItem, {
+			label: '退出',
+			command: 'cmdLogout'
+		}];
 
-        this.controller.setupWidget(Mojo.Menu.appMenu, {omitDefaultItems: true}, {visible: true, items: menuItems});
+		this.controller.setupWidget(Mojo.Menu.appMenu, {
+			omitDefaultItems: true
+		},
+		{
+			visible: true,
+			items: menuItems
+		});
 
 		//init ui
 		that.idList = 'conv-list';
@@ -131,10 +135,10 @@ var MainAssistant = Class.create({
 	},
 	activate: function(event) {
 		var that = this;
-        if(Global.authInfo.user.status < 3){
-		    this.controller.stageController.pushScene('complete');
-            return false;
-        }
+		if (Global.authInfo.user.status < 3) {
+			this.controller.stageController.pushScene('complete');
+			return;
+		}
 		this.controller.document.addEventListener("click", this.onClickReal, true);
 
 		if (event && event.hasOwnProperty('phoneNumbers')) {
@@ -170,19 +174,22 @@ var MainAssistant = Class.create({
 						choices: choices
 					});
 				}
-
 			}
 		} else {
-			RabbitDB.instance().getConvList(function(result) {
-				Mojo.Log.info('get conv list success ---' + result.length);
-				that.modelList.setItems(result);
-				that.controller.modelChanged(that.modelList);
-				if (Global.hasNewUnread) {
-					that.list.mojo.revealItem(0, true);
-					Global.hasNewUnread = false;
-				}
-			});
+			that.refreshDataFromDB();
 		}
+	},
+	refreshDataFromDB: function() {
+		var that = this;
+		RabbitDB.instance().getConvList(function(result) {
+			Mojo.Log.info('get conv list success ---' + result.length);
+			that.modelList.setItems(result);
+			that.controller.modelChanged(that.modelList);
+			if (Global.hasNewUnread) {
+				that.list.mojo.revealItem(0, true);
+				Global.hasNewUnread = false;
+			}
+		});
 	},
 	talkTo: function(people) {
 		var that = this;
@@ -261,5 +268,5 @@ ConvAdapter.prototype = {
 			this.items.push(item);
 		}
 	}
-}
+};
 
