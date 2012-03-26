@@ -104,8 +104,8 @@ var ConvDetailAssistant = Class.create({
 	},
 	listWasTapped: function(event) {
 		Mojo.Log.info('listWasTapped');
-		NotifyHelper.instance().banner('text coppied', true);
 		if(event.item.content && event.item.content.hasOwnProperty('text')) {
+			NotifyHelper.instance().banner('text coppied', true);
 			this.controller.stageController.setClipboard(event.item.content.text);
 			/*
 			this.sendChat({
