@@ -23,12 +23,12 @@ p{color:#404547;word-wrap: break-word; word-break: break-all;}
     -webkit-animation-timing-function: linear;
 }
 .dashboard-icon-momo {background: url(../icon.png) center center no-repeat;}
-.stuck.sendButton {background: url(../images/sender/msg-send-airplane-press.png) top left no-repeat;background: url(../images/sender/msg-send-airplane.png) top left no-repeat;width: 48px;padding: 0;margin: 0px;height: 48px;position: absolute;bottom: 6px;left: 6px;}
+.stuck.sendButton {background: url(../images/sender/recorder.png) top left no-repeat;width: 48px;padding: 0;margin: 0px;height: 48px;position: absolute;bottom: 6px;left: 6px;}
 .stuck.smileButton {background: url(../images/sender/smiles-button-press.png) top left no-repeat;background: url(../images/sender/smiles-button.png) top left no-repeat;width: 48px;padding: 0;margin: 0px;height: 48px;position: absolute;bottom: 6px;left: 6px;}
 .stuck.attachButton {background: url(../images/sender/msg-attachment-paperclip-press.png) top left no-repeat;background: url(../images/sender/msg-attachment-paperclip.png) top left no-repeat;width: 48px;padding: 0;margin: 0px;height: 48px;position: absolute;bottom: 6px;right: 6px;}
 #messageContainer .textentry {margin-top: 7px;}
 #messageContainer .messageTextWidget {margin: 0px;padding: 0px;margin-right: 52px;margin-left: 50px;padding-right:5px}
-.stuck.sendButton.selected {background: url(../images/sender/msg-send-airplane-press.png) top left no-repeat;}
+.stuck.sendButton.selected {background: url(../images/sender/recorder-press.png) top left no-repeat;}
 .stuck.smileButton.selected {background: url(../images/sender/smiles-button-active.png) top left no-repeat;}
 .login-bg{margin:10px auto 0;padding-top:60px;background:url(../images/login_logo.png) no-repeat top center}
 .login-bg{color:#FFF}
