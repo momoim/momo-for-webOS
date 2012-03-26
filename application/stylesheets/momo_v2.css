@@ -30,7 +30,10 @@ p{color:#404547;word-wrap: break-word; word-break: break-all;}
 #messageContainer .messageTextWidget {margin: 0px;padding: 0px;margin-right: 52px;margin-left: 50px;padding-right:5px}
 .stuck.sendButton.selected {background: url(../images/sender/msg-send-airplane-press.png) top left no-repeat;}
 .stuck.smileButton.selected {background: url(../images/sender/smiles-button-active.png) top left no-repeat;}
-#mojo-scene-login-scene-scroller{padding:85px 10px 0;background:url(../images/login_bg.jpg) no-repeat #111;background-size:cover}
+.login-bg{margin:10px auto 0;padding-top:60px;background:url(../images/login_logo.png) no-repeat top center}
+.login-bg{color:#FFF}
+.login-tb{width:100%}
+.login-tb td{width:50%}
 .palm-row-wrapper{padding:4px 8px}
 .palm-button.affirmative,#palm-dialog-box .palm-button.affirmative{color:#fff;-webkit-border-image: url(../images/palm-button-blue.png) 0 17 104 17 repeat repeat;}
 .palm-button.affirmative.selected,#palm-dialog-box .palm-button.affirmative.selected {-webkit-border-image: url(../images/palm-button-blue.png) 52 17 52 17 repeat repeat;}

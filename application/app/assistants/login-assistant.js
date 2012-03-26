@@ -2,12 +2,13 @@ var Login = function() {
 };
 
 Login.prototype = {
-	auth: function(mobile, password, onLoginSuccess, onLoginFailure) {
+	auth: function(zone_code, mobile, password, onLoginSuccess, onLoginFailure) {
 		if (Global.deviceID == null) {
 			NotifyHelper.instance().banner('获取设备ID失败');
 			return;
 		}
 		var postParams = {
+            zone_code: zone_code,
 			mobile: mobile,
 			password: password,
 			device_id: Global.deviceID,
@@ -40,10 +41,29 @@ LoginAssistant.prototype = {
 		});
 
 		this.modelUser = {
+            zone_code: 86,
 			username: '',
 			password: '',
 			disabled: false
 		};
+        /*区号选择*/
+        var country = CountryHelper.data();
+        var tempCountry = [];
+        for(var i = 0, len = country.length; i < len; i++){
+            var tempObj = {label:$L(country[i][1] + "(+" + country[i][0] + ")" ), value: country[i][0]};
+            tempCountry.push(tempObj);
+        }
+        this.selectorsModel = {currentStatus: '86'};
+        this.statuses =  tempCountry;
+        this.controller.setupWidget('country-code',
+           this.attributes = {
+               label: '国家(区号)',
+               labelPlacement: Mojo.Widget.labelPlacementRight,
+               choices: this.statuses,
+               modelProperty:'currentStatus'
+           },
+           this.model = this.selectorsModel);
+        this.controller.listen('country-code', Mojo.Event.propertyChange, this.changed.bindAsEventListener(this));
 
 		this.controller.setupWidget('login-username', {
 			hintText: $L("13800000000"),
@@ -98,6 +118,9 @@ LoginAssistant.prototype = {
 		Mojo.Log.info(this.TAG, 'setup end');
 
 	},
+    changed: function(propertyChangeEvent) {
+        this.modelUser.zone_code = this.selectorsModel.currentStatus;
+    },
 	onLoginSuccess: function(data) {
 		var that = this;
 		Mojo.Log.info('onSuccess.......text:' + data.responseText);
@@ -142,7 +165,7 @@ LoginAssistant.prototype = {
 		Mojo.Log.info(this.TAG, 'onLoginTapped');
 		if (!this.buttonSignin.spinning) {
 			this.buttonSignin.mojo.activate();
-			new Login().auth(this.modelUser.username, this.modelUser.password, that.onLoginSuccess.bind(that), that.onLoginFailure.bind(that));
+			new Login().auth(this.modelUser.zone_code, this.modelUser.username, this.modelUser.password, that.onLoginSuccess.bind(that), that.onLoginFailure.bind(that));
 		}
 	},
 	keyUpHandler: function(event) {
