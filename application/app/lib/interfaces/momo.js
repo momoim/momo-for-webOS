@@ -78,6 +78,10 @@ interfaces.Momo = function() {
 	};
 
 	this.action = function(method, url, params, callbacks) {
+		var postData = '';
+		if(method == 'POST') {
+			postData = (JSON.stringify(params));
+		}
 		var fullUrl = hostUrl + url;
 		var timestamp = OAuth.timestamp();
 		var nonce = OAuth.nonce(20);
@@ -88,7 +92,8 @@ interfaces.Momo = function() {
 		var message = {
 			method: method,
 			action: fullUrl,
-			parameters: OAuth.decodeForm(method == 'POST' ? JSON.stringify(params) : '')
+			// ADD encodeURIComponent to fix post data with '+' oauth fail
+			parameters: OAuth.decodeForm(encodeURIComponent(postData))
 		};
 		message.parameters.push(['oauth_consumer_key', "15f0fd5931f17526873bf8959cbfef2a04dda2d84"]);
 		message.parameters.push(['oauth_nonce', nonce]);
@@ -102,7 +107,7 @@ interfaces.Momo = function() {
 
 		var headers = ["Authorization", authHeader];
 		if (method == 'POST') {
-			return http.post(fullUrl, JSON.stringify(params), headers, callbacks);
+			return http.post(fullUrl, postData, headers, callbacks);
 		} else {
 			return http.get(fullUrl, '', headers, callbacks);
 		}

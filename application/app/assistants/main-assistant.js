@@ -136,6 +136,7 @@ var MainAssistant = Class.create({
             return false;
         }
 		this.controller.document.addEventListener("click", this.onClickReal, true);
+
 		if (event && event.hasOwnProperty('phoneNumbers')) {
 			Mojo.Log.info('people: ' + JSON.stringify(event.phoneNumbers));
 			if (event.phoneNumbers.length > 0) {
@@ -187,10 +188,10 @@ var MainAssistant = Class.create({
 		var that = this;
 		Mojo.Log.info(this.TAG, 'getting people uid ====' + people.mobile);
 		//NotifyHelper.instance().banner('getting people: ' + people.mobile);
-		//FIXME phone number with + will cause 401 error
 		new interfaces.Momo().postRegisterCreateAt([people], {
 			onSuccess: function(hey) {
-				//NotifyHelper.instance().banner('create success' + hey.responseText);
+				//NotifyHelper.instance().banner('create success' + hey.responseJSON[0].mobile);
+				//people.mobile = hey.responseJSON[0].mobile;
 				new interfaces.Momo().postUserShowByMobile(people, {
 					onSuccess: function(response) {
 						var res = response.responseJSON;
@@ -204,7 +205,8 @@ var MainAssistant = Class.create({
 						});
 					}.bind(that),
 					onFailure: function(response) {
-						NotifyHelper.instance().banner('get user info fail' + response.responseText);
+						//NotifyHelper.instance().banner('get user info fail' + response.responseText);
+						NotifyHelper.instance().banner('get user info fail' + response.responseJSON.error);
 					}.bind(that)
 				});
 			}.bind(that),
@@ -229,12 +231,12 @@ var MainAssistant = Class.create({
 
 function ConvAdapter() {
 	this.items = [];
-};
+}
 
 ConvAdapter.prototype = {
 	addItem: function(item) {
 		var that = this;
-		if (item.other == null) {
+		if (!item.other) {
 			item.other = (item.sender.id == Global.authInfo.user.id ? item.receiver[0] : item.sender);
 		}
 		//that.items.push(item);
@@ -253,7 +255,7 @@ ConvAdapter.prototype = {
 		this.items = [];
 		for (var i = 0; i < items.length; ++i) {
 			var item = items[i];
-			if (item.other == null) {
+			if (!item.other) {
 				item.other = (item.sender.id == Global.authInfo.user.id ? item.receiver[0] : item.sender);
 			}
 			this.items.push(item);
