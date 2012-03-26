@@ -35,6 +35,8 @@ var ConvDetailAssistant = Class.create({
 		that.modelList = new ConvAdapter());
 		that.list = that.controller.get(that.idList);
 
+		Mojo.Event.listen(this.list, Mojo.Event.listTap, this.listWasTapped.bind(this));
+
 		this.modelComment = {
 			content: '',
 			replyto: null,
@@ -98,6 +100,18 @@ var ConvDetailAssistant = Class.create({
 			that.modelList.addItem(message);
 			that.controller.modelChanged(that.modelList);
 			that.list.mojo.revealItem(that.modelList.items.length, false);
+		}
+	},
+	listWasTapped: function(event) {
+		Mojo.Log.info('listWasTapped');
+		NotifyHelper.instance().banner('text coppied', true);
+		if(event.item.content && event.item.content.hasOwnProperty('text')) {
+			this.controller.stageController.setClipboard(event.item.content.text);
+			/*
+			this.sendChat({
+				text: event.item.content.text
+			});
+			*/
 		}
 	},
 	keyUpHandler: function(event) {

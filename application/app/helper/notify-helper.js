@@ -1,9 +1,9 @@
 var NotifyHelper = function() {
 	return {
-		banner: function(msg) {
+		banner: function(msg, silence) {
 			var bannerParams = {
 				messageText: msg,
-				soundClass: 'notifications'
+				soundClass: silence ? '' : 'notifications'
 			};
 
 			Mojo.Controller.getAppController().showBanner(bannerParams, {
