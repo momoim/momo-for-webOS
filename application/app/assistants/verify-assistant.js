@@ -84,7 +84,7 @@ VerifyAssistant.prototype = {
             },
             this.model = {
                 buttonLabel: $L('重发验证码'),
-                buttonClass: 'affirmative',
+                buttonClass: 'secondary',
                 disabled: false
             }
         );

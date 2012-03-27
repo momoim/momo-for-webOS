@@ -17,10 +17,10 @@
 @border_radius : 5px;
 @zIndex_loading : 100000;
 @zIndex_header : 100;
-@moBg : url('../images/low/mo-bg.png') left top repeat-x;
-@avatar_bg : url('../images/low/default-avatar.png') no-repeat;
-@load_fade : url('../images/low/load-fade.png') left top repeat-x;
-@dashboard_icon_momo : url('../icon.png') center center no-repeat;
+@moBg : url(../images/low/mo-bg.png) left top repeat-x;
+@avatar_bg : url(../images/low/default-avatar.png) no-repeat;
+@load_fade : url(../images/low/load-fade.png) left top repeat-x;
+@dashboard_icon_momo : url(../icon.png) center center no-repeat;
 @btn_recorder : url(../images/sender/recorder.png) top left no-repeat;
 @btn_recorder_selected : url(../images/sender/recorder-press.png) top left no-repeat;
 @btn_attach : url(../images/sender/msg-attachment-paperclip.png) top left no-repeat;
@@ -29,13 +29,16 @@
 @btn_blue_selected : url(../images/palm-button-blue.png) 52 17 52 17 repeat repeat;
 @btn_blue_disabled : url(../images/palm-button-blue.png) 104 17 0 17 repeat repeat;
 @login_bg : url(../images/login_logo.png) no-repeat top center;
-@header_bg : url('../images/low/header-bar.png') left -25px repeat-x;
-@hdt_bg : url('../images/low/nav-icon-border.png') left bottom no-repeat, url('../images/low/nav-icon-border.png') right bottom no-repeat;
+@header_bg : url(../images/low/header-bar.png) left -25px repeat-x;
+@hdt_bg : url(../images/low/nav-icon-border.png) left bottom no-repeat, url(../images/low/nav-icon-border.png) right bottom no-repeat;
 @hdt_act_bg : url(../images/trans70.png);
 @btn_refresh : url(../images/low/icons/refresh.png) no-repeat center center;
 @btn_add : url(../images/low/icons/compose.png) no-repeat 23px 14px;
 @sta_sel_bg : url(../images/low/tweet-highlight.png) center top repeat-x, url(../images/low/tweet-highlight-bottom.png) center bottom repeat-x;
 @sta_del_bg : url(../images/low/tweet-highlight.png) center top repeat-x, url(../images/low/tweet-highlight-bottom.png) center bottom repeat-x;
+@arrow_other : url(../images/is_said.png) no-repeat;
+@arrow_is : url(../images/other_said.png) no-repeat;
+@toaster_bg : url(../images/low/toaster-bg.png) left top repeat-x;
 .breakP(){word-wrap: break-word; word-break: break-all;}
 .reset(){margin:0;padding:0}
 .border-radius (@radius: 5px) {
@@ -57,13 +60,8 @@
 .palm-mouse-target(@ignore: ignore){
     -webkit-palm-mouse-target : @ignore;
 }
-.clear(){
-    clear : both;
-}
 
-.clear{
-    .clear;
-}
+.clear{clear: both}
 body.palm-default{
     font-size: @fontSize_default;
     display: block;
@@ -81,7 +79,7 @@ a{
 }
 
 p{
-    color: @color_gray;
+    color: #404547;
     .breakP
 }
 
@@ -94,6 +92,10 @@ p{
 .avatar img{
     .avatar;
     background: @avatar_bg;
+}
+
+.palm-body-text{
+    .reset;
 }
 
 .palm-row-wrapper{
@@ -140,11 +142,11 @@ p{
     .reset;
     position: absolute; 
     bottom: 6px;
-    left: 6px;
 }
 .stuck.sendButton{
     background: @btn_recorder;
     .menu-btn;
+    left: 6px;
     &.selected{
         background: @btn_recorder_selected;
     }
@@ -152,6 +154,7 @@ p{
 .stuck.attachButton{
     .menu-btn;
     background: @btn_attach;
+    right: 6px;
     &.selected{
         background: @btn_attach_selected;
     }
@@ -235,7 +238,7 @@ p{
 .status-row{
     .reset;
     color: @color_gray;
-    .clear;
+    clear: both;
     &.selected{
         background: @sta_sel_bg;
     }
@@ -271,4 +274,97 @@ p{
     width: 50px;
     vertical-align: top;
     float: left;
+}
+.conv-list-detail-item{
+    padding: 5px;
+    list-style: none;
+    .mo-chat-detail-item-avatar{
+        float: left;
+        margin-right: 2px;
+    }
+    .time{
+        float: left;
+        color: #ccc;
+        margin: 0 0 5px 60px;
+    }
+    .mo-chat-detail-item{
+        clear: both;
+        .detail-content{
+            position: relative;
+            float: left;
+            margin: 0 10px;
+            padding: 2px;
+            max-width: 230px;
+            background: #E1E1E1;
+            .border-radius;
+        }
+        p{
+            margin: 0;
+            padding: 5px;
+            min-height: 12px;
+        }
+    }
+}
+.other-said{
+    .mo-chat-detail-item{
+        .detail-content{
+            .arrow{
+                position: absolute;
+                top: 10px;
+                left: -11px;
+                display: inline-block;
+                width: 11px;
+                height: 10px;
+                background: @arrow_other;
+            }
+        }
+    }
+}
+.is-said{
+    .mo-chat-detail-item-avatar{
+        float: right;
+        margin-left: 2px;
+    }
+    .time{
+        float: right;
+        margin: 0 60px 5px 0;
+        clear: both;
+        color: #9c9c9c;
+    }
+    .mo-chat-detail-item{
+        .detail-content{
+            float: right;
+            background: #C4E7FF;
+            .arrow{
+                position: absolute;
+                top: 10px;
+                right: -11px;
+                display: inline-block;
+                width: 11px;
+                height: 10px;
+                background: @arrow_is;
+            }
+        }
+    }
+}
+.toaster{
+    display: block;
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    width: @width_100;
+    .transition(bottom, .5s);
+    z-index: 300;
+    background: @toaster_bg;
+    opacity: @opacity_9;
+    color: #d2d2d2;
+}
+#comment-content > *{
+    color: #fff;
+    padding-left: 5px;
+}
+#comment-content{
+    .multiline-hint-text{
+        padding-top: 15px;
+    }
 }
