@@ -31,12 +31,12 @@ var NodeService = function() {
 
 //singleton
 NodeService.instance = function() {
-	if (NodeService.mInstance == null) {
+	if (!NodeService.mInstance) {
 		NodeService.mInstance = new NodeService();
 		NodeService.mInstance.init();
 	}
 	return NodeService.mInstance;
-}
+};
 
 NodeService.prototype = {
 	init: function() {
@@ -46,16 +46,18 @@ NodeService.prototype = {
 	},
 	getID: function() {
 		return guidGenerator();
+		/*
 		var that = this;
 
 		var result = 'sub_' + that.mID; ++that.mID;
 		return result;
+		*/
 	},
 	subscribe: function(sub) {
 		console.log('subscribe: ' + sub.sname);
 		var that = this;
 
-		if (that.mSubscriptions == null) {
+		if (!that.mSubscriptions) {
 			that.mSubscriptions = [];
 		}
 		that.mSubscriptions.push(sub);
@@ -63,7 +65,7 @@ NodeService.prototype = {
 	unsubscribe: function(sub) {
 		var that = this;
 
-		if (sub == null) return;
+		if (!sub) return;
 		for (var i = 0; i < that.mSubscriptions.length; ++i) {
 			var curr = that.mSubscriptions[i];
 			if (curr.sname == sub.sname) {
@@ -86,7 +88,7 @@ NodeService.prototype = {
 		var info = total.auth;
 		var chat = total.chat;
 
-		if (that.authInfo == null || that.authInfo.user == null) {
+		if (!that.authInfo || !that.authInfo.user) {
 			if (chat.kind == 'sms') {
 				//that.sendMsgWithHttp(chat.data);
 				that.sendMsgFail(chat);
@@ -96,7 +98,7 @@ NodeService.prototype = {
 			var will = {
 				kind: chat.kind,
 				data: chat.data
-			}
+			};
 			var oid;
 			if (will.kind == 'sms') {
 				oid = chat.data.receiver[0].id;
@@ -115,7 +117,7 @@ NodeService.prototype = {
 			var chated = {
 				kind: 'im',
 				data: JSON.parse(result)
-			}
+			};
 			console.log('on msg send end');
 			PalmCall.call('palm://com.palm.applicationManager', 'open', {
 				'id': 'momo.im.app',
@@ -137,8 +139,8 @@ NodeService.prototype = {
 		console.log('tokenSecret: ' + info.tokenSecret);
 		console.log('queueName: ' + info.queueName);
 		that.authInfo = info;
-		if (that.authInfo != null) {
-			if (that.mqClient != null && that.mqClient.isAlive()) {
+		if (that.authInfo) {
+			if (that.mqClient && that.mqClient.isAlive()) {
 				console.log('connection is still alive');
 				f.result = {
 					alive: true
@@ -168,7 +170,7 @@ NodeService.prototype = {
 			f.result = {
 				hello: 'got im data ' + chatResult,
 				data: chatResult
-			}
+			};
 		},
 		function(response) {
 			var status = response.statusCode;
@@ -180,7 +182,7 @@ NodeService.prototype = {
 	},
 	httpReq: function(method, path, json, onSuccess, onFail) {
 		var params = '';
-		if (json != null && json != '') {
+		if (json && json !== '') {
 			params = JSON.stringify(json);
 		}
 		var that = this;
@@ -194,7 +196,7 @@ NodeService.prototype = {
 		var message = {
 			method: method,
 			action: url,
-			parameters: OAuth.decodeForm(params)
+			parameters: OAuth.decodeForm(encodeURIComponent(params))
 		};
 		message.parameters.push(['oauth_consumer_key', "15f0fd5931f17526873bf8959cbfef2a04dda2d84"]);
 		message.parameters.push(['oauth_nonce', nonce]);
@@ -202,7 +204,7 @@ NodeService.prototype = {
 		message.parameters.push(['oauth_timestamp', timestamp]);
 		message.parameters.push(['oauth_token', that.authInfo.oauthToken]);
 		message.parameters.push(['oauth_version', '1.0']);
-		message.parameters.sort()
+		message.parameters.sort();
 		OAuth.SignatureMethod.sign(message, accessor);
 		var authHeader = OAuth.getAuthorizationHeader("", message.parameters);
 

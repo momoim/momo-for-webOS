@@ -308,6 +308,7 @@ var ConvDetailAssistant = Class.create({
 				method: "chatSend",
 				parameters: {
 					auth: Global.authInfo,
+					//chat: JSON.stringify(chat)
 					chat: chat
 				},
 				onSuccess: function() {},

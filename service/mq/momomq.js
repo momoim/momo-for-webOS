@@ -3,7 +3,7 @@ var amqp = require('./amqp/amqp');
 function MomoMQ(nodeService) {
 	this.nodeService = nodeService;
 	this.init();
-};
+}
 
 MomoMQ.prototype.init = function() {
 	var that = this;
@@ -13,7 +13,7 @@ MomoMQ.prototype.init = function() {
 };
 
 MomoMQ.prototype.isAlive = function() {
-	return this.connection != null && this.connection.readyState != 'closed' && this.connection.writable;
+	return this.connection && this.connection.readyState !== 'closed' && this.connection.writable;
 };
 
 MomoMQ.prototype.logUI = function(msg) {
@@ -26,14 +26,34 @@ MomoMQ.prototype.logUI = function(msg) {
 			});
 };
 
+var getStringCodePoints = (function() {
+    function surrogatePairToCodePoint(charCode1, charCode2) {
+        return ((charCode1 & 0x3FF) << 10) + (charCode2 & 0x3FF) + 0x10000;
+    }
+
+    // Read string in character by character and create an array of code points
+    return function(str) {
+        var codePoints = [], i = 0, charCode;
+        while (i < str.length) {
+            charCode = str.charCodeAt(i);
+            if ((charCode & 0xF800) == 0xD800) {
+                codePoints.push(surrogatePairToCodePoint(charCode, str.charCodeAt(++i)));
+            } else {
+                codePoints.push(charCode);
+            }
+            ++i;
+        }
+        return codePoints;
+    };
+})();
+
 MomoMQ.prototype.connect = function(imm) {
 	var that = this;
 	var now = new Date();
-	if (!that.connectTime || imm) {
-	} else {
+	if (that.connectTime && !imm) {
 		if ((now.getTime() - that.connectTime.getTime()) < 20000) {
 			return;
-		} else {
+		//} else {
 			//that.logUI('on connection retrying after 20 seconds');
 		}
 	}
@@ -96,6 +116,21 @@ MomoMQ.prototype.connect = function(imm) {
 					if (that.nodeService !== null) {
 						var raw = JSON.parse(message.data.toString());
 						raw.data.timestamp = deliveryInfo.timestamp; // * 1000;
+
+						/*
+						if(raw.data && raw.data.content && raw.data.content.text) {
+						var strs = JSON.stringify(raw.data.content);
+						var codes = getStringCodePoints(strs);
+						console.log(codes.join(','));
+						for(var i = 0; i < codes.length; ++i) {
+							var code = codes[i];
+							if(code > 65534) {
+								console.log('message data ==========================>' + code);
+							}
+						}
+						console.log('message data code ending==========');
+						}
+						*/
 						var income = JSON.parse(JSON.stringify(raw));
 						that.nodeService.receive.call(that.nodeService, raw);
 						//send roger
@@ -155,12 +190,12 @@ MomoMQ.prototype.connect = function(imm) {
 		//that.logUI('on connection end');
 		that.connect(true);
 	});
-}
+};
 
 MomoMQ.prototype.sendMsg = function(to, msg) {
 	console.log('sending: ' + msg);
 	var that = this;
-	if (this.isAlive() && this.exc != null) {
+	if (this.isAlive() && this.exc) {
 		this.exc.publish(to, msg, {
 			contentType: 'text/plain'
 		});
@@ -169,7 +204,7 @@ MomoMQ.prototype.sendMsg = function(to, msg) {
 		that.logUI('on connection send fail');
 		this.connect(true);
 	}
-}
+};
 
 module.exports = MomoMQ;
 

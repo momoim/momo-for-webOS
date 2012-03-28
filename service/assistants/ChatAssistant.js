@@ -46,7 +46,7 @@ onChatInit.prototype = {
 		console.log('on chat init');
 		NodeService.instance().auth(future, this.controller.args);
 	}
-}
+};
 
 // 发送消息体
 var onChatSend = function() {};
@@ -54,7 +54,9 @@ var onChatSend = function() {};
 onChatSend.prototype = {
 	run: function(future) {
 		console.log('on chat send');
-		NodeService.instance().send(future, this.controller.args);
+		var total = this.controller.args;
+		//total.chat = JSON.parse(total.chat);
+		NodeService.instance().send(future, total);
 	}
 };
 
@@ -62,7 +64,7 @@ var onChatSubscribe = function() {};
 
 onChatSubscribe.prototype = {
 	run: function(future, subscription) {
-		if (subscription != null) {
+		if (subscription) {
 			subscription.sname = NodeService.instance().getID();
 			var count = 0;
 			future.result = {
