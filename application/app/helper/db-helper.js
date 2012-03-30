@@ -35,7 +35,7 @@ DBHelper.prototype = {
 				if (value == null) {
 					onFailure()
 				} else {
-                    Mojo.Log.warn("value======>" + JSON.stringify(value));
+                    //Mojo.Log.warn("value======>" + JSON.stringify(value));
 					onSuccess(value);
 				}
 			},
