@@ -6,16 +6,20 @@ var ConvDetailAssistant = Class.create({
 	},
 	setup: function() {
 		var that = this;
-        //Menu
-        var menuItems = [
-            Mojo.Menu.editItem,
-            {
-                label: '退出',
-                command: 'cmdLogout'
-            }
-        ];
+		//Menu
+		var menuItems = [
+		Mojo.Menu.editItem, {
+			label: '退出',
+			command: 'cmdLogout'
+		}];
 
-        this.controller.setupWidget(Mojo.Menu.appMenu, {omitDefaultItems: true}, {visible: true, items: menuItems});
+		this.controller.setupWidget(Mojo.Menu.appMenu, {
+			omitDefaultItems: true
+		},
+		{
+			visible: true,
+			items: menuItems
+		});
 		//init ui
 		that.idList = 'conv-list';
 
@@ -104,7 +108,7 @@ var ConvDetailAssistant = Class.create({
 	},
 	listWasTapped: function(event) {
 		Mojo.Log.info('listWasTapped');
-		if(event.item.content && event.item.content.hasOwnProperty('text')) {
+		if (event.item.content && event.item.content.hasOwnProperty('text')) {
 			NotifyHelper.instance().banner('text coppied', true);
 			this.controller.stageController.setClipboard(event.item.content.text);
 			/*
@@ -330,6 +334,78 @@ var ConvDetailAssistant = Class.create({
 			var dataID = target.getAttribute('data-id');
 			Mojo.Log.info(this.TAG, 'onClick: -----' + action);
 			switch (action) {
+			case 'chat-file':
+				var fileSrc = target.getAttribute('file-src');
+				Mojo.Log.info(this.TAG, 'chat audio click: ' + fileSrc);
+				var idUrl = Setting.cache.file + target.getAttribute('file-name');
+
+				function chatFileFailed() {
+					//open with url
+					new Mojo.Service.Request('palm://com.palm.applicationManager', {
+						method: 'open',
+						parameters: {
+							id: 'com.palm.app.browser',
+							params: {
+								target: fileSrc
+							}
+						}
+					});
+				}
+				function chatFileSuccess() {
+					//open with local file
+					new Mojo.Service.Request('palm://com.palm.applicationManager', {
+						method: 'open',
+						parameters: {
+							target: idUrl
+						}
+					});
+					NotifyHelper.instance().banner('file saved:' + idUrl, true);
+				}
+				Mojo.Log.warn('try to check file exist');
+				new Mojo.Service.Request("palm://momo.im.app.service.node/", {
+					method: "onFileInfo",
+					parameters: {
+						path: idUrl
+					},
+					onSuccess: function(response) {
+						if (response.error) {
+							Mojo.Log.warn('file not exists:' + idUrl);
+							//fileFailed();
+							//NotifyHelper.instance().banner(Object.toJSON(response.error));
+							new Mojo.Service.Request("palm://momo.im.app.service.node/", {
+								method: "onFileDownload",
+								parameters: {
+									path: idUrl,
+									url: fileSrc
+								},
+								onSuccess: function(response) {
+									if (response.error) {
+										Mojo.Log.warn('file not exists donwload fail:' + idUrl);
+										chatFileFailed();
+										//NotifyHelper.instance().banner(Object.toJSON(response.error));
+									} else {
+										Mojo.Log.warn('file not exists donwload success:' + idUrl);
+										chatFileSuccess();
+										//NotifyHelper.instance().banner('cache success');
+									}
+								},
+								onFailure: function(fail) {
+									chatFileFailed();
+									//NotifyHelper.instance().banner('cache service fail');
+								}
+							});
+						} else {
+							Mojo.Log.warn('file exists:' + idUrl);
+							chatFileSuccess();
+							//NotifyHelper.instance().banner('cache get success');
+						}
+					},
+					onFailure: function(fail) {
+						Mojo.Log.warn('file info get fail:' + JSON.stringify(fail));
+						chatFileFailed();
+					}
+				});
+				break;
 			case 'chat-audio':
 				var audioSrc = target.getAttribute('audio-src');
 				Mojo.Log.info(this.TAG, 'chat audio click: ' + audioSrc);

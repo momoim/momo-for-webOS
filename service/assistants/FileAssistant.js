@@ -60,6 +60,7 @@ onFileDownload.prototype = {
 		fs.mkdir(Setting.CACHE_FOLDER, 755);
 		fs.mkdir(Setting.cache.audio, 755);
 		fs.mkdir(Setting.cache.photo, 755);
+		fs.mkdir(Setting.cache.file, 755);
 
 		var host = url.parse(fileUrl).hostname;
 

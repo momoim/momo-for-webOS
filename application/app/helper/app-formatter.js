@@ -75,7 +75,7 @@ var AppFormatter = {
 				//+ '<audio src="'+ audio['url'] +'" id="audio-' + model['id'] + '"/>';
 			} else if (now == 'file') {
 				var file = n[now];
-				return '<a href="' + file.url + '">' + file.name + '</a>';
+				return '<a href="#" data-action="chat-file" data-id="' + model['id'] + '" file-src="' + file.url + '" file-name="' + file.name + '">' + file.name + '</a>';
 			} else {
 				var base = '发送了';
 				if (now == 'picture') {

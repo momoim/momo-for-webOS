@@ -24,7 +24,8 @@ Setting.clientID = 1;
 Setting.CACHE_FOLDER = '/media/internal/.momo';
 Setting.cache = {
 	audio: Setting.CACHE_FOLDER + '/audio/',
-	photo: Setting.CACHE_FOLDER + '/photo/'
+	photo: Setting.CACHE_FOLDER + '/photo/',
+	file: Setting.CACHE_FOLDER + '/file/'
 };
 function guidGenerator(){
     var S4 = function(){
