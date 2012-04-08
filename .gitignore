@@ -12,4 +12,3 @@ doc/app
 *.ipk
 bin/*.ipk
 *Thumbs.db
-application/amr_helper
