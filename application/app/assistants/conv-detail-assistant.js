@@ -97,6 +97,7 @@ var ConvDetailAssistant = Class.create({
 		} else {
 			this.switchToText();
 		}
+
 	},
 	update: function(message) {
 		var that = this;
@@ -537,9 +538,37 @@ var ConvDetailAssistant = Class.create({
 		var self = this;
 
 		this.captureHelper.stopRecording();
+
+		var wavfile = VR_FOLDER + self.audioFile + VR_EXTENSION;
+		var amrfile = VR_FOLDER + self.audioFile + VR_EXTENSION_AMR;
+		var audiofile = wavfile;
+		if (Global.AmrHelper && Global.AmrHelper.isReady) {
+			//NotifyHelper.instance().banner('is ready ..');
+			try {
+				var amred = Global.AmrHelper.wave2amr(wavfile, amrfile);
+				if (amred == 'ok') {
+					audiofile = amrfile;
+					//NotifyHelper.instance().banner('amr convert ok');
+					new Mojo.Service.Request("palm://momo.im.app.service.node/", {
+						method: "onFileDel",
+						parameters: {
+							path: wavfile,
+						},
+						onSuccess: function() {},
+						onFailure: function() {}
+					});
+					//NotifyHelper.instance().banner('amr convert success: ' + amred);
+				} else {
+					//NotifyHelper.instance().banner('amr convert wrong: ' + amred);
+				}
+			} catch(e) {
+				//NotifyHelper.instance().banner('amr convert wrong' + e);
+			}
+		}
+
 		self.sendChat({
 			audio: {
-				url: VR_FOLDER + self.audioFile + VR_EXTENSION,
+				url: audiofile,
 				duration: 0
 			}
 		});
@@ -551,6 +580,7 @@ var ConvDetailAssistant = Class.create({
 		}
 	},
 	activate: function(event) {
+		var that = this;
 
 		this.controller.document.addEventListener("keyup", this.keyUpHandlerReal, true);
 		this.controller.document.addEventListener("click", this.onClickReal, true);

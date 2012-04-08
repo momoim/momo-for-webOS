@@ -1,5 +1,6 @@
 VR_FOLDER = "/media/internal/momo/";
-VR_EXTENSION = ".amr";
+VR_EXTENSION = ".wav";
+VR_EXTENSION_AMR = ".amr";
 
 var CaptureHelper = function CaptureHelper(){
 	

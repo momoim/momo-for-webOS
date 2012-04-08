@@ -76,7 +76,7 @@ NodeService.prototype = {
 	},
 	sendMsgFail: function(chat) {
 		PalmCall.call('palm://com.palm.applicationManager', 'open', {
-			'id': 'momo.im.app',
+			'id': 'momo.im.app.mojo',
 			'params': {
 				'action': 'onMsgSendError',
 				'data': JSON.stringify(chat)
@@ -120,7 +120,7 @@ NodeService.prototype = {
 			};
 			console.log('on msg send end');
 			PalmCall.call('palm://com.palm.applicationManager', 'open', {
-				'id': 'momo.im.app',
+				'id': 'momo.im.app.mojo',
 				'params': {
 					'action': 'onNewIncome',
 					'data': JSON.stringify(chated)
@@ -161,7 +161,7 @@ NodeService.prototype = {
 		that.httpReq('GET', '/im/all.json', '', function(chatResult) {
 			console.log('on chat list end');
 			PalmCall.call('palm://com.palm.applicationManager', 'open', {
-				'id': 'momo.im.app',
+				'id': 'momo.im.app.mojo',
 				'params': {
 					'action': 'onUnreadList',
 					'data': chatResult
@@ -248,7 +248,7 @@ NodeService.prototype = {
 		var that = this;
 
 		PalmCall.call('palm://com.palm.applicationManager', 'open', {
-			'id': 'momo.im.app',
+			'id': 'momo.im.app.mojo',
 			'params': {
 				'action': 'onNewIncome',
 				'data': JSON.stringify(dataMsg)

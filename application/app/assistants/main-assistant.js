@@ -52,6 +52,54 @@ var MainAssistant = Class.create({
 		});
 
 		this.onClickReal = this.onClick.bind(this);
+
+		//amr辅助PDK类
+		this.createPluginAmr(this.controller.window.document);
+		Global.AmrHelper = this.controller.get('amr_helper');
+		if (Global.AmrHelper) {
+			Global.AmrHelper.ready = function() {
+				//NotifyHelper.instance().banner('well');
+				Global.AmrHelper.isReady = true;
+			}.bind(this);
+			//this.initializePlugin();
+		} else {
+			NotifyHelper.instance().banner('fail to load amr helper');
+		}
+	},
+	initializePlugin: function() {
+		var that = this;
+		if (!Global.AmrHelper.foo) {
+			setTimeout(that.initializePlugin.bind(that), 50);
+		} else {
+			// plug-in is ready to be used
+			/*
+			var foo = Global.AmrHelper.foo();
+			NotifyHelper.instance().banner(foo);
+			*/
+			//Global.AmrHelper.wave2amr("/media/internal/.momo/audio/74eaa851-db2c-03fe-fed1-15f9a2df49dc.amr", "/media/internal/.momo/testmojo.amr");
+		}
+	},
+	createPluginAmr: function(document) {
+		var pluginObj = document.createElement("object");
+
+		pluginObj.id = "amr_helper";
+		pluginObj.type = "application/x-palm-remote";
+		pluginObj.width = 2;
+		pluginObj.height = 2;
+		pluginObj['x-palm-pass-event'] = true;
+
+		var param1 = document.createElement("param");
+		param1.name = "appid";
+		param1.value = Mojo.Controller.appInfo.id;
+
+		var param2 = document.createElement("param");
+		param2.name = "exe";
+		param2.value = "amr_helper";
+
+		pluginObj.appendChild(param1);
+		pluginObj.appendChild(param2);
+
+		document.body.appendChild(pluginObj);
 	},
 	onInitSuccess: function(result) {
 		var that = this;

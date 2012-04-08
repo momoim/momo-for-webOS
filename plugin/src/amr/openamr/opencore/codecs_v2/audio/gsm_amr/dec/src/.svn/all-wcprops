@@ -1,0 +1,401 @@
+K 25
+svn:wc:ra_dav:version-url
+V 157
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src
+END
+dec_amr.h
+K 25
+svn:wc:ra_dav:version-url
+V 167
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/dec_amr.h
+END
+ex_ctrl.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 169
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/ex_ctrl.cpp
+END
+bgnscd.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 168
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/bgnscd.cpp
+END
+d_gain_p.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 170
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/d_gain_p.cpp
+END
+d8_31pf.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 169
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/d8_31pf.cpp
+END
+d3_14pf.h
+K 25
+svn:wc:ra_dav:version-url
+V 167
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/d3_14pf.h
+END
+dec_lag3.h
+K 25
+svn:wc:ra_dav:version-url
+V 168
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/dec_lag3.h
+END
+ec_gains.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 170
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/ec_gains.cpp
+END
+dec_input_format_tab.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 182
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/dec_input_format_tab.cpp
+END
+dtx_dec.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 169
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/dtx_dec.cpp
+END
+pvgsmamrdecoder.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 177
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/pvgsmamrdecoder.cpp
+END
+d1035pf.h
+K 25
+svn:wc:ra_dav:version-url
+V 167
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/d1035pf.h
+END
+ph_disp.h
+K 25
+svn:wc:ra_dav:version-url
+V 167
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/ph_disp.h
+END
+dec_gain.h
+K 25
+svn:wc:ra_dav:version-url
+V 168
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/dec_gain.h
+END
+dec_lag3.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 170
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/dec_lag3.cpp
+END
+d2_11pf.h
+K 25
+svn:wc:ra_dav:version-url
+V 167
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/d2_11pf.h
+END
+dec_lag6.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 170
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/dec_lag6.cpp
+END
+ex_ctrl.h
+K 25
+svn:wc:ra_dav:version-url
+V 167
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/ex_ctrl.h
+END
+bgnscd.h
+K 25
+svn:wc:ra_dav:version-url
+V 166
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/bgnscd.h
+END
+d8_31pf.h
+K 25
+svn:wc:ra_dav:version-url
+V 167
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/d8_31pf.h
+END
+decoder_gsm_amr.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 177
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/decoder_gsm_amr.cpp
+END
+ec_gains.h
+K 25
+svn:wc:ra_dav:version-url
+V 168
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/ec_gains.h
+END
+dtx_dec.h
+K 25
+svn:wc:ra_dav:version-url
+V 167
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/dtx_dec.h
+END
+b_cn_cod.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 170
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/b_cn_cod.cpp
+END
+pvgsmamrdecoder.h
+K 25
+svn:wc:ra_dav:version-url
+V 175
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/pvgsmamrdecoder.h
+END
+amrdecode.h
+K 25
+svn:wc:ra_dav:version-url
+V 169
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/amrdecode.h
+END
+a_refl.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 168
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/a_refl.cpp
+END
+d2_9pf.h
+K 25
+svn:wc:ra_dav:version-url
+V 166
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/d2_9pf.h
+END
+d_plsf_3.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 170
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/d_plsf_3.cpp
+END
+dec_gain.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 170
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/dec_gain.cpp
+END
+pstfilt.h
+K 25
+svn:wc:ra_dav:version-url
+V 167
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/pstfilt.h
+END
+agc.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 165
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/agc.cpp
+END
+d_plsf_5.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 170
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/d_plsf_5.cpp
+END
+preemph.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 169
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/preemph.cpp
+END
+lsp_avg.h
+K 25
+svn:wc:ra_dav:version-url
+V 167
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/lsp_avg.h
+END
+if2_to_ets.h
+K 25
+svn:wc:ra_dav:version-url
+V 170
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/if2_to_ets.h
+END
+d4_17pf.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 169
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/d4_17pf.cpp
+END
+gsmamr_dec.h
+K 25
+svn:wc:ra_dav:version-url
+V 170
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/gsmamr_dec.h
+END
+d_plsf.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 168
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/d_plsf.cpp
+END
+dec_lag6.h
+K 25
+svn:wc:ra_dav:version-url
+V 168
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/dec_lag6.h
+END
+post_pro.h
+K 25
+svn:wc:ra_dav:version-url
+V 168
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/post_pro.h
+END
+c_g_aver.h
+K 25
+svn:wc:ra_dav:version-url
+V 168
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/c_g_aver.h
+END
+amrdecode.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 171
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/amrdecode.cpp
+END
+d2_9pf.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 168
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/d2_9pf.cpp
+END
+qgain475_tab.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 174
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/qgain475_tab.cpp
+END
+pstfilt.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 169
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/pstfilt.cpp
+END
+dec_amr.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 169
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/dec_amr.cpp
+END
+lsp_avg.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 169
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/lsp_avg.cpp
+END
+b_cn_cod.h
+K 25
+svn:wc:ra_dav:version-url
+V 168
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/b_cn_cod.h
+END
+if2_to_ets.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 172
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/if2_to_ets.cpp
+END
+a_refl.h
+K 25
+svn:wc:ra_dav:version-url
+V 166
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/a_refl.h
+END
+int_lsf.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 169
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/int_lsf.cpp
+END
+agc.h
+K 25
+svn:wc:ra_dav:version-url
+V 163
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/agc.h
+END
+d3_14pf.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 169
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/d3_14pf.cpp
+END
+sp_dec.h
+K 25
+svn:wc:ra_dav:version-url
+V 166
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/sp_dec.h
+END
+preemph.h
+K 25
+svn:wc:ra_dav:version-url
+V 167
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/preemph.h
+END
+post_pro.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 170
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/post_pro.cpp
+END
+c_g_aver.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 170
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/c_g_aver.cpp
+END
+wmf_to_ets.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 172
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/wmf_to_ets.cpp
+END
+d4_17pf.h
+K 25
+svn:wc:ra_dav:version-url
+V 167
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/d4_17pf.h
+END
+d1035pf.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 169
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/d1035pf.cpp
+END
+pvgsmamrdecoder_dpi.h
+K 25
+svn:wc:ra_dav:version-url
+V 179
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/pvgsmamrdecoder_dpi.h
+END
+d_gain_c.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 170
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/d_gain_c.cpp
+END
+ph_disp.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 169
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/ph_disp.cpp
+END
+d2_11pf.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 169
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/d2_11pf.cpp
+END
+sp_dec.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 168
+/svn/application/!svn/ver/185849/19_Mobile/03_WorkArea/mobile/momo_v0.1_bugfix/third_party/opencore-amr-0.1.2/opencore/codecs_v2/audio/gsm_amr/amr_nb/dec/src/sp_dec.cpp
+END

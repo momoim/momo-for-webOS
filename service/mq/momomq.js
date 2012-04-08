@@ -18,7 +18,7 @@ MomoMQ.prototype.isAlive = function() {
 
 MomoMQ.prototype.logUI = function(msg) {
 			PalmCall.call('palm://com.palm.applicationManager', 'open', {
-				'id': 'momo.im.app',
+				'id': 'momo.im.app.mojo',
 				'params': {
 					'action': 'onConnError',
 					'data': msg

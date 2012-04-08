@@ -22,13 +22,11 @@ onKeepAlive.prototype = {
 		console.log('keeping alive timeout');
 		
 		PalmCall.call('palm://com.palm.applicationManager', 'open', {
-			'id': 'momo.im.app',
+			'id': 'momo.im.app.mojo',
 			'params': {
 				'action': 'keep-alive'
 			}
 		});
-
-		//PalmCall.call('palm://momo.im.app.service.node', 'keepAlive', {});
 
 		clearInterval(this.interval);
 
