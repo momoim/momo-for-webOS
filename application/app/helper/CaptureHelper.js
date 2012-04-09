@@ -58,8 +58,11 @@ var CaptureHelper = function CaptureHelper(){
 	}
 	
 	function stopRecording(){
+		var duration = Math.floor(mediaCaptureObj.elapsedTime*1000);
+		//NotifyHelper.instance().banner('duration:' + duration);
 		mediaCaptureObj.stopAudioCapture();
 		mediaCaptureObj.unload();
+		return duration;
 	}
 	
 	

@@ -202,6 +202,7 @@ var ConvDetailAssistant = Class.create({
 					},
 					onSuccess: function() {
 						//NotifyHelper.instance().banner('audio renamed!===');
+						/*
 						new Mojo.Service.Request("palm://momo.im.app.service.node/", {
 							method: "onFileUpload",
 							parameters: {
@@ -217,8 +218,8 @@ var ConvDetailAssistant = Class.create({
 								Mojo.Log.warn('on file upload fail' + JSON.stringify(e));
 							}
 						});
-						/*
 						return;
+						*/
 						new interfaces.Momo().postFileUpload(that.controller, idUrl, {
 							onSuccess: function(resp) {
 								Mojo.Log.warn('Success : ' + ' --' + resp.httpCode + '==' + Object.toJSON(resp));
@@ -230,7 +231,7 @@ var ConvDetailAssistant = Class.create({
 								} else {
 									total.data.content.audio = {
 										url: audioUrl,
-										duration: 0
+										duration: total.data.content.audio.duration
 									};
 									onPrepared(total);
 								}
@@ -240,7 +241,6 @@ var ConvDetailAssistant = Class.create({
 								onPrepareFail(total);
 							}.bind(this)
 						});
-						*/
 					},
 					onFailure: function(fail) {
 						Mojo.Log.warn('audio:' + Object.toJSON(fail));
@@ -537,7 +537,11 @@ var ConvDetailAssistant = Class.create({
 	onRecordEnd: function() {
 		var self = this;
 
-		this.captureHelper.stopRecording();
+		var duration = this.captureHelper.stopRecording();
+		if(duration < 1000) {
+			NotifyHelper.instance().banner('Hey! too short!');
+			return;
+		}
 
 		var wavfile = VR_FOLDER + self.audioFile + VR_EXTENSION;
 		var amrfile = VR_FOLDER + self.audioFile + VR_EXTENSION_AMR;
@@ -569,7 +573,7 @@ var ConvDetailAssistant = Class.create({
 		self.sendChat({
 			audio: {
 				url: audiofile,
-				duration: 0
+				duration: duration
 			}
 		});
 		self.audioFile = '';
