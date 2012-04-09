@@ -72,15 +72,15 @@ int encode_amr(const char* infile,const char* outfile) {
     }
     if (!wav_get_header(wav, &format, &channels, &sampleRate, &bitsPerSample, NULL)) {
         fprintf(stderr, "Bad wav file %s\n", infile);
-        return 1;
+        return 2;
     }
     if (format != 1) {
         fprintf(stderr, "Unsupported WAV format %d\n", format);
-        return 1;
+        return 3;
     }
     if (bitsPerSample != 16) {
         fprintf(stderr, "Unsupported WAV sample depth %d\n", bitsPerSample);
-        return 1;
+        return 4;
     }
     if (channels != 1)
         fprintf(stderr, "Warning, only compressing one audio channel\n");
@@ -94,7 +94,7 @@ int encode_amr(const char* infile,const char* outfile) {
     out = fopen(outfile, "wb");
     if (!out) {
         perror(outfile);
-        return 1;
+        return 5;
     }
     
     fwrite("#!AMR\n", 1, 6, out);

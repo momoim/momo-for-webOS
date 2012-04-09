@@ -202,7 +202,6 @@ var ConvDetailAssistant = Class.create({
 					},
 					onSuccess: function() {
 						//NotifyHelper.instance().banner('audio renamed!===');
-						/*
 						new Mojo.Service.Request("palm://momo.im.app.service.node/", {
 							method: "onFileUpload",
 							parameters: {
@@ -219,7 +218,7 @@ var ConvDetailAssistant = Class.create({
 							}
 						});
 						return;
-						*/
+						/*
 						new interfaces.Momo().postFileUpload(that.controller, idUrl, {
 							onSuccess: function(resp) {
 								Mojo.Log.warn('Success : ' + ' --' + resp.httpCode + '==' + Object.toJSON(resp));
@@ -241,6 +240,7 @@ var ConvDetailAssistant = Class.create({
 								onPrepareFail(total);
 							}.bind(this)
 						});
+						*/
 					},
 					onFailure: function(fail) {
 						Mojo.Log.warn('audio:' + Object.toJSON(fail));
@@ -248,7 +248,6 @@ var ConvDetailAssistant = Class.create({
 					}
 				});
 			} else if (content.hasOwnProperty('file')) {
-				/*
 				new Mojo.Service.Request("palm://momo.im.app.service.node/", {
 					method: "onFileUpload",
 					parameters: {
@@ -265,7 +264,7 @@ var ConvDetailAssistant = Class.create({
 					}
 				});
 				return;
-				*/
+				/*
 				new interfaces.Momo().postFileUpload(that.controller, content.file.url, {
 					onSuccess: function(resp) {
 						Mojo.Log.warn('file upload success: ' + Object.toJSON(resp));
@@ -288,8 +287,10 @@ var ConvDetailAssistant = Class.create({
 						onPrepareFail(total);
 					}
 				});
+				*/
 			} else {
 				Mojo.Log.info(this.TAG, 'prepare other ====');
+				onPrepared(total);
 			}
 		}
 	},
@@ -534,11 +535,12 @@ var ConvDetailAssistant = Class.create({
 			Mojo.Log.info(self.TAG, 'startAudioCapture.');
 		});
 	},
+	//FIXME call plugin first, dunt waiting for amr compress complete
 	onRecordEnd: function() {
 		var self = this;
 
 		var duration = this.captureHelper.stopRecording();
-		if(duration < 1000) {
+		if (duration < 1000) {
 			NotifyHelper.instance().banner('Hey! too short!');
 			return;
 		}
@@ -546,6 +548,17 @@ var ConvDetailAssistant = Class.create({
 		var wavfile = VR_FOLDER + self.audioFile + VR_EXTENSION;
 		var amrfile = VR_FOLDER + self.audioFile + VR_EXTENSION_AMR;
 		var audiofile = wavfile;
+
+		function sendAudio() {
+			self.sendChat({
+				audio: {
+					url: audiofile,
+					duration: duration
+				}
+			});
+			self.audioFile = '';
+		}
+
 		if (Global.AmrHelper && Global.AmrHelper.isReady) {
 			//NotifyHelper.instance().banner('is ready ..');
 			try {
@@ -562,21 +575,17 @@ var ConvDetailAssistant = Class.create({
 						onFailure: function() {}
 					});
 					//NotifyHelper.instance().banner('amr convert success: ' + amred);
+					sendAudio();
 				} else {
-					//NotifyHelper.instance().banner('amr convert wrong: ' + amred);
+					NotifyHelper.instance().banner('amr convert wrong: ' + amred);
+					sendAudio();
 				}
 			} catch(e) {
-				//NotifyHelper.instance().banner('amr convert wrong' + e);
+				NotifyHelper.instance().banner('a:' + e);
+				sendAudio();
 			}
 		}
 
-		self.sendChat({
-			audio: {
-				url: audiofile,
-				duration: duration
-			}
-		});
-		self.audioFile = '';
 	},
 	onMouseUp: function() {
 		if (this.audioFile !== '') {

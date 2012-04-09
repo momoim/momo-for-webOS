@@ -41,9 +41,11 @@ PDL_bool wave_to_amr(PDL_JSParameters *params) {
 		if(what == 0) {
 			PDL_JSReply(params, "ok");
 			return PDL_TRUE;
+		} else {
+			PDL_JSReply(params, "fail: " + what);
 		}
 	}
-	PDL_JSReply(params, "fail");
+	PDL_JSReply(params, "fail: unknown");
 	return PDL_FALSE;
 }
 

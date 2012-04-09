@@ -1,4 +1,16 @@
-var amqp = require('./amqp/amqp');
+if (typeof require === 'undefined') {
+	require = IMPORTS.require;
+}
+var libraries = MojoLoader.require({
+	name: "foundations",
+	version: "1.0"
+});
+var PalmCall = libraries["foundations"].Comms.PalmCall;
+
+var fs = require('fs');
+var where_path = fs.realpathSync('.');
+
+var amqp = require(where_path + '/mq/amqp/amqp');
 
 function MomoMQ(nodeService) {
 	this.nodeService = nodeService;
@@ -18,7 +30,7 @@ MomoMQ.prototype.isAlive = function() {
 
 MomoMQ.prototype.logUI = function(msg) {
 			PalmCall.call('palm://com.palm.applicationManager', 'open', {
-				'id': 'momo.im.app.mojo',
+				'id': Setting.APP_ID,
 				'params': {
 					'action': 'onConnError',
 					'data': msg
@@ -206,5 +218,5 @@ MomoMQ.prototype.sendMsg = function(to, msg) {
 	}
 };
 
-module.exports = MomoMQ;
+//module.exports = MomoMQ;
 

@@ -36,6 +36,11 @@ onFileRename.prototype = {
 		var path1 = this.controller.args.path1;
 		var path2 = this.controller.args.path2;
 
+		fs.mkdir(Setting.CACHE_FOLDER, 755);
+		fs.mkdir(Setting.cache.audio, 755);
+		fs.mkdir(Setting.cache.photo, 755);
+		fs.mkdir(Setting.cache.file, 755);
+
 		fs.rename(path1, path2, function(err) {
 			future.result = {
 				path1: path1,
@@ -220,7 +225,7 @@ onFileUpload.prototype = {
 				} else if (chat.content.audio) {
 					actionData.data.content.audio = {
 						url: json.src,
-						duration: 1
+						duration: chat.content.audio.duration
 					};
 				}
 

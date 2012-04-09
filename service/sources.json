@@ -12,6 +12,9 @@
 		"source": "global/Setting.js"
 	},
 	{
+		"source": "mq/momomq.js"
+	},
+	{
 		"source": "assistants/NodeService.js"
 	},
 	{

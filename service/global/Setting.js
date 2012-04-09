@@ -34,3 +34,6 @@ function guidGenerator(){
     var split = "-";
     return (S4() + S4() + split + S4() + split + S4() + split + S4() + split + S4() + S4() + S4());
 }
+
+//for service
+Setting.APP_ID = 'momo.im.app.mojo';

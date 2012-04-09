@@ -76,7 +76,7 @@ NodeService.prototype = {
 	},
 	sendMsgFail: function(chat) {
 		PalmCall.call('palm://com.palm.applicationManager', 'open', {
-			'id': 'momo.im.app.mojo',
+			'id': Setting.APP_ID,
 			'params': {
 				'action': 'onMsgSendError',
 				'data': JSON.stringify(chat)
@@ -123,7 +123,7 @@ NodeService.prototype = {
 			};
 			console.log('on msg send end');
 			PalmCall.call('palm://com.palm.applicationManager', 'open', {
-				'id': 'momo.im.app.mojo',
+				'id': Setting.APP_ID,
 				'params': {
 					'action': 'onNewIncome',
 					'data': JSON.stringify(chated)
@@ -138,13 +138,10 @@ NodeService.prototype = {
 	auth: function(f, info) {
 		var that = this;
 
-		console.log('oauthToken: ' + info.oauthToken);
-		console.log('tokenSecret: ' + info.tokenSecret);
-		console.log('queueName: ' + info.queueName);
 		that.authInfo = info;
 		if (that.authInfo) {
 			if (that.mqClient && that.mqClient.isAlive()) {
-				console.log('connection is still alive');
+				//console.log('connection is still alive');
 				f.result = {
 					alive: true
 				};
@@ -153,10 +150,13 @@ NodeService.prototype = {
 				console.log('connection is not alive');
 			}
 		}
+		console.log('oauthToken: ' + info.oauthToken);
+		console.log('tokenSecret: ' + info.tokenSecret);
+		console.log('queueName: ' + info.queueName);
 		that.refreshUnread(f);
 
 		that.path = fs.realpathSync('.');
-		var MomoMQ = require(that.path + '/mq/momomq');
+		//var MomoMQ = require(that.path + '/mq/momomq');
 		that.mqClient = new MomoMQ(that);
 	},
 	refreshUnread: function(f) {
@@ -164,7 +164,7 @@ NodeService.prototype = {
 		that.httpReq('GET', '/im/all.json', '', function(chatResult) {
 			console.log('on chat list end');
 			PalmCall.call('palm://com.palm.applicationManager', 'open', {
-				'id': 'momo.im.app.mojo',
+				'id': Setting.APP_ID,
 				'params': {
 					'action': 'onUnreadList',
 					'data': chatResult
@@ -251,7 +251,7 @@ NodeService.prototype = {
 		var that = this;
 
 		PalmCall.call('palm://com.palm.applicationManager', 'open', {
-			'id': 'momo.im.app.mojo',
+			'id': Setting.APP_ID,
 			'params': {
 				'action': 'onNewIncome',
 				'data': JSON.stringify(dataMsg)
