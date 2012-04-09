@@ -88,7 +88,7 @@ NodeService.prototype = {
 		var info = total.auth;
 		var chat = total.chat;
 
-		if (!that.authInfo || !that.authInfo.user) {
+		if (!that.authInfo || !that.authInfo.user || !that.mqClient || !that.mqClient.isAlive()) {
 			if (chat.kind == 'sms') {
 				//that.sendMsgWithHttp(chat.data);
 				that.sendMsgFail(chat);
@@ -109,6 +109,9 @@ NodeService.prototype = {
 				that.mqClient.sendMsg(oid + '', JSON.stringify(will));
 			}
 			console.log('sending to: ' + oid);
+			f.result = {
+				success: true
+			};
 		}
 	},
 	sendMsgWithHttp: function(chat) {

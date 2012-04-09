@@ -248,6 +248,7 @@ var ConvDetailAssistant = Class.create({
 					}
 				});
 			} else if (content.hasOwnProperty('file')) {
+				/*
 				new Mojo.Service.Request("palm://momo.im.app.service.node/", {
 					method: "onFileUpload",
 					parameters: {
@@ -263,8 +264,8 @@ var ConvDetailAssistant = Class.create({
 						Mojo.Log.warn('on file upload fail' + JSON.stringify(e));
 					}
 				});
-				/*
 				return;
+				*/
 				new interfaces.Momo().postFileUpload(that.controller, content.file.url, {
 					onSuccess: function(resp) {
 						Mojo.Log.warn('file upload success: ' + Object.toJSON(resp));
@@ -287,7 +288,6 @@ var ConvDetailAssistant = Class.create({
 						onPrepareFail(total);
 					}
 				});
-				*/
 			} else {
 				Mojo.Log.info(this.TAG, 'prepare other ====');
 			}
