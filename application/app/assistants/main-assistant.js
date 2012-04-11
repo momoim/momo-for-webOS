@@ -210,12 +210,14 @@ var MainAssistant = Class.create({
 					}
 					this.controller.showAlertDialog({
 						onChoose: function(what) {
-							//NotifyHelper.instance().banner(what);
-							var people = {
-								name: event.name.familyName + event.name.givenName,
-								mobile: what
-							};
-							that.talkTo(people);
+							//NotifyHelper.instance().banner('what: ' + what);
+							if (what) {
+								var people = {
+									name: event.name.familyName + event.name.givenName,
+									mobile: what
+								};
+								that.talkTo(people);
+							}
 						}.bind(that),
 						title: '选择一个手机号',
 						message: '选择您的消息要发给的号码',

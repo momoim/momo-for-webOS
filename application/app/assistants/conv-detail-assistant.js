@@ -105,6 +105,14 @@ var ConvDetailAssistant = Class.create({
 			that.modelList.addItem(message);
 			that.controller.modelChanged(that.modelList);
 			that.list.mojo.revealItem(that.modelList.items.length, false);
+			//var listScroller = that.controller.get(that.idList + '-scroller');
+			var listScroller = that.controller.get(that.idList);
+			if(listScroller) {
+				Mojo.Log.warn(listScroller.outerHTML);
+				NotifyHelper.instance().banner(listScroller.outerHTML);
+			} else {
+				NotifyHelper.instance().banner('scroller not found');
+			}
 		}
 	},
 	listWasTapped: function(event) {
@@ -647,7 +655,7 @@ var ConvDetailAssistant = Class.create({
 
 				}
 			} catch(e) {
-				NotifyHelper.instance().banner('a:' + e);
+				//NotifyHelper.instance().banner('a:' + e);
 				sendAudio();
 				//self.list.innerHTML = e + '';
 			}
