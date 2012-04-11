@@ -4,6 +4,8 @@ var Global = {
 	hasNewUnread: false,
 	//是否有新未读，回到主列表跳转到第一条
 	lastSwitcher: 'sound',
+	//正在转换的录音文件，用于转换完发送
+	convertingAmrList: [],
 	keepAuth: function() {
 		function fail() {}
 		function success(info) {
