@@ -304,8 +304,7 @@ var ConvDetailAssistant = Class.create({
 			}
 		}
 	},
-	sendChat: function(content) {
-		Mojo.Log.info(this.TAG, 'sendChat====== ' + JSON.stringify(content));
+	createChat: function(content) {
 		var chat = {
 			kind: 'sms',
 			data: {
@@ -316,6 +315,14 @@ var ConvDetailAssistant = Class.create({
 				content: content
 			}
 		};
+		return chat;
+	},
+	sendChat: function(content) {
+		this.sendChated(this.createChat(content));
+	},
+	sendChated: function(chat) {
+		Mojo.Log.info(this.TAG, 'sendChat====== ' + JSON.stringify(content));
+		var content = chat.data.content;
 
 		Mojo.Log.info(this.TAG, 'sendChat=---+---===== ' + JSON.stringify(chat));
 
@@ -550,6 +557,22 @@ var ConvDetailAssistant = Class.create({
 	sendAudioFromPlugin: function(result, infile, outfile, duration) {
 		var self = this;
 		//NotifyHelper.instance().banner('on audio: ' + String(result) + String(infile));
+		
+		//get chat obj from Global.convertingAmrList
+		var chated = null;
+		for(var i = 0; i < Global.convertingAmrList.length; ++9) {
+			var chat = Global.convertingAmrList[i];
+			if(chat.data.content.audio.url == outfile) {
+				chated = chat;
+				Global.convertingAmrList.splice(i, 1);
+				break;
+			}
+		}
+
+		if(!chated) {
+			return;
+		}
+
 		if (result == 'success') {
 			new Mojo.Service.Request("palm://momo.im.app.service.node/", {
 				method: "onFileDel",
@@ -559,20 +582,11 @@ var ConvDetailAssistant = Class.create({
 				onSuccess: function() {},
 				onFailure: function() {}
 			});
-			self.sendChat({
-				audio: {
-					url: outfile,
-					duration: parseInt(duration)
-				}
-			});
+			chated.data.content.audio.url = outfile;
 		} else {
-			self.sendChat({
-				audio: {
-					url: infile,
-					duration: parseInt(duration)
-				}
-			});
+			chated.data.content.audio.url = infile;
 		}
+		self.sendChated(chated);
 	},
 	onRecordEnd: function() {
 		var self = this;
@@ -620,6 +634,14 @@ var ConvDetailAssistant = Class.create({
 				if (amred == 'ok') {
 					//NotifyHelper.instance().banner('amr converting');
 					//waiting for c plugin to call sendAudioFromPlugin
+					Global.convertingAmrList.push(
+						self.createChat({
+							audio: {
+								url: amrfile,
+								duration: duration
+							}
+						})
+					);
 				} else {
 					//NotifyHelper.instance().banner('amr convert wrong: ' + amred);
 					sendAudio();
@@ -653,8 +675,10 @@ var ConvDetailAssistant = Class.create({
 	},
 	cleanup: function(event) {
 		Global.talking = '';
+
 		if(this.audioFile !== '') {
-			onRecordEnd();
+			//NotifyHelper.instance().banner('deactivate' + this.audioFile);
+			this.onRecordEnd();
 		}
 	}
 });
