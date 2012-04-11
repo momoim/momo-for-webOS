@@ -544,6 +544,7 @@ var ConvDetailAssistant = Class.create({
 		this.captureHelper.startRecording(self.audioFile, function(response) {
 			Mojo.Log.info(self.TAG, 'startAudioCapture.');
 		});
+		setTimeout(self.onRecordEnd.bind(self), 60000);
 	},
 	//this is called by the plugin
 	sendAudioFromPlugin: function(result, infile, outfile, duration) {
@@ -651,6 +652,9 @@ var ConvDetailAssistant = Class.create({
 	},
 	cleanup: function(event) {
 		Global.talking = '';
+		if(this.audioFile !== '') {
+			onRecordEnd();
+		}
 	}
 });
 
