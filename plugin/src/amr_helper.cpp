@@ -167,8 +167,19 @@ void plugin_start() {
 				//PDL_CallJS("ready", NULL, 0);
 				PDL_CallJS("onAmr", results, 4);
 				syslog(LOG_ALERT, "wave to amr event onAmr called");
+
 				//end thread
 				pthread_join((pthread_t)event.user.data2, NULL);
+
+				//free memory
+				free(audio->infile);
+				audio->infile = NULL;
+				free(audio->outfile);
+				audio->outfile = NULL;
+				free(audio->duration);
+				audio->duration = NULL;
+				free(audio);
+				audio = NULL;
 			}
 
 			//PDL_CallJS("ready", NULL, 0);
