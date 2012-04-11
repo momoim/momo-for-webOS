@@ -132,6 +132,16 @@ var ConvDetailAssistant = Class.create({
 			else {
 				Mojo.Log.info(this.TAG, 'on comment area enter key is null content');
 			}
+		} else if(event.keyCode == 32) {
+			//space keyup
+			if(Global.lastSwitcher == 'sound') {
+				//it's record state
+				if(this.audioFile == '') {
+					this.onRecordStart();
+				} else {
+					this.onRecordEnd();
+				}
+			}
 		}
 	},
 	prepareChat: function(total, onPrepared, onPrepareFail) {
