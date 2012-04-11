@@ -2,15 +2,27 @@
 	Palm disclaimer
  **/
 #include <stdio.h>
-#include <math.h>
+//#include <math.h>
 #include <syslog.h>
 #include <signal.h>
+#include <pthread.h>
 
 
-#include <GLES2/gl2.h>
+//#include <GLES2/gl2.h>
 #include "SDL.h"
 #include "PDL.h"
 #include "amr/wave2amr/wav_amr.h"
+
+#define WHAT_AMR_COMPRESS 101;
+#define WHAT_AMR_THREAD 102;
+
+typedef struct 
+{
+	int what;
+	char* infile;
+	char* outfile;
+	char* duration;
+} MOMO_WaveAmrAudio;
 
 #ifdef WIN32
 extern "C" 
@@ -27,23 +39,59 @@ void sighandler(int sig) {
 	exit(0);
 }
 
+void* compress(void* info) {
+	syslog(LOG_ALERT, "wave to amr compress");
+	MOMO_WaveAmrAudio* audio = (MOMO_WaveAmrAudio*) info;
+	syslog(LOG_ALERT, "wave to amr compress: %s", audio->infile);
+	int what = encode_amr(audio->infile, audio->outfile);
+	SDL_Event event;
+	event.type = SDL_USEREVENT;
+	event.user.code = WHAT_AMR_COMPRESS;
+	audio->what = what;
+	event.user.data1 = info;
+	pthread_t self = pthread_self();
+	event.user.data2 = (void *)&self;
+	SDL_PushEvent(&event);
+	syslog(LOG_ALERT, "wave to amr event pushed compress");
+}
 
-//FIXME how to notify amr convert fail?
+
 PDL_bool wave_to_amr(PDL_JSParameters *params) {
 	int num = PDL_GetNumJSParams(params);
-	if(num == 2) {
-		syslog(LOG_ALERT, "wave to amr param num: %d", num);
+	syslog(LOG_ALERT, "wave to amr param num: %d", num);
+	if(num == 3) {
+		PDL_JSReply(params, "ok");
 		const char* infile = PDL_GetJSParamString(params, 0);
 		syslog(LOG_ALERT, "wave to amr param num: %s", infile);
 		const char* outfile = PDL_GetJSParamString(params, 1);
 		syslog(LOG_ALERT, "wave to amr param num: %s", outfile);
-		int what = encode_amr(infile, outfile);
-		if(what == 0) {
-			PDL_JSReply(params, "ok");
-			return PDL_TRUE;
-		} else {
-			PDL_JSReply(params, "fail: " + what);
-		}
+		MOMO_WaveAmrAudio* audio = (MOMO_WaveAmrAudio*)malloc(sizeof(MOMO_WaveAmrAudio));
+		int lenIn = strlen(infile) + 1;
+		syslog(LOG_ALERT, "wave to amr param copied===>: %d", lenIn);
+		audio->infile = (char*)malloc(lenIn);
+		memcpy(audio->infile, infile, lenIn);
+		syslog(LOG_ALERT, "wave to amr param copied===>: %s", audio->infile);
+
+		int lenOut = strlen(outfile) + 1;
+		audio->outfile = (char*)malloc(lenOut);
+		memcpy(audio->outfile, outfile, lenOut);
+		const char* duration = PDL_GetJSParamString(params, 2);
+		int lenD = strlen(duration) + 1;
+		audio->duration = (char*)malloc(lenD);
+		memcpy(audio->duration, duration, lenD);
+
+		SDL_Event event;
+		event.type = SDL_USEREVENT;
+		event.user.code = WHAT_AMR_THREAD;
+		event.user.data1 = (void *) audio;
+		SDL_PushEvent(&event);
+		syslog(LOG_ALERT, "wave to amr event pushed thread");
+
+
+		syslog(LOG_ALERT, "wave to amr ending");
+
+
+		return PDL_TRUE;
 	}
 	PDL_JSReply(params, "fail: unknown");
 	return PDL_FALSE;
@@ -89,11 +137,44 @@ PDL_Err plugin_initialize() {
 
 
 void plugin_start() {
-	SDL_Event Event;
+	SDL_Event event;
 	int cont = 1;
 	do {
-		SDL_WaitEvent(&Event);
-	} while (Event.type != SDL_QUIT);
+		SDL_WaitEvent(&event);
+		if(event.type == SDL_USEREVENT) {
+			syslog(LOG_ALERT, "wave to amr event poll");
+
+			if(event.user.code == 102) {
+				MOMO_WaveAmrAudio* audio = (MOMO_WaveAmrAudio*) event.user.data1;
+				syslog(LOG_ALERT, "thread starting: infile===>%s", audio->infile);
+				syslog(LOG_ALERT, "thread starting: what===>%s", (char*)event.user.data2);
+				pthread_t thread;
+				pthread_create(&thread, NULL, compress, event.user.data1);
+				syslog(LOG_ALERT, "wave to amr event thread created");
+			} else {
+				MOMO_WaveAmrAudio* audio = (MOMO_WaveAmrAudio*) event.user.data1;
+				syslog(LOG_ALERT, "compressed: what===>%d", audio->what);
+				syslog(LOG_ALERT, "compressed: duration===>%s", audio->duration);
+				const char* results[4];
+				if(audio->what == 0) {
+					results[0] = "success";
+				} else {
+					results[0] = "fail";
+				}
+				results[1] = audio->infile;
+				results[2] = audio->outfile;
+				results[3] = audio->duration;
+				//PDL_CallJS("ready", NULL, 0);
+				PDL_CallJS("onAmr", results, 4);
+				syslog(LOG_ALERT, "wave to amr event onAmr called");
+				//end thread
+				pthread_join((pthread_t)event.user.data2, NULL);
+			}
+
+			//PDL_CallJS("ready", NULL, 0);
+			//syslog(LOG_ALERT, "wave to amr event ready called");
+		}
+	} while (event.type != SDL_QUIT);
 }
 
 int main(int argc, char** argv)
@@ -115,6 +196,7 @@ int main(int argc, char** argv)
 	}
 
 	cleanup(-1);
+	syslog(LOG_NOTICE, "return 0 called");
 
 	return 0;
 }

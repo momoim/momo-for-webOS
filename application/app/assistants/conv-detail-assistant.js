@@ -535,19 +535,57 @@ var ConvDetailAssistant = Class.create({
 			Mojo.Log.info(self.TAG, 'startAudioCapture.');
 		});
 	},
-	//FIXME call plugin first, dunt waiting for amr compress complete
+	//this is called by the plugin
+	sendAudioFromPlugin: function(result, infile, outfile, duration) {
+		var self = this;
+		//NotifyHelper.instance().banner('on audio: ' + String(result));
+		if (result == 'success') {
+			new Mojo.Service.Request("palm://momo.im.app.service.node/", {
+				method: "onFileDel",
+				parameters: {
+					path: infile,
+				},
+				onSuccess: function() {},
+				onFailure: function() {}
+			});
+			self.sendChat({
+				audio: {
+					url: outfile,
+					duration: parseInt(duration)
+				}
+			});
+		} else {
+			self.sendChat({
+				audio: {
+					url: infile,
+					duration: parseInt(duration)
+				}
+			});
+		}
+	},
 	onRecordEnd: function() {
 		var self = this;
-
-		var duration = this.captureHelper.stopRecording();
-		if (duration < 1000) {
-			NotifyHelper.instance().banner('Hey! too short!');
-			return;
-		}
 
 		var wavfile = VR_FOLDER + self.audioFile + VR_EXTENSION;
 		var amrfile = VR_FOLDER + self.audioFile + VR_EXTENSION_AMR;
 		var audiofile = wavfile;
+		//reset recording file
+		self.audioFile = '';
+
+		var duration = this.captureHelper.stopRecording();
+		if (duration < 1000) {
+			NotifyHelper.instance().banner('Hey! too short!');
+			new Mojo.Service.Request("palm://momo.im.app.service.node/", {
+				method: "onFileDel",
+				parameters: {
+					path: wavfile,
+				},
+				onSuccess: function() {},
+				onFailure: function() {}
+			});
+			return;
+		}
+
 
 		function sendAudio() {
 			self.sendChat({
@@ -556,36 +594,33 @@ var ConvDetailAssistant = Class.create({
 					duration: duration
 				}
 			});
-			self.audioFile = '';
+		}
+
+		if (Global.AmrHelper) {
+			Global.AmrHelper.onAmr = self.sendAudioFromPlugin.bind(self);
 		}
 
 		if (Global.AmrHelper && Global.AmrHelper.isReady) {
 			//NotifyHelper.instance().banner('is ready ..');
 			try {
-				var amred = Global.AmrHelper.wave2amr(wavfile, amrfile);
+				var amred = Global.AmrHelper.wave2amr(wavfile, amrfile, duration + '');
+				//var amred = Global.AmrHelper.wave2amr(wavfile, amrfile);
 				if (amred == 'ok') {
-					audiofile = amrfile;
-					//NotifyHelper.instance().banner('amr convert ok');
-					new Mojo.Service.Request("palm://momo.im.app.service.node/", {
-						method: "onFileDel",
-						parameters: {
-							path: wavfile,
-						},
-						onSuccess: function() {},
-						onFailure: function() {}
-					});
-					//NotifyHelper.instance().banner('amr convert success: ' + amred);
-					sendAudio();
+					//NotifyHelper.instance().banner('amr converting');
+					//waiting for c plugin to call sendAudioFromPlugin
 				} else {
-					NotifyHelper.instance().banner('amr convert wrong: ' + amred);
+					//NotifyHelper.instance().banner('amr convert wrong: ' + amred);
 					sendAudio();
+
 				}
 			} catch(e) {
 				NotifyHelper.instance().banner('a:' + e);
 				sendAudio();
+				//self.list.innerHTML = e + '';
 			}
+		} else {
+			sendAudio();
 		}
-
 	},
 	onMouseUp: function() {
 		if (this.audioFile !== '') {

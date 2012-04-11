@@ -58,7 +58,7 @@ done
 ### List the libraries needed.                                      ###
 ### LIBS="-l<libname>"                                              ###
 #######################################################################
-export LIBS="-lSDL -lGLESv2 -lpdl"
+export LIBS="-lSDL -lGLESv2 -lpdl -lpthread"
 
 #######################################################################
 ### Name your output executable                                     ###
