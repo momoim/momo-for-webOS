@@ -118,10 +118,11 @@ var ConvDetailAssistant = Class.create({
 			//Mojo.Log.warn(listScroller.outerHTML);
 			var position = listScroller.mojo.getScrollPosition();
 			Mojo.Log.warn('scroller position -------->' + position.top);
-			listScroller.mojo.scrollTo(0, -99999999, false);
+			listScroller.mojo.scrollTo(0, - 99999999, false);
 			setTimeout(function() {
-				listScroller.mojo.scrollTo(0, -99999999, false);
-			}, 50);
+				listScroller.mojo.scrollTo(0, - 99999999, false);
+			},
+			50);
 		}
 	},
 	update: function(message) {
