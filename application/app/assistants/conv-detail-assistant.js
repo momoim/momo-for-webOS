@@ -553,7 +553,7 @@ var ConvDetailAssistant = Class.create({
 	},
 	onRecordStart: function() {
 		var self = this;
-
+        self.controller.get('recording').style.display = 'block';
 		//start recording
 		self.audioFile = 'temply_' + guidGenerator();
 		this.captureHelper.startRecording(self.audioFile, function(response) {
@@ -598,6 +598,7 @@ var ConvDetailAssistant = Class.create({
 	},
 	onRecordEnd: function() {
 		var self = this;
+        self.controller.get('recording').style.display = 'none';
 
 		var wavfile = VR_FOLDER + self.audioFile + VR_EXTENSION;
 		var amrfile = VR_FOLDER + self.audioFile + VR_EXTENSION_AMR;
