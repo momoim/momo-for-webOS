@@ -538,7 +538,7 @@ var ConvDetailAssistant = Class.create({
 	//this is called by the plugin
 	sendAudioFromPlugin: function(result, infile, outfile, duration) {
 		var self = this;
-		//NotifyHelper.instance().banner('on audio: ' + String(result));
+		//NotifyHelper.instance().banner('on audio: ' + String(result) + String(infile));
 		if (result == 'success') {
 			new Mojo.Service.Request("palm://momo.im.app.service.node/", {
 				method: "onFileDel",

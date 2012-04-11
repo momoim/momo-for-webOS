@@ -151,6 +151,7 @@ void plugin_start() {
 				pthread_t thread;
 				pthread_create(&thread, NULL, compress, event.user.data1);
 				syslog(LOG_ALERT, "wave to amr event thread created");
+				pthread_detach(thread);
 			} else {
 				MOMO_WaveAmrAudio* audio = (MOMO_WaveAmrAudio*) event.user.data1;
 				syslog(LOG_ALERT, "compressed: what===>%d", audio->what);
@@ -168,8 +169,9 @@ void plugin_start() {
 				PDL_CallJS("onAmr", results, 4);
 				syslog(LOG_ALERT, "wave to amr event onAmr called");
 
+				//FIXME why cant stop thread this way
 				//end thread
-				pthread_join((pthread_t)event.user.data2, NULL);
+				//pthread_join((pthread_t)event.user.data2, NULL);
 
 				//free memory
 				free(audio->infile);
