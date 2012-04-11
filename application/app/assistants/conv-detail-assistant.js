@@ -20,8 +20,18 @@ var ConvDetailAssistant = Class.create({
 			visible: true,
 			items: menuItems
 		});
+
 		//init ui
 		that.idList = 'conv-list';
+
+		//list scroller
+		that.controller.setupWidget(that.idList + '-scroller', {
+			mode: 'vertical'
+		},
+		{});
+		this.controller.get(that.idList + '-scroller').setStyle({
+			"max-height": this.controller.window.innerHeight + "px"
+		});
 
 		that.controller.setupWidget(that.idList, {
 			itemTemplate: 'templates/conv-detail-list-item',
@@ -84,7 +94,8 @@ var ConvDetailAssistant = Class.create({
 			Mojo.Log.info('get conv list success ---' + result.length);
 			that.modelList.setItems(result);
 			that.controller.modelChanged(that.modelList);
-			that.list.mojo.revealItem(result.length - 1, false);
+			//that.list.mojo.revealItem(result.length - 1, false);
+			that.updateScroller();
 		});
 
 		//发送已读
@@ -99,20 +110,27 @@ var ConvDetailAssistant = Class.create({
 		}
 
 	},
+	updateScroller: function() {
+		var that = this;
+		var listScroller = that.controller.get(that.idList + '-scroller');
+		if (listScroller) {
+			//listScroller.mojo.revealBottom();
+			//Mojo.Log.warn(listScroller.outerHTML);
+			var position = listScroller.mojo.getScrollPosition();
+			Mojo.Log.warn('scroller position -------->' + position.top);
+			listScroller.mojo.scrollTo(0, -99999999, false);
+			setTimeout(function() {
+				listScroller.mojo.scrollTo(0, -99999999, false);
+			}, 50);
+		}
+	},
 	update: function(message) {
 		var that = this;
 		if (Global.talking == message.other.id) {
 			that.modelList.addItem(message);
 			that.controller.modelChanged(that.modelList);
-			that.list.mojo.revealItem(that.modelList.items.length, false);
-			//var listScroller = that.controller.get(that.idList + '-scroller');
-			var listScroller = that.controller.get(that.idList);
-			if(listScroller) {
-				Mojo.Log.warn(listScroller.outerHTML);
-				NotifyHelper.instance().banner(listScroller.outerHTML);
-			} else {
-				NotifyHelper.instance().banner('scroller not found');
-			}
+			//that.list.mojo.revealItem(that.modelList.items.length, false);
+			this.updateScroller();
 		}
 	},
 	listWasTapped: function(event) {
@@ -140,11 +158,11 @@ var ConvDetailAssistant = Class.create({
 			else {
 				Mojo.Log.info(this.TAG, 'on comment area enter key is null content');
 			}
-		} else if(event.keyCode == 32) {
+		} else if (event.keyCode == 32) {
 			//space keyup
-			if(Global.lastSwitcher == 'sound') {
+			if (Global.lastSwitcher == 'sound') {
 				//it's record state
-				if(this.audioFile == '') {
+				if (this.audioFile == '') {
 					this.onRecordStart();
 				} else {
 					this.onRecordEnd();
@@ -553,7 +571,7 @@ var ConvDetailAssistant = Class.create({
 	},
 	onRecordStart: function() {
 		var self = this;
-        self.controller.get('recording').style.display = 'block';
+		self.controller.get('recording').style.display = 'block';
 		//start recording
 		self.audioFile = 'temply_' + guidGenerator();
 		this.captureHelper.startRecording(self.audioFile, function(response) {
@@ -565,19 +583,18 @@ var ConvDetailAssistant = Class.create({
 	sendAudioFromPlugin: function(result, infile, outfile, duration) {
 		var self = this;
 		//NotifyHelper.instance().banner('on audio: ' + String(result) + String(infile));
-		
 		//get chat obj from Global.convertingAmrList
 		var chated = null;
-		for(var i = 0; i < Global.convertingAmrList.length; ++9) {
+		for (var i = 0; i < Global.convertingAmrList.length; ++9) {
 			var chat = Global.convertingAmrList[i];
-			if(chat.data.content.audio.url == outfile) {
+			if (chat.data.content.audio.url == outfile) {
 				chated = chat;
 				Global.convertingAmrList.splice(i, 1);
 				break;
 			}
 		}
 
-		if(!chated) {
+		if (!chated) {
 			return;
 		}
 
@@ -598,7 +615,7 @@ var ConvDetailAssistant = Class.create({
 	},
 	onRecordEnd: function() {
 		var self = this;
-        self.controller.get('recording').style.display = 'none';
+		self.controller.get('recording').style.display = 'none';
 
 		var wavfile = VR_FOLDER + self.audioFile + VR_EXTENSION;
 		var amrfile = VR_FOLDER + self.audioFile + VR_EXTENSION_AMR;
@@ -619,7 +636,6 @@ var ConvDetailAssistant = Class.create({
 			});
 			return;
 		}
-
 
 		function sendAudio() {
 			self.sendChat({
@@ -643,13 +659,12 @@ var ConvDetailAssistant = Class.create({
 					//NotifyHelper.instance().banner('amr converting');
 					//waiting for c plugin to call sendAudioFromPlugin
 					Global.convertingAmrList.push(
-						self.createChat({
-							audio: {
-								url: amrfile,
-								duration: duration
-							}
-						})
-					);
+					self.createChat({
+						audio: {
+							url: amrfile,
+							duration: duration
+						}
+					}));
 				} else {
 					//NotifyHelper.instance().banner('amr convert wrong: ' + amred);
 					sendAudio();
@@ -684,7 +699,7 @@ var ConvDetailAssistant = Class.create({
 	cleanup: function(event) {
 		Global.talking = '';
 
-		if(this.audioFile !== '') {
+		if (this.audioFile !== '') {
 			//NotifyHelper.instance().banner('deactivate' + this.audioFile);
 			this.onRecordEnd();
 		}
