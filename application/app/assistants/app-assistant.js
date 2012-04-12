@@ -43,6 +43,50 @@ var Global = {
 				Global.keepAuth();
 			}
 		});
+	},
+	menu: function(controller) {
+		//Menu
+		var menuItems = [
+		Mojo.Menu.editItem
+		
+		, {
+			label: '关于momo',
+			command: 'cmdAbout'
+		}
+		, {
+			label: '退出',
+			command: 'cmdLogout'
+		}
+		];
+
+		controller.setupWidget(Mojo.Menu.appMenu, {
+			omitDefaultItems: true
+		},
+		{
+			visible: true,
+			items: menuItems
+		});
+	},
+	updateList: [],
+	updateRegister: function(what) {
+		Global.updateList.push(what);
+	},
+	updateUnRegister: function(what) {
+		for(var i = 0 ; i < Global.updateList.length; ++i) {
+			var scene = Global.updateList[i];
+			if(scene == what) {
+				Global.updateList.splice(i, 1);
+				break;
+			}
+		}
+	},
+	update: function(income) {
+		for(var now in Global.updateList) {
+			var scene = Global.updateList[now];
+			if(scene && scene.update) {
+				scene.update(income);
+			}
+		}
 	}
 };
 
@@ -242,8 +286,10 @@ AppAssistant.prototype = {
 		} else {
 			Global.sendRoger();
 		}
+		//NotifyHelper.instance().banner('got meesage main: ' + JSON.stringify(income.content));
 		if (mainStage) {
-			mainStage.delegateToSceneAssistant('update', income);
+			//mainStage.delegateToSceneAssistant('update', income);
+			Global.update(income);
 		}
 	},
 	handleCommand: function(event) {
@@ -251,6 +297,8 @@ AppAssistant.prototype = {
 		if (event.command === 'cmdLogout') {
 			DBHelper.instance().remove('authInfo');
 			stage.pushScene('login');
+		} else if(event.command === 'cmdAbout') {
+			this.controller.getActiveStageController().pushAppSupportInfoScene();
 		}
         if (event.command === 'cmdAbout') {
 			stage.pushScene('about');

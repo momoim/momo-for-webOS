@@ -9,7 +9,7 @@
 	"version": "1.0.1",
 	"icon": "icon.png",
 	"miniicon": "icon.png",
-	"vendor": "Tsung Wu",
-	"vendorurl": "http://momo.im",
+	"vendor": "Tsung W.",
+	"vendorurl": "http://3g.momo.im",
 	"services": ["momo.im.app.service.node"]
 }

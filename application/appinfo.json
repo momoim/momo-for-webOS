@@ -9,5 +9,28 @@
 	"title": "momo",
 	"icon": "icon.png",
 	"miniicon": "icon32.png",
-	"noWindow": true
+	"smallicon": "icon32.png",
+	"noWindow": true,
+	"copyright": "@copy; Copyright 2012 momo.im",
+	"support": {
+		"url": "http://momo.im"
+	},
+	"phone": "",
+	"resources": [
+		{
+			"type": "web",
+			"label": "momo触屏版本, 3g.momo.im",
+			"url": "http://3g.momo.im"
+		},
+		{
+			"type": "web",
+			"label": "momo键盘机版本, m.momo.im",
+			"url": "http://m.momo.im"
+		},
+		{
+			"type": "web",
+			"label": "momo网站, momo.im",
+			"url": "http://momo.im"
+		}
+	]
 }
