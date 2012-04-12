@@ -562,6 +562,9 @@ var ConvDetailAssistant = Class.create({
 	},
 	onRecordStart: function() {
 		var self = this;
+		if(Global.audioPlayer) {
+			Global.audioPlayer.pause();
+		}
 		self.controller.get('recording').style.display = 'block';
 		//start recording
 		self.audioFile = 'temply_' + guidGenerator();

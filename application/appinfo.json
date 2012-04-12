@@ -1,6 +1,6 @@
 {
 	"id": "momo.im.app.mojo",
-	"version": "1.0.0",
+	"version": "1.0.2",
 	"vendor": "Tsung W.",
 	"type": "web",
 	"plug-ins": true,
