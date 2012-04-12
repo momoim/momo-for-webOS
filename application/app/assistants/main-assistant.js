@@ -1,23 +1,11 @@
 var MainAssistant = Class.create({
-	initialize: function() {},
+	initialize: function() {
+		Global.updateRegister(this);
+	},
 	setup: function() {
 		var that = this;
 
-		//Menu
-		var menuItems = [
-		Mojo.Menu.editItem, {
-			label: '退出',
-			command: 'cmdLogout'
-		}];
-
-		this.controller.setupWidget(Mojo.Menu.appMenu, {
-			omitDefaultItems: true
-		},
-		{
-			visible: true,
-			items: menuItems
-		});
-
+		Global.menu(this.controller);
 		//init ui
 		that.idList = 'conv-list';
 
@@ -283,6 +271,8 @@ var MainAssistant = Class.create({
 	cleanup: function(event) {
 		this.cleaning = true;
 		//remove callback
+		
+		Global.updateUnRegister(this);
 	}
 });
 

@@ -3,24 +3,12 @@ var ConvDetailAssistant = Class.create({
 		this.TAG = "ConvDetailAssistant";
 		this.incomeItem = opts.item;
 		Global.talking = this.incomeItem.id;
+		Global.updateRegister(this);
 	},
 	setup: function() {
 		var that = this;
-		//Menu
-		var menuItems = [
-		Mojo.Menu.editItem, {
-			label: '退出',
-			command: 'cmdLogout'
-		}];
 
-		this.controller.setupWidget(Mojo.Menu.appMenu, {
-			omitDefaultItems: true
-		},
-		{
-			visible: true,
-			items: menuItems
-		});
-
+		Global.menu(this.controller);
 		//init ui
 		that.idList = 'conv-list';
 
@@ -114,19 +102,21 @@ var ConvDetailAssistant = Class.create({
 		var that = this;
 		var listScroller = that.controller.get(that.idList + '-scroller');
 		if (listScroller) {
-			//listScroller.mojo.revealBottom();
+			listScroller.mojo.revealBottom();
 			//Mojo.Log.warn(listScroller.outerHTML);
 			var position = listScroller.mojo.getScrollPosition();
 			Mojo.Log.warn('scroller position -------->' + position.top);
 			listScroller.mojo.scrollTo(0, - 99999999, false);
-			setTimeout(function() {
+			var t = setTimeout(function() {
 				listScroller.mojo.scrollTo(0, - 99999999, false);
+				clearTimeout(t);
 			},
-			50);
+			30);
 		}
 	},
 	update: function(message) {
 		var that = this;
+		//NotifyHelper.instance().banner('got meesage: ' + JSON.stringify(message.content));
 		if (Global.talking == message.other.id) {
 			that.modelList.addItem(message);
 			that.controller.modelChanged(that.modelList);
@@ -578,7 +568,7 @@ var ConvDetailAssistant = Class.create({
 		this.captureHelper.startRecording(self.audioFile, function(response) {
 			Mojo.Log.info(self.TAG, 'startAudioCapture.');
 		});
-		setTimeout(self.onRecordEnd.bind(self), 60000);
+		this.t60 = setTimeout(self.onRecordEnd.bind(self), 60000);
 	},
 	//this is called by the plugin
 	sendAudioFromPlugin: function(result, infile, outfile, duration) {
@@ -615,8 +605,13 @@ var ConvDetailAssistant = Class.create({
 		self.sendChated(chated);
 	},
 	onRecordEnd: function() {
+		if (this.t60) {
+			clearTimeout(this.t60);
+		}
 		var self = this;
-		self.controller.get('recording').style.display = 'none';
+		if (self.controller) {
+			self.controller.get('recording').style.display = 'none';
+		}
 
 		var wavfile = VR_FOLDER + self.audioFile + VR_EXTENSION;
 		var amrfile = VR_FOLDER + self.audioFile + VR_EXTENSION_AMR;
@@ -704,6 +699,8 @@ var ConvDetailAssistant = Class.create({
 			//NotifyHelper.instance().banner('deactivate' + this.audioFile);
 			this.onRecordEnd();
 		}
+
+		Global.updateUnRegister(this);
 	}
 });
 
