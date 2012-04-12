@@ -48,7 +48,6 @@ var Global = {
 		//Menu
 		var menuItems = [
 		Mojo.Menu.editItem
-		
 		, {
 			label: '关于momo',
 			command: 'cmdAbout'
@@ -298,9 +297,6 @@ AppAssistant.prototype = {
 			DBHelper.instance().remove('authInfo');
 			stage.pushScene('login');
 		} else if(event.command === 'cmdAbout') {
-			this.controller.getActiveStageController().pushAppSupportInfoScene();
-		}
-        if (event.command === 'cmdAbout') {
 			stage.pushScene('about');
 		}
 	}
