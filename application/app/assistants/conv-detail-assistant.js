@@ -8,7 +8,12 @@ var ConvDetailAssistant = Class.create({
 		var that = this;
 		//Menu
 		var menuItems = [
-		Mojo.Menu.editItem, {
+		Mojo.Menu.editItem, 
+        {
+            label: '关于momo',
+            command: 'cmdAbout'
+        },
+        {
 			label: '退出',
 			command: 'cmdLogout'
 		}];

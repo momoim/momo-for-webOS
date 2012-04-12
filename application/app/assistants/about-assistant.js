@@ -1,0 +1,5 @@
+function AboutAssistant(){}
+
+AboutAssistant.prototype = {
+	
+};

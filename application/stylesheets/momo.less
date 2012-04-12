@@ -41,6 +41,7 @@
 @toaster_bg : url(../images/low/toaster-bg.png) left top repeat-x;
 @recording_bg: "../images/low/recording_bg.png";
 @recording_img_bg: "../images/low/recording.png";
+@about_logo: "../images/splash-icon.png";
 .breakP(){word-wrap: break-word; word-break: break-all;}
 .reset(){margin:0;padding:0}
 .border-radius (@radius: 5px) {
@@ -74,6 +75,7 @@ body.palm-default{
     background: @moBg;
     opacity: @opacity_9;
     .transition(bottom, .5s);
+    font-family: "Microsoft Yahei", "Helvetica Neue", "Luxi Sans", "DejaVu Sans", Tahoma, "Hiragino Sans GB", STHeiti !important;
 }
 
 a{
@@ -389,5 +391,38 @@ p{
         height : 250px;
         margin: 30px auto 0;
         .background(@recording_img_bg);
+    }
+}
+#about-logo{
+    .background(@about_logo, center, 0);
+    height: 120px;
+    margin: 40px 0px 20px;
+}
+#about-body {
+    text-align: center;
+    font-size: 12px;
+    color: #d2d2d2;
+    font-family: "Prelude";
+    h3{
+        padding:5px 0 2px;
+        margin: 0;
+    }
+    p{
+        margin: 13px 0;
+        padding: 0;   
+    }
+}
+#about-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    font-size: 11px;
+    color: #d2d2d2;
+    text-align: center;
+    padding-bottom: 10px;
+    h3{
+        padding:5px 0 2px;
+        margin: 0;
     }
 }

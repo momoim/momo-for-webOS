@@ -46,5 +46,9 @@
     {
         "scenes": "complete",
         "source": "app/assistants/complete-assistant.js"
+    },
+    {
+        "scenes": "about",
+        "source": "app/assistants/about-assistant.js"
     }
 ]

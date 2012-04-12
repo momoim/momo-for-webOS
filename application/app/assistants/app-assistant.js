@@ -252,6 +252,9 @@ AppAssistant.prototype = {
 			DBHelper.instance().remove('authInfo');
 			stage.pushScene('login');
 		}
+        if (event.command === 'cmdAbout') {
+			stage.pushScene('about');
+		}
 	}
 };
 
