@@ -12,6 +12,7 @@
     {"source": "app/helper/app-formatter.js"},
     {"source": "app/helper/notify-helper.js"},
 	{"source": "app/helper/CaptureHelper.js"},
+    {"source": "app/helper/chat-sender.js"},
 	{"source": "app/helper/country-helper.js"},
     {"source": "app/assistants/app-assistant.js"},
     {"source": "app/assistants/stage-assistant.js"},

@@ -25,6 +25,11 @@
 					"public": true
 				},
 				{
+					"name": "chatForce",
+					"assistant": "onChatForce",
+					"public": true
+				},
+				{
 					"name": "chatSend",
 					"assistant": "onChatSend",
 					"public": true

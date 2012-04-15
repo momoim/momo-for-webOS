@@ -91,9 +91,9 @@ NodeService.prototype = {
 		if (!that.authInfo || !that.authInfo.user || !that.mqClient || !that.mqClient.isAlive()) {
 			if (chat.kind == 'sms') {
 				//that.sendMsgWithHttp(chat.data);
-				that.sendMsgFail(chat);
+				//that.sendMsgFail(chat);
 			}
-			that.auth(f, info);
+			that.auth(f, info, true);
 		} else {
 			var will = {
 				kind: chat.kind,
@@ -135,11 +135,22 @@ NodeService.prototype = {
 			console.log('send msg fail ' + status);
 		});
 	},
-	auth: function(f, info) {
+	auth: function(f, info, force) {
 		var that = this;
 
+		if(that.force) {
+			console.log('still forcing restart service');
+			return;
+		}
+		if(force) {
+			that.force = true;
+			that.timing = setTimeout(function() {
+				clearTimeout(that.timing);
+				that.force = false;
+				}, 60000);
+		}
 		that.authInfo = info;
-		if (that.authInfo) {
+		if (!force && that.authInfo) {
 			if (that.mqClient && that.mqClient.isAlive()) {
 				//console.log('connection is still alive');
 				f.result = {

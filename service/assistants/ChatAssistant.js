@@ -46,6 +46,16 @@ onChatInit.prototype = {
 	}
 };
 
+//force restart service
+var onChatForce = function() {};
+
+onChatForce.prototype = {
+	run: function(future) {
+		console.log('on chat force');
+		NodeService.instance().auth(future, this.controller.args, true);
+	}
+};
+
 // 发送消息体
 var onChatSend = function() {};
 

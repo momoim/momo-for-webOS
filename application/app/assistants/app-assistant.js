@@ -19,6 +19,19 @@ var Global = {
 		};
 		DBHelper.instance().get('authInfo', success, fail);
 	},
+	force: function() {
+		function fail() {}
+		function success(info) {
+			Global.authInfo = info;
+			new Mojo.Service.Request("palm://momo.im.app.service.node/", {
+				method: "chatForce",
+				parameters: Global.authInfo,
+				onSuccess: function() {},
+				onFailure: function(fail) {}
+			});
+		};
+		DBHelper.instance().get('authInfo', success, fail);
+	},
 	sendRoger: function() {
 		if (Global.talking == null || Global.talking == '') return;
 		var roger = {
@@ -47,16 +60,14 @@ var Global = {
 	menu: function(controller) {
 		//Menu
 		var menuItems = [
-		Mojo.Menu.editItem
-		, {
+		Mojo.Menu.editItem, {
 			label: '关于momo',
 			command: 'cmdAbout'
-		}
-		, {
+		},
+		{
 			label: '退出',
 			command: 'cmdLogout'
-		}
-		];
+		}];
 
 		controller.setupWidget(Mojo.Menu.appMenu, {
 			omitDefaultItems: true
@@ -71,18 +82,18 @@ var Global = {
 		Global.updateList.push(what);
 	},
 	updateUnRegister: function(what) {
-		for(var i = 0 ; i < Global.updateList.length; ++i) {
+		for (var i = 0; i < Global.updateList.length; ++i) {
 			var scene = Global.updateList[i];
-			if(scene == what) {
+			if (scene == what) {
 				Global.updateList.splice(i, 1);
 				break;
 			}
 		}
 	},
 	update: function(income) {
-		for(var now in Global.updateList) {
+		for (var now in Global.updateList) {
 			var scene = Global.updateList[now];
-			if(scene && scene.update) {
+			if (scene && scene.update) {
 				scene.update(income);
 			}
 		}
@@ -158,17 +169,25 @@ AppAssistant.prototype = {
 				this.onKeepAlive();
 				break;
 			case 'onMsgSendError':
-				Mojo.Log.warn('on msg send error trying to send with http');
+				Mojo.Log.error('on msg send error trying to send with http');
 				new interfaces.Momo().postSendMessage(JSON.parse(launchParams.data).data, {
 					onSuccess: function(resp) {
-						Mojo.Log.warn('on msg send error trying to send with http success');
-						that.onNewIncome({
-							kind: 'im',
-							data: resp.responseJSON
-						});
+						Mojo.Log.error('on msg send error trying to send with http success' + resp.responseText);
+						var c = resp.responseJSON;
+						if (c) {
+							if (c.kind) {
+								that.onNewIncome(c);
+							} else {
+								that.onNewIncome({
+									kind: 'im',
+									data: c
+								});
+							}
+						}
 					},
 					onFailure: function() {
-						Mojo.Log.warn('on msg send error trying to send with http fail');
+						Mojo.Log.error('on msg send error trying to send with http fail');
+						NotifyHelper.instance().banner('msg send fail');
 					}
 				});
 				break;
@@ -251,6 +270,7 @@ AppAssistant.prototype = {
 		Mojo.Log.info('onNewIncome================:' + messageStr);
 		// store to database
 		RabbitDB.instance().addTalk(income);
+		ChatSender.instance().removeSendingChat(message);
 
 		//notify
 		var appController = Mojo.Controller.getAppController();
@@ -296,7 +316,7 @@ AppAssistant.prototype = {
 		if (event.command === 'cmdLogout') {
 			DBHelper.instance().remove('authInfo');
 			stage.pushScene('login');
-		} else if(event.command === 'cmdAbout') {
+		} else if (event.command === 'cmdAbout') {
 			stage.pushScene('about');
 		}
 	}

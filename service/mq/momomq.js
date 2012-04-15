@@ -102,6 +102,8 @@ MomoMQ.prototype.connect = function(imm) {
 		});
 		connection.addListener('ready', function() {
 			console.log('connection ready');
+			//reset force status;
+			that.nodeService.force = false;
 			var exc = connection.exchange('momo_im', {
 				passive: true
 			},
