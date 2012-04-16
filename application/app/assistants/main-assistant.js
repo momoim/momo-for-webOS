@@ -5,6 +5,8 @@ var MainAssistant = Class.create({
 	setup: function() {
 		var that = this;
 
+		//for reupload
+		ChatSender.instance().setController(this.controller);
 		Global.menu(this.controller);
 		//init ui
 		that.idList = 'conv-list';

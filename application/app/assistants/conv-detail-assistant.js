@@ -377,7 +377,7 @@ var ConvDetailAssistant = Class.create({
 		//NotifyHelper.instance().banner('on audio: ' + String(result) + String(infile));
 		//get chat obj from Global.convertingAmrList
 		var chated = null;
-		for (var i = 0; i < Global.convertingAmrList.length; ++9) {
+		for (var i = 0; i < Global.convertingAmrList.length; ++i) {
 			var chat = Global.convertingAmrList[i];
 			if (chat.data.content.audio.url == outfile) {
 				chated = chat;

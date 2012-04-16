@@ -88,10 +88,12 @@ NodeService.prototype = {
 		var info = total.auth;
 		var chat = total.chat;
 
-		if (!that.authInfo || !that.authInfo.user || !that.mqClient || !that.mqClient.isAlive()) {
+		if (!that.authInfo || ! that.authInfo.user || ! that.mqClient || ! that.mqClient.isAlive()) {
 			if (chat.kind == 'sms') {
 				//that.sendMsgWithHttp(chat.data);
-				//that.sendMsgFail(chat);
+				if (! (chat.data.content.hasOwnProperty('text'))) {
+					that.sendMsgFail(chat);
+				}
 			}
 			that.auth(f, info, true);
 		} else {
@@ -138,16 +140,17 @@ NodeService.prototype = {
 	auth: function(f, info, force) {
 		var that = this;
 
-		if(that.force) {
+		if (that.force) {
 			console.log('still forcing restart service');
 			return;
 		}
-		if(force) {
+		if (force) {
 			that.force = true;
 			that.timing = setTimeout(function() {
 				clearTimeout(that.timing);
 				that.force = false;
-				}, 60000);
+			},
+			60000);
 		}
 		that.authInfo = info;
 		if (!force && that.authInfo) {

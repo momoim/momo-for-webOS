@@ -154,6 +154,10 @@ onFileUpload.prototype = {
 				response.on('data', function(chunk) {
 					reqResult += chunk;
 					console.log('on req fail chunk: ' + chunk.length + chunk);
+					future.result = {
+						errorCode: status,
+						data: reqResult
+					};
 				});
 				response.on('end', function() {
 					console.log('on req fail chunk end');
@@ -231,7 +235,7 @@ onFileUpload.prototype = {
 
 				NodeService.instance().send(future, {
 					chat: actionData,
-					info: that.authInfo
+					auth: that.authInfo
 				});
 			}
 			break;
