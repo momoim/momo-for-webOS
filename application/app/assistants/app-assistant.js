@@ -64,6 +64,11 @@ var Global = {
 			label: '关于momo',
 			command: 'cmdAbout'
 		},
+        {
+            label: '开启后台运行',
+            icon: 'toggle-off',
+            command: 'cmdOpenService'
+        },
 		{
 			label: '退出',
 			command: 'cmdLogout'
