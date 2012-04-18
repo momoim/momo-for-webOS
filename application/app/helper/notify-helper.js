@@ -12,7 +12,7 @@ var NotifyHelper = function() {
 			'momo');
 		},
 		bannerNewMsg: function() {
-			this.banner('You just got new message.');
+			this.banner('You just got new message.', !Global.alertSound());
 		}
 	}
 };

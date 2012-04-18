@@ -91,7 +91,7 @@ var ConvDetailAssistant = Class.create({
 
 		this.elTextField = this.controller.document.getElementById('comment-content');
 		this.elButtonRecord = this.controller.document.getElementById('audio-recorder');
-		if (Global.lastSwitcher == 'sound') {
+		if (Global.configs.lastSwitcher == 'sound') {
 			this.switchToSound();
 		} else {
 			this.switchToText();
@@ -146,7 +146,7 @@ var ConvDetailAssistant = Class.create({
 			}
 		} else if (event.keyCode == 32) {
 			//space keyup
-			if (Global.lastSwitcher == 'sound') {
+			if (Global.configs.lastSwitcher == 'sound') {
 				//it's record state
 				if (this.audioFile == '') {
 					this.onRecordStart();
@@ -349,14 +349,14 @@ var ConvDetailAssistant = Class.create({
 		if (this.commentContent.mojo) {
 			this.commentContent.mojo.focus();
 		}
-		Global.lastSwitcher = 'text';
-		DBHelper.instance().add('lastSwitcher', Global.lastSwitcher);
+		Global.configs.lastSwitcher = 'text';
+		DBHelper.instance().add('configs', Global.configs);
 	},
 	switchToSound: function() {
 		this.elButtonRecord.style.display = 'block';
 		this.elTextField.style.display = 'none';
-		Global.lastSwitcher = 'sound';
-		DBHelper.instance().add('lastSwitcher', Global.lastSwitcher);
+		Global.configs.lastSwitcher = 'sound';
+		DBHelper.instance().add('configs', Global.configs);
 	},
 	onRecordStart: function() {
 		var self = this;

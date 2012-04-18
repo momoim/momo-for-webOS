@@ -6,6 +6,13 @@ var Global = {
 	lastSwitcher: 'sound',
 	//正在转换的录音文件，用于转换完发送
 	convertingAmrList: [],
+	configs: {
+		background: true,
+		lastSwitcher: 'sound',
+		alert: {
+			sound: true
+		}
+	},
 	keepAuth: function() {
 		function fail() {}
 		function success(info) {
@@ -61,26 +68,43 @@ var Global = {
 		//Menu
 		var menuItems = [
 		Mojo.Menu.editItem, {
+			label: Global.configs.background ? '关闭后台运行': '开启后台运行',
+			icon: Global.configs.background ? 'toggle-on': 'toggle-off',
+			command: 'cmdToggleBackground'
+		},
+		{
+			label: Global.alertSound() ? '关闭声音提醒': '开启声音提醒',
+			icon: Global.alertSound() ? 'toggle-on': 'toggle-off',
+			command: 'cmdToggleAlertSound'
+		},
+		{
 			label: '关于momo',
 			command: 'cmdAbout'
 		},
-        {
-            label: '开启后台运行',
-            icon: 'toggle-off',
-            command: 'cmdOpenService'
-        },
 		{
 			label: '退出',
 			command: 'cmdLogout'
 		}];
 
+		if (Global.menuModels) {
+			Global.menuModels.items = menuItems;
+		} else {
+			Global.menuModels = {
+				visible: true,
+				items: menuItems
+			};
+		}
 		controller.setupWidget(Mojo.Menu.appMenu, {
 			omitDefaultItems: true
 		},
-		{
-			visible: true,
-			items: menuItems
-		});
+		Global.menuModels);
+	},
+	alertSound: function() {
+		if (Global.configs.alert && ! Global.configs.alert.sound) {
+			return false;
+		} else {
+			return true;
+		}
 	},
 	updateList: [],
 	updateRegister: function(what) {
@@ -102,6 +126,29 @@ var Global = {
 				scene.update(income);
 			}
 		}
+	},
+	refreshMenus: function() {
+		//toggle background
+		for (var i = 0; i < Global.updateList.length; ++i) {
+			var scene = Global.updateList[i];
+			if (scene && scene.controller) {
+				Global.menu(scene.controller);
+			}
+		}
+	},
+	toggleBackground: function() {
+		Global.configs.background = ! (Global.configs.background);
+
+		DBHelper.instance().add('configs', Global.configs);
+		Global.refreshMenus();
+	},
+	toggleAlertSound: function() {
+		Global.configs.alert = {
+			sound: ! (Global.alertSound())
+		};
+
+		DBHelper.instance().add('configs', Global.configs);
+		Global.refreshMenus();
 	}
 };
 
@@ -120,10 +167,13 @@ AppAssistant.prototype = {
 			//that.setWakeup();
 		};
 		DBHelper.instance().get('authInfo', success, fail);
-		DBHelper.instance().get('lastSwitcher', function(s) {
-			Global.lastSwitcher = s;
+
+		DBHelper.instance().get('configs', function(s) {
+			Global.configs = s;
 		},
-		function() {});
+		function() {
+			DBHelper.instance().add('configs', Global.configs);
+		});
 	},
 	handleLaunch: function(launchParams) {
 		Mojo.Log.info('handleLaunch');
@@ -171,7 +221,21 @@ AppAssistant.prototype = {
 				this.onNewIncome(launchParams.data);
 				break;
 			case 'keep-alive':
-				this.onKeepAlive();
+				if (cardStageController) {
+					this.onKeepAlive();
+					//Mojo.Log.error('has stage keep alive');
+				} else {
+					DBHelper.instance().get('configs', function(c) {
+						Global.configs = c;
+						if (Global.configs.background) {
+							that.onKeepAlive();
+							//Mojo.Log.error('backgournd keep alive');
+						} else {
+							Mojo.Log.error('not backgournd dunt keep alive');
+						}
+					},
+					function() {});
+				}
 				break;
 			case 'onMsgSendError':
 				Mojo.Log.error('on msg send error trying to send with http');
@@ -320,9 +384,14 @@ AppAssistant.prototype = {
 		var stage = this.controller.getActiveStageController();
 		if (event.command === 'cmdLogout') {
 			DBHelper.instance().remove('authInfo');
+			DBHelper.instance().remove('config');
 			stage.pushScene('login');
 		} else if (event.command === 'cmdAbout') {
 			stage.pushScene('about');
+		} else if (event.command === 'cmdToggleBackground') {
+			Global.toggleBackground();
+		} else if (event.command === 'cmdToggleAlertSound') {
+			Global.toggleAlertSound();
 		}
 	}
 };
