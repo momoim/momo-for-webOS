@@ -179,19 +179,36 @@ var MainAssistant = Class.create({
 		}
 		this.controller.document.addEventListener("click", this.onClickReal, true);
 
-		if (event && event.hasOwnProperty('phoneNumbers')) {
-			Mojo.Log.info('people: ' + JSON.stringify(event.phoneNumbers));
-			if (event.phoneNumbers.length > 0) {
-				if (event.phoneNumbers.length == 1) {
+		if(event) {
+			Mojo.Log.error('evented main: ' + JSON.stringify(event));
+		}
+		if (event && (event.hasOwnProperty('phoneNumbers') || event.details && event.details.record && event.details.record.phoneNumbers)) {
+			var phoneNumbers;
+			var name;
+			if(event.phoneNumbers) {
+				//webOS 2.x
+				phoneNumbers = event.phoneNumbers;
+				name = event.name.familyName + event.name.givenName;
+			} else if(event.details && event.details.record && event.details.record.phoneNumbers) {
+				//webOS 1.4.5
+				phoneNumbers = event.details.record.phoneNumbers;
+				name = event.details.record.lastName + event.details.record.firstName;
+			} else {
+				//this should not be called
+				return;
+			}
+			Mojo.Log.error('people: ' + JSON.stringify(phoneNumbers));
+			if (phoneNumbers.length > 0) {
+				if (phoneNumbers.length == 1) {
 					var people = {
-						name: event.name.familyName + event.name.givenName,
-						mobile: event.phoneNumbers[0].value
+						name: name,
+						mobile: phoneNumbers[0].value
 					};
 					that.talkTo(people);
 				} else {
 					var choices = [];
-					for (var i = 0; i < event.phoneNumbers.length; ++i) {
-						var num = event.phoneNumbers[i].value;
+					for (var i = 0; i < phoneNumbers.length; ++i) {
+						var num = phoneNumbers[i].value;
 						choices.push({
 							label: num,
 							value: num,
@@ -203,14 +220,14 @@ var MainAssistant = Class.create({
 							//NotifyHelper.instance().banner('what: ' + what);
 							if (what) {
 								var people = {
-									name: event.name.familyName + event.name.givenName,
+									name: name,
 									mobile: what
 								};
 								that.talkTo(people);
 							}
 						}.bind(that),
 						title: '选择一个手机号',
-						message: '选择您的消息要发给的号码',
+						message: '选择您要发给 ' + name + ' 的哪个号码',
 						choices: choices
 					});
 				}

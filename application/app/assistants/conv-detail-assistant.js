@@ -66,7 +66,11 @@ var ConvDetailAssistant = Class.create({
 		});
 
 		//录音辅助类
-		this.captureHelper = new CaptureHelper();
+		try {
+			this.captureHelper = new CaptureHelper();
+		} catch(e) {
+			//
+		}
 		this.audioFile = '';
 
 		this.audioRecorder = this.controller.get('audio-recorder');
@@ -359,6 +363,7 @@ var ConvDetailAssistant = Class.create({
 		DBHelper.instance().add('configs', Global.configs);
 	},
 	onRecordStart: function() {
+		if(!this.captureHelper) return;
 		var self = this;
 		if(Global.audioPlayer) {
 			Global.audioPlayer.pause();
@@ -406,6 +411,7 @@ var ConvDetailAssistant = Class.create({
 		ChatSender.instance().sendChat(chated);
 	},
 	onRecordEnd: function() {
+		if(!this.captureHelper) return;
 		if (this.t60) {
 			clearTimeout(this.t60);
 		}

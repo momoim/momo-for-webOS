@@ -51,7 +51,7 @@ ChatSender.prototype.addSendingChat = function(chat) {
 		});
 		Global.force();
 	},
-	15000);
+	5000);
 	that.sendingChat.push(chat);
 };
 

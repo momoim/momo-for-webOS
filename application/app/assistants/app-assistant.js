@@ -1,9 +1,8 @@
 var Global = {
 	mainStage: 'mainStage',
 	dashStage: 'dashboardStage',
-	hasNewUnread: false,
 	//是否有新未读，回到主列表跳转到第一条
-	lastSwitcher: 'sound',
+	hasNewUnread: false,
 	//正在转换的录音文件，用于转换完发送
 	convertingAmrList: [],
 	configs: {
@@ -80,6 +79,7 @@ var Global = {
 		{
 			label: '关于momo',
 			command: 'cmdAbout'
+			//,template: 'templates/menu/about'
 		},
 		{
 			label: '退出',
@@ -238,24 +238,23 @@ AppAssistant.prototype = {
 				}
 				break;
 			case 'onMsgSendError':
-				Mojo.Log.error('on msg send error trying to send with http');
+				//Mojo.Log.error('on msg send error trying to send with http');
 				new interfaces.Momo().postSendMessage(JSON.parse(launchParams.data).data, {
 					onSuccess: function(resp) {
-						Mojo.Log.error('on msg send error trying to send with http success' + resp.responseText);
+						//Mojo.Log.error('on msg send error trying to send with http success');// + resp.responseText);
 						var c = resp.responseJSON;
 						if (c) {
-							if (c.kind) {
-								that.onNewIncome(c);
-							} else {
-								that.onNewIncome({
+							if (! (c.kind)) {
+								c = {
 									kind: 'im',
 									data: c
-								});
+								};
 							}
+							that.onNewIncome(JSON.stringify(c));
 						}
 					},
-					onFailure: function() {
-						Mojo.Log.error('on msg send error trying to send with http fail');
+					onFailure: function(e) {
+						Mojo.Log.error('on msg send error trying to send with http fail' + JSON.stringify(e));
 						NotifyHelper.instance().banner('msg send fail');
 					}
 				});
@@ -336,7 +335,7 @@ AppAssistant.prototype = {
 		if (!message || message.kind != 'sms') {
 			return;
 		}
-		Mojo.Log.info('onNewIncome================:' + messageStr);
+		//Mojo.Log.error('onNewIncome================:' + messageStr);
 		// store to database
 		RabbitDB.instance().addTalk(income);
 		ChatSender.instance().removeSendingChat(message);
