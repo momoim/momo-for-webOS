@@ -2,16 +2,14 @@
 	Palm disclaimer
  **/
 #include <stdio.h>
-//#include <math.h>
 #include <syslog.h>
 #include <signal.h>
 #include <pthread.h>
 
-
-//#include <GLES2/gl2.h>
 #include "SDL.h"
 #include "PDL.h"
 #include "amr/wave2amr/wav_amr.h"
+#include "proxy/mqproxy.h"
 
 #define WHAT_AMR_COMPRESS 101;
 #define WHAT_AMR_THREAD 102;
@@ -97,6 +95,29 @@ PDL_bool wave_to_amr(PDL_JSParameters *params) {
 	return PDL_FALSE;
 }
 
+PDL_bool open_socket(PDL_JSParameters *params) {
+	syslog(LOG_ALERT, "open socket callled!!");
+	int num = PDL_GetNumJSParams(params);
+	PDL_Err err = PDL_JSReply(params, "hello");
+	const char *addr = PDL_GetJSParamString(params, 0);
+	int port = PDL_GetJSParamInt(params, 1);
+	const char *auth = PDL_GetJSParamString(params, 2);
+	openSocket(addr, port, auth);
+	if(err != PDL_NOERROR) {
+		return PDL_FALSE;
+	}
+	return PDL_TRUE;
+}
+
+
+PDL_bool close_socket(PDL_JSParameters *params)
+{
+	syslog(LOG_ALERT, "close socket callled!!");
+	closeSocket();
+
+	return PDL_TRUE;
+}
+
 PDL_bool JSHandlerFunc(PDL_JSParameters *params) {
 	syslog(LOG_ALERT, "foo callled!!");
 	int num = PDL_GetNumJSParams(params);
@@ -112,6 +133,8 @@ int plugin_client_init() {
 	int ret = 0;
 	ret += PDL_RegisterJSHandler("foo", JSHandlerFunc);
 	ret += PDL_RegisterJSHandler("wave2amr", wave_to_amr);
+	ret += PDL_RegisterJSHandler("openSocket", open_socket);
+	ret += PDL_RegisterJSHandler("closeSocket", close_socket);
 	return ret;
 }
 

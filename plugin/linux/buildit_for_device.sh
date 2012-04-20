@@ -21,6 +21,8 @@ export SRC="amr_helper.cpp"
 SRCDIRAMR="../src/amr";
 SRCDIROPENCORE=${SRCDIRAMR}/openamr/opencore/codecs_v2/audio/gsm_amr
 
+SRCDIRPROXY="../src/proxy";
+
 SRCAMR="";
 for name in "`find ${SRCDIROPENCORE}/common -name \"*.cpp\"`"
 do
@@ -47,6 +49,12 @@ do
 done
 
 for name in "`find ${SRCDIRAMR}/wave2amr -name \"*.cpp\"`"
+do
+		SRCAMR+=" "
+		SRCAMR+=$name
+done
+
+for name in "`find ${SRCDIRPROXY} -name \"*.cpp\"`"
 do
 		SRCAMR+=" "
 		SRCAMR+=$name
@@ -107,9 +115,10 @@ INCLUDEDIRENCINC="${SRCDIROPENCORE}/enc/include"
 INCLUDEDIRDECINC="${SRCDIROPENCORE}/dec/include"
 INCLUDEDIRNB="${SRCDIRAMR}/openamr/amrnb"
 INCLUDEDIRWAVE="${SRCDIRAMR}/wave2amr"
+INCLUDEDIRPROXY="${SRCDIRPROXY}"
 LIBDIR="${PalmPDK}/device/lib"
 
-CPPFLAGS="-I${INCLUDEDIR} -I${INCLUDEDIR}/SDL --sysroot=$SYSROOT -I${INCLUDEDIRAC} -I${INCLUDEDIROSCL} -I${INCLUDEDIRENC} -I${INCLUDEDIRDEC} -I${INCLUDEDIRENCINC} -I${INCLUDEDIRDECINC} -I${INCLUDEDIRNB} -I${INCLUDEDIRWAVE} -I."
+CPPFLAGS="-I${INCLUDEDIR} -I${INCLUDEDIR}/SDL --sysroot=$SYSROOT -I${INCLUDEDIRAC} -I${INCLUDEDIROSCL} -I${INCLUDEDIRENC} -I${INCLUDEDIRDEC} -I${INCLUDEDIRENCINC} -I${INCLUDEDIRDECINC} -I${INCLUDEDIRNB} -I${INCLUDEDIRWAVE} -I${INCLUDEDIRPROXY} -I."
 echo $CPPFLAGS
 LDFLAGS="-L${LIBDIR} -Wl,--allow-shlib-undefined"
 SRCDIR="../src"

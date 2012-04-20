@@ -6,10 +6,10 @@
 	"uiRevision": 2,
 	"package_format_version": 2,
 	"loc_name": "momo",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"icon": "icon.png",
 	"miniicon": "icon.png",
 	"vendor": "Tsung W.",
-	"vendorurl": "http://3g.momo.im",
+	"vendorurl": "http://m.momo.im",
 	"services": ["momo.im.app.service.node"]
 }

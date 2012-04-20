@@ -67,6 +67,17 @@ var MainAssistant = Class.create({
 			NotifyHelper.instance().banner(foo);
 			*/
 			//Global.AmrHelper.wave2amr("/media/internal/.momo/audio/74eaa851-db2c-03fe-fed1-15f9a2df49dc.amr", "/media/internal/.momo/testmojo.amr");
+			var auth = {
+				"login_type": "token",
+				"data": {
+					"token": Global.authInfo.oauthToken
+				},
+				"heartbeat": 60,
+				//TODO "compress": "gzip",
+				"version": "1.1.1"
+			};
+			Global.AmrHelper.openSocket('58.22.103.41', 9191, JSON.stringify(auth));
+			//Global.AmrHelper.openSocket('proxy.momo.im', 9191, JSON.stringify(auth));
 		}
 	},
 	createPluginAmr: function(document) {
