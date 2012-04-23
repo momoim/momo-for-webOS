@@ -20,6 +20,9 @@
 #include "mqproxy.h"
 #define MAX_BUFFER_LEN 2048
 
+#define ntohll(x) ( ( (uint64_t)(ntohl( (uint32_t)((x << 32) >> 32) )) << 32) | ntohl( ((uint32_t)(x >> 32)) ) )                                        
+#define htonll(x) ntohll(x)
+
 int sock;
 
 void didConnected(const char* auth);
@@ -77,7 +80,7 @@ int openSocket(const char* addr, unsigned short port, const char* auth) {
 		syslog(LOG_ALERT, "Unable to put client sock into non-blocking/async mode");
 		return -1;
 	}	
-	
+
 	didConnected(auth);
 }
 
@@ -120,7 +123,6 @@ void SIGIOHandler(int signum, siginfo_t *info, void *uap)
 	int recvMsgSize;                  /* Size of datagram */
 	char echoBuffer[MAX_BUFFER_LEN];  /* Datagram buffer */
 
-	/* printf("signal %d si_code: %d error: %d\n", info->si_signo, info->si_code, info->si_errno); */
 	do  /* As long as there is input... */
 	{
 		clntLen = sizeof(serveraddr);
@@ -128,15 +130,111 @@ void SIGIOHandler(int signum, siginfo_t *info, void *uap)
 		if ((recvMsgSize = recvfrom(sock, echoBuffer, MAX_BUFFER_LEN, 0,
 						(struct sockaddr *) &serveraddr, &clntLen)) > 0)
 		{
-			echoBuffer[recvMsgSize] = '\0';
-			didReceiveData(echoBuffer);
-			/*
-			if (sendto(sock, echoBuffer, recvMsgSize, 0, (struct sockaddr *) 
-						&serveraddr, sizeof(serveraddr)) != recvMsgSize){
-				printf("sendto() failed");
-				return;
+			if(recvMsgSize < 8) break;
+
+			//head
+			uint8_t* buffer = (uint8_t*)echoBuffer;
+			int byteCount = 0;
+
+			//cmd
+			MM_SMCP_CMD_TYPE cmdType = (MM_SMCP_CMD_TYPE)(ntohs(*(uint16_t*)buffer));
+			buffer += sizeof(uint16_t);
+			byteCount += sizeof(uint16_t);
+
+			//flags
+			uint16_t packHead = ntohs(*(uint16_t*)buffer);
+			buffer += sizeof(uint16_t);
+			byteCount += sizeof(uint16_t);
+
+			uint64_t uid = 0;
+			if (packHead & 0x20) {
+				if (recvMsgSize < byteCount + sizeof(uint64_t) + sizeof(uint32_t)) break;
+
+				uid = ntohll(*(uint64_t*)buffer);
+				buffer += sizeof(uint64_t);
+				byteCount += sizeof(uint64_t);
 			}
-			*/
+
+			uint64_t timeStamp = 0;
+			if (packHead & 0x10) {
+				if (recvMsgSize < byteCount + sizeof(uint64_t) + sizeof(uint32_t)) break;
+
+				timeStamp = ntohll(*(uint64_t*)buffer);
+				buffer += sizeof(uint64_t);
+				byteCount += sizeof(uint64_t);
+			}
+
+			//下行包序号
+			int downPackNumber = 0;
+			if (packHead & 0x8) {
+				if (recvMsgSize < byteCount + sizeof(uint32_t) + sizeof(uint32_t)) break;
+
+				downPackNumber = ntohl(*(uint32_t*)buffer);
+				buffer += sizeof(uint32_t);
+				byteCount += sizeof(uint32_t);
+			}
+
+			//上行包序号
+			int upPackNumber = 0;
+			if (packHead & 0x4) {
+				if (recvMsgSize < byteCount + sizeof(uint32_t) + sizeof(uint32_t)) break;
+
+				upPackNumber = ntohl(*(uint32_t*)buffer);
+				buffer += sizeof(uint32_t);
+				byteCount += sizeof(uint32_t);
+			}
+
+			//是否加密
+			bool isEncrypted = false;
+			if (packHead & 0x2) {
+				isEncrypted = true;
+			}
+
+			//是否压缩
+			bool isCompress = false;
+			if (packHead & 0x1) {
+				isCompress = true;
+			}
+
+			//length
+			if (recvMsgSize < byteCount + 4) break;
+			int contentLength = ntohl(*(uint32_t*)buffer);
+			buffer += sizeof(uint32_t);
+			byteCount += sizeof(uint32_t);
+
+			//check content
+			if(recvMsgSize >= byteCount + contentLength) {
+				syslog(LOG_ALERT, "recving msg type: %d, timestamp: %d", cmdType, timeStamp);
+				
+				if(cmdType == SMCP_IM_DELIVER) {
+					char* body = (char*)malloc(contentLength + 1);
+					memcpy(body, buffer, contentLength);
+					char* last = body + contentLength;
+					memset(last, 0, 1);
+					syslog(LOG_ALERT, "length: %d, recving msg conetnt!!!: %s", contentLength, body);
+
+					//call js
+					const char* results[2];
+					results[0] = body;
+					char* time;
+					sprintf(time, "%d", timeStamp);
+					results[1] = time;
+					PDL_CallJS("onProxyMsg", results, 2);
+					free(body);
+				} else {
+					syslog(LOG_ALERT, "not an im delivery");
+				}
+			}
+
+			/*
+				 echoBuffer[recvMsgSize] = '\0';
+				 didReceiveData(echoBuffer);
+				 if (sendto(sock, echoBuffer, recvMsgSize, 0, (struct sockaddr *) 
+				 &serveraddr, sizeof(serveraddr)) != recvMsgSize){
+				 printf("sendto() failed");
+				 return;
+				 }
+				 */
 		}
 		else if (recvMsgSize == 0)
 		{

@@ -58,9 +58,21 @@ var MainAssistant = Class.create({
 	},
 	initializePlugin: function() {
 		var that = this;
+		if (that.initingT) {
+			clearTimeout(that.initingT);
+		}
 		if (!Global.AmrHelper.foo) {
-			setTimeout(that.initializePlugin.bind(that), 50);
+			that.initingT = setTimeout(that.initializePlugin.bind(that), 50);
 		} else {
+			//register callbacks
+			Global.AmrHelper.onProxyMsg = function(body, timestamp) {
+				var msg = JSON.parse(body);
+				msg.timestamp = parseInt(timestamp);
+				Mojo.Log.error('on plugin msg: ' + body + ' ..' + timestamp);
+				//call by launch
+				AppLauncher.onNewIncome(msg);
+			};
+
 			// plug-in is ready to be used
 			/*
 			var foo = Global.AmrHelper.foo();
@@ -74,8 +86,10 @@ var MainAssistant = Class.create({
 				},
 				"heartbeat": 60,
 				//TODO "compress": "gzip",
+				//"receive_audio": false,
 				"version": "1.1.1"
 			};
+			//Global.AmrHelper.openSocket(Setting.proxy, 9191, JSON.stringify(auth));
 			Global.AmrHelper.openSocket('58.22.103.41', 9191, JSON.stringify(auth));
 			//Global.AmrHelper.openSocket('proxy.momo.im', 9191, JSON.stringify(auth));
 		}
@@ -152,19 +166,8 @@ var MainAssistant = Class.create({
 		loading.className = "show";
 		new interfaces.Momo().getIMAll({
 			onSuccess: function(response) {
-				Mojo.Log.info('refreshClick: trying to refresh unread: ' + response.responseText);
-				new Mojo.Service.Request("palm://com.palm.applicationManager", {
-					method: "launch",
-					parameters: {
-						id: Mojo.appInfo.id,
-						params: {
-							"action": "onUnreadList",
-							"data": response.responseText
-						}
-					},
-					onSuccess: function(response) {},
-					onFailure: function(response) {}
-				});
+				Mojo.Log.error('refreshClick: trying to refresh unread: ' + response.responseText);
+				AppLauncher.onUnreadList(response.responseText);
 				loading.className = "ignore";
 			}.bind(that),
 			onFailure: function(response) {
@@ -190,17 +193,17 @@ var MainAssistant = Class.create({
 		}
 		this.controller.document.addEventListener("click", this.onClickReal, true);
 
-		if(event) {
+		if (event) {
 			Mojo.Log.error('evented main: ' + JSON.stringify(event));
 		}
 		if (event && (event.hasOwnProperty('phoneNumbers') || event.details && event.details.record && event.details.record.phoneNumbers)) {
 			var phoneNumbers;
 			var name;
-			if(event.phoneNumbers) {
+			if (event.phoneNumbers) {
 				//webOS 2.x
 				phoneNumbers = event.phoneNumbers;
 				name = event.name.familyName + event.name.givenName;
-			} else if(event.details && event.details.record && event.details.record.phoneNumbers) {
+			} else if (event.details && event.details.record && event.details.record.phoneNumbers) {
 				//webOS 1.4.5
 				phoneNumbers = event.details.record.phoneNumbers;
 				name = event.details.record.lastName + event.details.record.firstName;
@@ -301,7 +304,6 @@ var MainAssistant = Class.create({
 	cleanup: function(event) {
 		this.cleaning = true;
 		//remove callback
-		
 		Global.updateUnRegister(this);
 	}
 });

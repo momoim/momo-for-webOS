@@ -6,6 +6,7 @@ function Release(){
             im: 'momo_im'
         }
     };
+	this.proxy = '58.22.103.41';
 };
 
 function Develop(){
@@ -16,9 +17,24 @@ function Develop(){
             im: 'momo_im'
         }
     };
+	this.proxy = '121.207.242.210';
+};
+
+function Inside(){
+    this.api = 'v3.api.momo.im';
+    this.mq = {
+        host: '121.207.242.244',
+        exchange: {
+            im: 'momo_im'
+        }
+    };
+	//this.proxy = '192.168.57.65';
+	this.proxy = '121.207.242.210';
 };
 
 var Setting = new Release();
+//var Setting = new Develop();
+//var Setting = new Inside();
 Setting.protocol = 'http://';
 Setting.clientID = 1;
 Setting.CACHE_FOLDER = '/media/internal/.momo';

@@ -53,21 +53,7 @@ DashboardAssistant.prototype = {
     },
     createStage: function(launchArgs){
 		var app = this.controller.stageController.getAppController();
-        new Mojo.Service.Request("palm://com.palm.applicationManager", {
-            method: "launch",
-            parameters: {
-                id: Mojo.appInfo.id,
-                params: {
-                    //"action": "keep-alive"
-                }
-            },
-            onSuccess: function(response){
-				app.closeStage(Global.dashStage);
-            },
-            onFailure: function(response){
-				NotifyHelper.instance().banner(response);
-		    }
-        });
+		AppLauncher.onDashClick(this.delivery, app);
     },
     stageActivate: function(event){
         this.controller.stageController.indicateNewContent(false); // no more flashy
