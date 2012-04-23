@@ -1,7 +1,7 @@
 var AppLauncher = {
-	launch: function(action, data, onSuccess, onFailure) {
+	launch: function(action, data, onSuccess, onFailure, method) {
 		new Mojo.Service.Request("palm://com.palm.applicationManager", {
-			method: "open",
+			method: method ? method : "open",
 			parameters: {
 				id: Mojo.appInfo.id,
 				params: {
@@ -37,7 +37,7 @@ var AppLauncher = {
 		},
 		function(response) {
 			NotifyHelper.instance().banner(response);
-		});
+		}, 'launch');
 	}
 };
 
