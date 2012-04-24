@@ -180,7 +180,7 @@ AppAssistant.prototype = {
 		var that = this;
 		var cardStageController = this.controller.getStageController(Global.mainStage);
 		var appController = Mojo.Controller.getAppController();
-		if (!launchParams) {
+		if (!launchParams || launchParams.action === 'onDashClick') {
 			//
 			Mojo.Log.info('no launch params');
 			var pushMainScene = function(stageController) {
@@ -192,7 +192,9 @@ AppAssistant.prototype = {
 				function success(info) {
 					Mojo.Log.info('get auth info success');
 					Global.authInfo = info;
-					stageController.pushScene('main');
+					stageController.pushScene('main', {
+						which: launchParams.data
+					});
 					//stageController.pushScene('recorder');
 				};
 				DBHelper.instance().get('authInfo', success, fail);
@@ -208,6 +210,7 @@ AppAssistant.prototype = {
 			}
 			else {
 				cardStageController.activate();
+				cardStageController.delegateToSceneAssistant('switchInto', launchParams.data);
 			}
 		}
 		else {

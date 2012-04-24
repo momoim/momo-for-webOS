@@ -1,6 +1,7 @@
 var MainAssistant = Class.create({
-	initialize: function() {
+	initialize: function(what) {
 		Global.updateRegister(this);
+		if(what) this.willSwitch = what.which;
 	},
 	setup: function() {
 		var that = this;
@@ -54,6 +55,12 @@ var MainAssistant = Class.create({
 			//this.initializePlugin();
 		} else {
 			NotifyHelper.instance().banner('fail to load amr helper');
+		}
+
+		//try to auto switch to some dash taped item
+		if(this.willSwitch) {
+			this.switchInto(this.willSwitch);
+			this.willSwitch = null;
 		}
 	},
 	initializePlugin: function() {
@@ -136,8 +143,16 @@ var MainAssistant = Class.create({
 	},
 	listWasTapped: function(event) {
 		Mojo.Log.info('listWasTapped');
+		/*
 		this.controller.stageController.pushScene('conv-detail', {
 			item: event.item.other
+		});
+		*/
+		this.switchInto(event.item);
+	},
+	switchInto: function(which) {
+		this.controller.stageController.pushScene('conv-detail', {
+			item: which.other
 		});
 	},
 	itemDelete: function(event) {
