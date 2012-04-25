@@ -38,28 +38,52 @@ var Global = {
 		};
 		DBHelper.instance().get('authInfo', success, fail);
 	},
-	sendRoger: function() {
+	sendRogerInbox: function(who, which) {
+		Mojo.Log.error('sending roger inbox: ' + which + ' who ' + who);
+		var roger = {
+			client_id: 7,
+			sender: Global.authInfo.user.id,
+			receiver: who,
+			status: {
+				msg_receive: {
+					id: which
+				}
+			}
+		};
+		Global.sendRoger(roger);
+	},
+	sendRogerRead: function(which) {
+		Mojo.Log.error('sending roger read: ' + which);
 		if (Global.talking == null || Global.talking == '') return;
 		var roger = {
 			client_id: 7,
 			sender: Global.authInfo.user.id,
 			receiver: Global.talking,
 			status: {
-				msg_read: {}
+				msg_read: {
+					id: which
+				}
 			}
 		};
+		Global.sendRoger(roger);
+	},
+	sendRoger: function(roger) {
+		Mojo.Log.error('sending roger : ' + JSON.stringify(roger));
+		var all = {
+					kind: 'roger',
+					data: roger
+				};
 		new Mojo.Service.Request("palm://momo.im.app.service.node/", {
 			method: "chatSend",
 			parameters: {
 				auth: Global.authInfo,
-				chat: {
-					kind: 'roger',
-					data: roger
-				}
+				chat: all
 			},
 			onSuccess: function() {},
 			onFailure: function(fail) {
 				Global.keepAuth();
+				Mojo.Log.error('sending roger read fail try plugin');
+				ChatSender.instance().sendWithPlugin(all, roger.receiver);
 			}
 		});
 	},
@@ -341,7 +365,9 @@ AppAssistant.prototype = {
 		//Mojo.Log.error('onNewIncome================:' + messageStr);
 		// store to database
 		RabbitDB.instance().addTalk(income);
-		ChatSender.instance().removeSendingChat(message);
+		if(income.sender.id == Global.authInfo.user.id) {
+			ChatSender.instance().removeSendingChat(message);
+		}
 
 		//notify
 		var appController = Mojo.Controller.getAppController();
@@ -373,8 +399,12 @@ AppAssistant.prototype = {
 			}
 
 			Global.hasNewUnread = true;
+			Global.sendRogerInbox(income.sender.id, income.id);
 		} else {
-			Global.sendRoger();
+			//TODO string compare?
+			if(income.sender.id != Global.authInfo.user.id) {
+				Global.sendRogerRead(income.id);
+			}
 		}
 		//NotifyHelper.instance().banner('got meesage main: ' + JSON.stringify(income.content));
 		if (mainStage) {

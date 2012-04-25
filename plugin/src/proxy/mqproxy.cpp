@@ -205,7 +205,7 @@ void SIGIOHandler(int signum, siginfo_t *info, void *uap)
 			//check content
 			if(recvMsgSize >= byteCount + contentLength) {
 				syslog(LOG_ALERT, "recving msg type: %d, timestamp: %d", cmdType, timeStamp);
-				
+
 				if(cmdType == SMCP_IM_DELIVER) {
 					char* body = (char*)malloc(contentLength + 1);
 					memcpy(body, buffer, contentLength);
@@ -225,16 +225,6 @@ void SIGIOHandler(int signum, siginfo_t *info, void *uap)
 					syslog(LOG_ALERT, "not an im delivery");
 				}
 			}
-
-			/*
-				 echoBuffer[recvMsgSize] = '\0';
-				 didReceiveData(echoBuffer);
-				 if (sendto(sock, echoBuffer, recvMsgSize, 0, (struct sockaddr *) 
-				 &serveraddr, sizeof(serveraddr)) != recvMsgSize){
-				 printf("sendto() failed");
-				 return;
-				 }
-				 */
 		}
 		else if (recvMsgSize == 0)
 		{
@@ -252,4 +242,71 @@ void SIGIOHandler(int signum, siginfo_t *info, void *uap)
 		}
 	}  while (recvMsgSize > 0);
 	/* Nothing left to receive */
+}
+
+int currentUpPackNum = 0;
+void sendMsgs(MM_SMCP_CMD_TYPE cmdTypeRaw, char* orig, const char* receiver) {
+	//send 1v1 msg( chat and roger)
+	//
+	syslog(LOG_ALERT, "sending msg 1v1 content: %s --- receiver: %s", orig, receiver);
+	MOMO_SENDING_MSG msg;
+	msg.upPackNumber = currentUpPackNum++;
+	msg.msg = orig;
+
+	char buf[2048];
+
+	char* index = buf;
+	//cmdType
+	uint16_t cmdType = htons((uint16_t)cmdTypeRaw);
+	memcpy(index, &cmdType, sizeof(cmdType));
+	index+=sizeof(cmdType);
+
+	//pack head
+	uint16_t packHead = 0;
+	if(msg.upPackNumber > 0) {
+		packHead = packHead | 0x4;
+	}
+
+	uint16_t packNet = htons((uint16_t)packHead);
+	memcpy(index, &packNet, sizeof(packNet));
+	index+=sizeof(packNet);
+
+	//pack number
+	if(msg.upPackNumber > 0) {
+		uint32_t packNumber = htonl((uint32_t)msg.upPackNumber);
+		memcpy(index, &packNumber, sizeof(packNumber));
+		index+=sizeof(packNumber);
+	}
+
+	uint16_t rLen = strlen(receiver);
+	uint16_t cLen = strlen(msg.msg);
+	uint32_t totalLength = cLen + rLen;
+	if(rLen > 0) {
+		totalLength += sizeof(uint16_t);
+	}
+
+	uint32_t totalNet = htonl(totalLength);
+	memcpy(index, &totalNet, sizeof(totalNet));
+	index+=sizeof(totalNet);
+
+	if(rLen > 0) {
+		//receiver len
+		uint16_t rLenNet = htons(rLen);
+		memcpy(index, &rLenNet, sizeof(rLenNet));
+		index+=sizeof(rLenNet);
+
+		//receiver data
+		memcpy(index, receiver, rLen);
+		index+=rLen;
+	}
+
+	//content
+	memcpy(index, msg.msg, cLen);
+	index+=cLen;
+
+	int r = send(sock, buf, index - buf, 0);
+	syslog(LOG_ALERT, "msg send result: %d", r);
+}
+void sendMsg1V1(char* orig, const char* receiver) {
+	sendMsgs(SMCP_IM_1V1, orig, receiver);
 }

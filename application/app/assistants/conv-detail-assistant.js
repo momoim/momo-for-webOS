@@ -88,10 +88,12 @@ var ConvDetailAssistant = Class.create({
 			that.controller.modelChanged(that.modelList);
 			//that.list.mojo.revealItem(result.length - 1, false);
 			that.updateScroller();
+			//发送已读
+			if(result.length > 0) {
+				Global.sendRogerRead(result[result.length - 1].id);
+			}
 		});
 
-		//发送已读
-		Global.sendRoger();
 
 		this.elTextField = this.controller.document.getElementById('comment-content');
 		this.elButtonRecord = this.controller.document.getElementById('audio-recorder');

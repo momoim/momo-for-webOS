@@ -37,21 +37,10 @@ ChatSender.prototype.addSendingChat = function(chat) {
 		clearTimeout(chat.timing);
 		//it's failed, force service to restart and send msg with http
 		Mojo.Log.error(that.TAG, 'sending timeout !!!=====_+');
-		new Mojo.Service.Request("palm://com.palm.applicationManager", {
-			method: "launch",
-			parameters: {
-				id: Mojo.appInfo.id,
-				params: {
-					"action": "onMsgSendError",
-					"data": JSON.stringify(chat)
-				}
-			},
-			onSuccess: function(response) {},
-			onFailure: function(response) {}
-		});
+		AppLauncher.onMsgSendError(chat);
 		Global.force();
 	},
-	5000);
+	7000);
 	that.sendingChat.push(chat);
 };
 
@@ -85,8 +74,10 @@ ChatSender.prototype.sendChat = function(chat) {
 			},
 			onSuccess: function() {},
 			onFailure: function(fail) {
-				Mojo.Log.error('send chat fail' + JSON.stringify(fail));
+				Mojo.Log.error('send chat fail' + JSON.stringify(chat));
 				Global.keepAuth();
+				//send with plugin
+				that.sendWithPlugin(chat, chat.data.receiver[0].id);
 			}
 		});
 	}.bind(that), function(chat) {
@@ -246,6 +237,40 @@ ChatSender.prototype.prepareChat = function(total, onPrepared, onPrepareFail) {
 		} else {
 			Mojo.Log.info(this.TAG, 'prepare other ====');
 			onPrepared(total);
+		}
+	}
+};
+
+ChatSender.prototype.sendWithPlugin = function(content, who) {
+	if (Global.AmrHelper && Global.AmrHelper.sendMsg) {
+		Mojo.Log.error('send content fail trying plugin: ' + JSON.stringify(content).length);
+		var receiver = JSON.stringify({
+			"uid": who
+		});
+		var content = JSON.stringify(content);
+		if (content.length + receiver.length > 1024) {
+			//TODO send roger with http and no need on webOS2.X
+			if (content.kind === 'sms') {
+				AppLauncher.onMsgSendError(chat);
+			}
+		} else {
+			var args = [];
+			args.push(receiver);
+			for (var i = 0; i < content.length;) {
+				var next = i + 255;
+				if (next > content.length) {
+					next = content.length;
+				}
+				var frame = content.substring(i, next);
+				Mojo.Log.error('content args index: ' + i + ' frame: ' + frame);
+
+				args.push(frame);
+				i = next;
+			}
+			Mojo.Log.error('content args length: ' + args.length);
+			Global.AmrHelper.sendMsg.apply(Global.AmrHelper, args);
+			Mojo.Log.error('content send with plugin passed');
+			//TODO webOS2.x no need to do split Global.AmrHelper.sendMsg(receiver, content);
 		}
 	}
 };

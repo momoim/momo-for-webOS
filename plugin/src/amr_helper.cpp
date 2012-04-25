@@ -118,6 +118,30 @@ PDL_bool close_socket(PDL_JSParameters *params)
 	return PDL_TRUE;
 }
 
+PDL_bool sendMsg(PDL_JSParameters *params) {
+	int num = PDL_GetNumJSParams(params);
+	syslog(LOG_ALERT, "sendMsg callled!!args : %d", num);
+	if(num > 1) {
+		const char* receiver = PDL_GetJSParamString(params, 0);
+
+		char total[1024];
+
+		int now = 1;
+		char* index = total;
+		while(now <= num) {
+			const char* curr = PDL_GetJSParamString(params, now);
+			memcpy(index, curr, strlen(curr));
+			index += strlen(curr);
+			++now;
+		}
+		memset(index, 0, 1);
+		++index;
+		sendMsg1V1(total, receiver);
+	}
+	PDL_Err err = PDL_JSReply(params, "ok");
+	return PDL_TRUE;
+}
+
 PDL_bool JSHandlerFunc(PDL_JSParameters *params) {
 	syslog(LOG_ALERT, "foo callled!!");
 	int num = PDL_GetNumJSParams(params);
@@ -135,6 +159,7 @@ int plugin_client_init() {
 	ret += PDL_RegisterJSHandler("wave2amr", wave_to_amr);
 	ret += PDL_RegisterJSHandler("openSocket", open_socket);
 	ret += PDL_RegisterJSHandler("closeSocket", close_socket);
+	ret += PDL_RegisterJSHandler("sendMsg", sendMsg);
 	return ret;
 }
 

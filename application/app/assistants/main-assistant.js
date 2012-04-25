@@ -74,8 +74,11 @@ var MainAssistant = Class.create({
 			//register callbacks
 			Global.AmrHelper.onProxyMsg = function(body, timestamp) {
 				var msg = JSON.parse(body);
-				msg.timestamp = parseInt(timestamp);
-				Mojo.Log.error('on plugin msg: ' + body + ' ..' + timestamp);
+				if(msg.kind !== 'sms') {
+					return;
+				}
+				msg.data.timestamp = parseInt(timestamp); 
+				//Mojo.Log.error('on plugin msg: ' + body + ' ..' + timestamp);
 				//call by launch
 				AppLauncher.onNewIncome(msg);
 			};
@@ -93,7 +96,7 @@ var MainAssistant = Class.create({
 				},
 				"heartbeat": 60,
 				//TODO "compress": "gzip",
-				//"receive_audio": false,
+				"receive_audio": true,
 				"version": "1.1.1"
 			};
 			//Global.AmrHelper.openSocket(Setting.proxy, 9191, JSON.stringify(auth));
@@ -143,11 +146,6 @@ var MainAssistant = Class.create({
 	},
 	listWasTapped: function(event) {
 		Mojo.Log.info('listWasTapped');
-		/*
-		this.controller.stageController.pushScene('conv-detail', {
-			item: event.item.other
-		});
-		*/
 		this.switchInto(event.item);
 	},
 	switchInto: function(which) {

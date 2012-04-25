@@ -38,6 +38,9 @@ var AppLauncher = {
 		function(response) {
 			NotifyHelper.instance().banner(response);
 		}, 'launch');
+	},
+	onMsgSendError: function(chat) {
+		AppLauncher.launch("onMsgSendError", JSON.stringify(chat));
 	}
 };
 
