@@ -78,7 +78,7 @@ var MainAssistant = Class.create({
 					return;
 				}
 				msg.data.timestamp = parseInt(timestamp); 
-				//Mojo.Log.error('on plugin msg: ' + body + ' ..' + timestamp);
+				Mojo.Log.error('on plugin msg: ' + body + ' ..' + timestamp);
 				//call by launch
 				AppLauncher.onNewIncome(msg);
 			};

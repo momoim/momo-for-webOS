@@ -4,6 +4,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <netinet/in.h>
 #include <netdb.h>
 
@@ -27,6 +28,7 @@ int sock;
 
 void didConnected(const char* auth);
 void SIGIOHandler(int, siginfo_t *info, void *uap); /* Function to handle SIGIO */
+void sendMsgs(MM_SMCP_CMD_TYPE cmdTypeRaw, int packNumberIn, char* orig, const char* receiver);
 
 void closeSocket(){
 	close(sock);
@@ -84,6 +86,27 @@ int openSocket(const char* addr, unsigned short port, const char* auth) {
 	didConnected(auth);
 }
 
+void setHeartBeatTimer() {
+	struct timeval my_value={60,0};
+	struct timeval my_interval={0,0};
+	struct itimerval my_timer={my_interval, my_value};
+	setitimer(ITIMER_REAL, &my_timer, 0);
+}
+
+void onKeepAlive(int sig) {
+	//TODO cancel timer on disconnected
+	syslog(LOG_ALERT, "===on keep alive===");
+	sendMsgs(SMCP_SYS_HEARTBEAT, 0, NULL, NULL);
+	
+	//setHeartBeatTimer();
+	SDL_Event event;
+	event.type = SDL_USEREVENT;
+	//put define together
+	event.user.code = 103;
+	SDL_PushEvent(&event);
+	syslog(LOG_ALERT, "setting another heartbeat");
+}
+
 void didConnected(const char* auth) {
 	/* 发送认证信息 */
 	int size = strlen(auth);
@@ -102,6 +125,11 @@ void didConnected(const char* auth) {
 
 	int r = send(sock, buf, size + sizeof(size) + 8, 0);
 	syslog(LOG_ALERT, "head info send result: %d", r);
+
+	//signal to keep alive
+	signal(SIGALRM, onKeepAlive);
+
+	setHeartBeatTimer();
 }
 
 void didReceiveData(const char *theData){
@@ -245,15 +273,15 @@ void SIGIOHandler(int signum, siginfo_t *info, void *uap)
 }
 
 int currentUpPackNum = 0;
-void sendMsgs(MM_SMCP_CMD_TYPE cmdTypeRaw, char* orig, const char* receiver) {
+void sendMsgs(MM_SMCP_CMD_TYPE cmdTypeRaw, int packNumberIn, char* orig, const char* receiver) {
 	//send 1v1 msg( chat and roger)
 	//
 	syslog(LOG_ALERT, "sending msg 1v1 content: %s --- receiver: %s", orig, receiver);
 	MOMO_SENDING_MSG msg;
-	msg.upPackNumber = currentUpPackNum++;
+	msg.upPackNumber = packNumberIn;
 	msg.msg = orig;
 
-	char buf[2048];
+	char buf[2048] = {0};
 
 	char* index = buf;
 	//cmdType
@@ -278,8 +306,14 @@ void sendMsgs(MM_SMCP_CMD_TYPE cmdTypeRaw, char* orig, const char* receiver) {
 		index+=sizeof(packNumber);
 	}
 
-	uint16_t rLen = strlen(receiver);
-	uint16_t cLen = strlen(msg.msg);
+	uint16_t rLen = 0;
+	uint16_t cLen = 0;
+	if(msg.msg != NULL) {
+		cLen = strlen(msg.msg);
+	}
+	if(receiver != NULL) {
+		rLen = strlen(receiver);
+	}
 	uint32_t totalLength = cLen + rLen;
 	if(rLen > 0) {
 		totalLength += sizeof(uint16_t);
@@ -308,5 +342,5 @@ void sendMsgs(MM_SMCP_CMD_TYPE cmdTypeRaw, char* orig, const char* receiver) {
 	syslog(LOG_ALERT, "msg send result: %d", r);
 }
 void sendMsg1V1(char* orig, const char* receiver) {
-	sendMsgs(SMCP_IM_1V1, orig, receiver);
+	sendMsgs(SMCP_IM_1V1, currentUpPackNum, orig, receiver);
 }

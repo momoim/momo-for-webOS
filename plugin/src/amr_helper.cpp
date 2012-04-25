@@ -11,8 +11,9 @@
 #include "amr/wave2amr/wav_amr.h"
 #include "proxy/mqproxy.h"
 
-#define WHAT_AMR_COMPRESS 101;
-#define WHAT_AMR_THREAD 102;
+#define WHAT_AMR_COMPRESS 101
+#define WHAT_AMR_THREAD 102
+#define WHAT_PROXY_HEART 103
 
 typedef struct 
 {
@@ -124,7 +125,7 @@ PDL_bool sendMsg(PDL_JSParameters *params) {
 	if(num > 1) {
 		const char* receiver = PDL_GetJSParamString(params, 0);
 
-		char total[1024];
+		char total[1024] = {0};
 
 		int now = 1;
 		char* index = total;
@@ -134,8 +135,6 @@ PDL_bool sendMsg(PDL_JSParameters *params) {
 			index += strlen(curr);
 			++now;
 		}
-		memset(index, 0, 1);
-		++index;
 		sendMsg1V1(total, receiver);
 	}
 	PDL_Err err = PDL_JSReply(params, "ok");
@@ -190,9 +189,9 @@ void plugin_start() {
 	do {
 		SDL_WaitEvent(&event);
 		if(event.type == SDL_USEREVENT) {
-			syslog(LOG_ALERT, "wave to amr event poll");
+			syslog(LOG_ALERT, "wave to amr event poll%d", event.user.code);
 
-			if(event.user.code == 102) {
+			if(event.user.code == WHAT_AMR_THREAD) {
 				MOMO_WaveAmrAudio* audio = (MOMO_WaveAmrAudio*) event.user.data1;
 				syslog(LOG_ALERT, "thread starting: infile===>%s", audio->infile);
 				syslog(LOG_ALERT, "thread starting: what===>%s", (char*)event.user.data2);
@@ -200,7 +199,9 @@ void plugin_start() {
 				pthread_create(&thread, NULL, compress, event.user.data1);
 				syslog(LOG_ALERT, "wave to amr event thread created");
 				pthread_detach(thread);
-			} else {
+			}  else if(event.user.code == WHAT_PROXY_HEART) {
+				setHeartBeatTimer();
+				} else {
 				MOMO_WaveAmrAudio* audio = (MOMO_WaveAmrAudio*) event.user.data1;
 				syslog(LOG_ALERT, "compressed: what===>%d", audio->what);
 				syslog(LOG_ALERT, "compressed: duration===>%s", audio->duration);

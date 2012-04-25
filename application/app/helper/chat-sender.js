@@ -262,7 +262,7 @@ ChatSender.prototype.sendWithPlugin = function(content, who) {
 					next = content.length;
 				}
 				var frame = content.substring(i, next);
-				Mojo.Log.error('content args index: ' + i + ' frame: ' + frame);
+				//Mojo.Log.error('content args index: ' + i + ' frame: ' + frame);
 
 				args.push(frame);
 				i = next;
