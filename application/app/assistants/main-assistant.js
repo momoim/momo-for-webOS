@@ -1,7 +1,7 @@
 var MainAssistant = Class.create({
 	initialize: function(what) {
 		Global.updateRegister(this);
-		if(what) this.willSwitch = what.which;
+		if (what) this.willSwitch = what.which;
 	},
 	setup: function() {
 		var that = this;
@@ -52,13 +52,18 @@ var MainAssistant = Class.create({
 				//NotifyHelper.instance().banner('well');
 				Global.AmrHelper.isReady = true;
 			}.bind(this);
-			this.initializePlugin();
+			//whether to init plugin for opensocket or not
+			var version = Mojo.Environment.DeviceInfo.platformVersionMajor;
+			Mojo.Log.error('majon version of device: ' + version);
+			if (version < 2) {
+				this.initializePlugin();
+			}
 		} else {
 			NotifyHelper.instance().banner('fail to load amr helper');
 		}
 
 		//try to auto switch to some dash taped item
-		if(this.willSwitch) {
+		if (this.willSwitch) {
 			this.switchInto(this.willSwitch);
 			this.willSwitch = null;
 		}
@@ -74,10 +79,10 @@ var MainAssistant = Class.create({
 			//register callbacks
 			Global.AmrHelper.onProxyMsg = function(body, timestamp) {
 				var msg = JSON.parse(body);
-				if(msg.kind !== 'sms') {
+				if (msg.kind !== 'sms') {
 					return;
 				}
-				msg.data.timestamp = parseInt(timestamp); 
+				msg.data.timestamp = parseInt(timestamp);
 				Mojo.Log.error('on plugin msg: ' + body + ' ..' + timestamp);
 				//call by launch
 				AppLauncher.onNewIncome(msg);
