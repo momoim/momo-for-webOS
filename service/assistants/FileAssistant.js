@@ -67,30 +67,47 @@ onFileDownload.prototype = {
 		fs.mkdir(Setting.cache.photo, 755);
 		fs.mkdir(Setting.cache.file, 755);
 
-		var host = url.parse(fileUrl).hostname;
+		console.log('onfiledownload ======> ' + filePath);
 
-		var httpClient = http.createClient(80, host);
+		fs.stat(filePath, function(err, stats) {
+			if (err) {
+				console.log('onfiledownload ======> ' + filePath + ' err: ' + JSON.stringify(err));
+				fs.writeFile(filePath, '', function(err) {
+					if(err) {
+						console.log('create file err: ' + JSON.stringify(err));
+					} else {
+						console.log('file created ' + filePath); 
+					}
+				});
+				var host = url.parse(fileUrl).hostname;
 
-		var request = httpClient.request('GET', fileUrl, {
-			"host": host
+				var httpClient = http.createClient(80, host);
+
+				var request = httpClient.request('GET', fileUrl, {
+					"host": host
+				});
+				request.end();
+
+				request.on('response', function(response) {
+					var downloadfile = fs.createWriteStream(filePath, {
+						'flags': 'a'
+					});
+					response.on('data', function(chunk) {
+						downloadfile.write(chunk, encoding = 'binary');
+					});
+					response.on('end', function() {
+						downloadfile.end();
+						future.result = {
+							path: filePath,
+							url: fileUrl
+						};
+					});
+				});
+			} else {
+				console.error('file downloading or exist');
+			}
 		});
-		request.end();
 
-		request.on('response', function(response) {
-			var downloadfile = fs.createWriteStream(filePath, {
-				'flags': 'a'
-			});
-			response.on('data', function(chunk) {
-				downloadfile.write(chunk, encoding = 'binary');
-			});
-			response.on('end', function() {
-				downloadfile.end();
-				future.result = {
-					path: filePath,
-					url: fileUrl
-				};
-			});
-		});
 	}
 };
 
