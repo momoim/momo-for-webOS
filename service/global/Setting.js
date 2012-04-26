@@ -1,8 +1,8 @@
 function Release(){
     this.api = 'v3.api.momo.im';
     this.mq = {
-        host: '121.207.242.244',
-        //TODO host: 'mq.momo.im',
+        //host: '121.207.242.244',
+        host: 'v3.mq.momo.im',
         exchange: {
             im: 'momo_im'
         }

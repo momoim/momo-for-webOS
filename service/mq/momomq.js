@@ -29,50 +29,70 @@ MomoMQ.prototype.isAlive = function() {
 };
 
 MomoMQ.prototype.logUI = function(msg) {
-			PalmCall.call('palm://com.palm.applicationManager', 'open', {
-				'id': Setting.APP_ID,
-				'params': {
-					'action': 'onConnError',
-					'data': msg
-				}
-			});
+	PalmCall.call('palm://com.palm.applicationManager', 'open', {
+		'id': Setting.APP_ID,
+		'params': {
+			'action': 'onConnError',
+			'data': msg
+		}
+	});
 };
 
 var getStringCodePoints = (function() {
-    function surrogatePairToCodePoint(charCode1, charCode2) {
-        return ((charCode1 & 0x3FF) << 10) + (charCode2 & 0x3FF) + 0x10000;
-    }
+	function surrogatePairToCodePoint(charCode1, charCode2) {
+		return ((charCode1 & 0x3FF) << 10) + (charCode2 & 0x3FF) + 0x10000;
+	}
 
-    // Read string in character by character and create an array of code points
-    return function(str) {
-        var codePoints = [], i = 0, charCode;
-        while (i < str.length) {
-            charCode = str.charCodeAt(i);
-            if ((charCode & 0xF800) == 0xD800) {
-                codePoints.push(surrogatePairToCodePoint(charCode, str.charCodeAt(++i)));
-            } else {
-                codePoints.push(charCode);
-            }
-            ++i;
-        }
-        return codePoints;
-    };
+	// Read string in character by character and create an array of code points
+	return function(str) {
+		var codePoints = [],
+		i = 0,
+		charCode;
+		while (i < str.length) {
+			charCode = str.charCodeAt(i);
+			if ((charCode & 0xF800) == 0xD800) {
+				codePoints.push(surrogatePairToCodePoint(charCode, str.charCodeAt(++i)));
+			} else {
+				codePoints.push(charCode);
+			}++i;
+		}
+		return codePoints;
+	};
 })();
-
 MomoMQ.prototype.connect = function(imm) {
 	var that = this;
 	var now = new Date();
-	if (that.connectTime && !imm) {
+	if (that.connectTime && ! imm) {
 		if ((now.getTime() - that.connectTime.getTime()) < 20000) {
 			return;
-		//} else {
+			//} else {
 			//that.logUI('on connection retrying after 20 seconds');
 		}
 	}
 	that.connectTime = now;
+
+	var dns = require('dns');
+
+	dns.resolve4(Setting.mq.host, function(err, addresses) {
+		var host = Setting.mq.host;
+		if (err) {
+			console.log('addresses lookup error : ' + JSON.stringify(err));
+		} else {
+			if (addresses.length > 0) {
+				host = addresses[0];
+			}
+		}
+		console.log('host result: ' + host);
+		that.connectReal(host);
+	});
+};
+
+MomoMQ.prototype.connectReal = function(host) {
+	console.log('connecting to ip : ' + host);
+	var that = this;
 	var config = {
 		heartbeat: 30,
-		host: Setting.mq.host,
+		host: host,
 		port: 5672,
 		vhost: '/',
 		login: that.nodeService.authInfo.oauthToken,
@@ -130,7 +150,6 @@ MomoMQ.prototype.connect = function(imm) {
 					if (that.nodeService !== null) {
 						var raw = JSON.parse(message.data.toString());
 						raw.data.timestamp = deliveryInfo.timestamp; // * 1000;
-
 						/*
 						if(raw.data && raw.data.content && raw.data.content.text) {
 						var strs = JSON.stringify(raw.data.content);
