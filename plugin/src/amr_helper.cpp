@@ -13,7 +13,6 @@
 
 #define WHAT_AMR_COMPRESS 101
 #define WHAT_AMR_THREAD 102
-#define WHAT_PROXY_HEART 103
 
 typedef struct 
 {
@@ -201,7 +200,7 @@ void plugin_start() {
 				pthread_detach(thread);
 			}  else if(event.user.code == WHAT_PROXY_HEART) {
 				setHeartBeatTimer();
-				} else {
+			} else {
 				MOMO_WaveAmrAudio* audio = (MOMO_WaveAmrAudio*) event.user.data1;
 				syslog(LOG_ALERT, "compressed: what===>%d", audio->what);
 				syslog(LOG_ALERT, "compressed: duration===>%s", audio->duration);

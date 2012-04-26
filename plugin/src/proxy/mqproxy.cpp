@@ -87,24 +87,17 @@ int openSocket(const char* addr, unsigned short port, const char* auth) {
 }
 
 void setHeartBeatTimer() {
-	struct timeval my_value={60,0};
-	struct timeval my_interval={0,0};
+	struct timeval my_value={30,0};
+	struct timeval my_interval={30,0};
 	struct itimerval my_timer={my_interval, my_value};
 	setitimer(ITIMER_REAL, &my_timer, 0);
 }
 
 void onKeepAlive(int sig) {
 	//TODO cancel timer on disconnected
-	syslog(LOG_ALERT, "===on keep alive===");
+	syslog(LOG_NOTICE, "on keep alive ====---====---: %d", getpid());
+
 	sendMsgs(SMCP_SYS_HEARTBEAT, 0, NULL, NULL);
-	
-	//setHeartBeatTimer();
-	SDL_Event event;
-	event.type = SDL_USEREVENT;
-	//put define together
-	event.user.code = 103;
-	SDL_PushEvent(&event);
-	syslog(LOG_ALERT, "setting another heartbeat");
 }
 
 void didConnected(const char* auth) {
@@ -147,16 +140,12 @@ void SIGIOHandler(int signum, siginfo_t *info, void *uap)
 {
 	syslog(LOG_ALERT, "sigio called");
 	struct sockaddr_in serveraddr;    /* Address of datagram source */
-	unsigned int clntLen;             /* Address length */
 	int recvMsgSize;                  /* Size of datagram */
-	char echoBuffer[MAX_BUFFER_LEN];  /* Datagram buffer */
+	char echoBuffer[MAX_BUFFER_LEN]={0};  /* Datagram buffer */
 
 	do  /* As long as there is input... */
 	{
-		clntLen = sizeof(serveraddr);
-
-		if ((recvMsgSize = recvfrom(sock, echoBuffer, MAX_BUFFER_LEN, 0,
-						(struct sockaddr *) &serveraddr, &clntLen)) > 0)
+		if ((recvMsgSize = recv(sock, echoBuffer, MAX_BUFFER_LEN, 0)) > 0)
 		{
 			if(recvMsgSize < 8) break;
 
@@ -241,10 +230,11 @@ void SIGIOHandler(int signum, siginfo_t *info, void *uap)
 					memset(last, 0, 1);
 					syslog(LOG_ALERT, "length: %d, recving msg conetnt!!!: %s", contentLength, body);
 
+					//return;
 					//call js
 					const char* results[2];
 					results[0] = body;
-					char* time;
+					char time[16] = {0};
 					sprintf(time, "%d", timeStamp);
 					results[1] = time;
 					PDL_CallJS("onProxyMsg", results, 2);
