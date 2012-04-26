@@ -52,7 +52,7 @@ var MainAssistant = Class.create({
 				//NotifyHelper.instance().banner('well');
 				Global.AmrHelper.isReady = true;
 			}.bind(this);
-			//this.initializePlugin();
+			this.initializePlugin();
 		} else {
 			NotifyHelper.instance().banner('fail to load amr helper');
 		}
