@@ -105,8 +105,9 @@ var MainAssistant = Class.create({
 				"version": "1.1.1"
 			};
 			//Global.AmrHelper.openSocket(Setting.proxy, 9191, JSON.stringify(auth));
-			Global.AmrHelper.openSocket('58.22.103.41', 9191, JSON.stringify(auth));
-			//Global.AmrHelper.openSocket('proxy.momo.im', 9191, JSON.stringify(auth));
+			//Global.AmrHelper.openSocket('58.22.103.41', 9191, JSON.stringify(auth));
+			//Global.AmrHelper.openSocket('121.207.242.119', 9191, JSON.stringify(auth));
+			Global.AmrHelper.openSocket('proxy.momo.im', 9191, JSON.stringify(auth));
 		}
 	},
 	createPluginAmr: function(document) {

@@ -118,6 +118,14 @@ PDL_bool close_socket(PDL_JSParameters *params)
 	return PDL_TRUE;
 }
 
+PDL_bool re_connect(PDL_JSParameters *params)
+{
+	syslog(LOG_ALERT, "reconnect socket callled!!");
+	reconnect();
+
+	return PDL_TRUE;
+}
+
 PDL_bool sendMsg(PDL_JSParameters *params) {
 	int num = PDL_GetNumJSParams(params);
 	syslog(LOG_ALERT, "sendMsg callled!!args : %d", num);
@@ -157,6 +165,7 @@ int plugin_client_init() {
 	ret += PDL_RegisterJSHandler("wave2amr", wave_to_amr);
 	ret += PDL_RegisterJSHandler("openSocket", open_socket);
 	ret += PDL_RegisterJSHandler("closeSocket", close_socket);
+	ret += PDL_RegisterJSHandler("reconnectSocket", re_connect);
 	ret += PDL_RegisterJSHandler("sendMsg", sendMsg);
 	return ret;
 }
@@ -188,7 +197,7 @@ void plugin_start() {
 	do {
 		SDL_WaitEvent(&event);
 		if(event.type == SDL_USEREVENT) {
-			syslog(LOG_ALERT, "wave to amr event poll%d", event.user.code);
+			syslog(LOG_ALERT, "------ event poll%d", event.user.code);
 
 			if(event.user.code == WHAT_AMR_THREAD) {
 				MOMO_WaveAmrAudio* audio = (MOMO_WaveAmrAudio*) event.user.data1;
@@ -198,7 +207,7 @@ void plugin_start() {
 				pthread_create(&thread, NULL, compress, event.user.data1);
 				syslog(LOG_ALERT, "wave to amr event thread created");
 				pthread_detach(thread);
-			} else {
+			} else if(event.user.code == WHAT_AMR_COMPRESS) {
 				MOMO_WaveAmrAudio* audio = (MOMO_WaveAmrAudio*) event.user.data1;
 				syslog(LOG_ALERT, "compressed: what===>%d", audio->what);
 				syslog(LOG_ALERT, "compressed: duration===>%s", audio->duration);
@@ -229,9 +238,6 @@ void plugin_start() {
 				free(audio);
 				audio = NULL;
 			}
-
-			//PDL_CallJS("ready", NULL, 0);
-			//syslog(LOG_ALERT, "wave to amr event ready called");
 		}
 	} while (event.type != SDL_QUIT);
 }

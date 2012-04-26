@@ -35,6 +35,14 @@ var Global = {
 				onSuccess: function() {},
 				onFailure: function(fail) {}
 			});
+
+			var version = Mojo.Environment.DeviceInfo.platformVersionMajor;
+			Mojo.Log.error('majon version of device: ' + version);
+			if (version < 2) {
+				if(Global.AmrHelper && Global.AmrHelper.reconnectSocket) {
+					Global.AmrHelper.reconnectSocket();
+				}
+			}
 		};
 		DBHelper.instance().get('authInfo', success, fail);
 	},

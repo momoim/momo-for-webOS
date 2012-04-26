@@ -69,7 +69,7 @@ var ConvDetailAssistant = Class.create({
 		try {
 			this.captureHelper = new CaptureHelper();
 		} catch(e) {
-			//
+			//TODO plugin recorder
 		}
 		this.audioFile = '';
 

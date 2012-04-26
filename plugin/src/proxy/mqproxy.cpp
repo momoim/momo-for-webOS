@@ -24,7 +24,15 @@
 #define ntohll(x) ( ( (uint64_t)(ntohl( (uint32_t)((x << 32) >> 32) )) << 32) | ntohl( ((uint32_t)(x >> 32)) ) )                                        
 #define htonll(x) ntohll(x)
 
-int sock;
+//socket
+int sock = -1;
+//reconnect time
+struct timeval timeReconn;
+
+const char* m_sock_addr;
+unsigned short m_sock_port;
+const char* m_auth;
+bool isInited = false;
 
 void didConnected(const char* auth);
 void SIGIOHandler(int, siginfo_t *info, void *uap); /* Function to handle SIGIO */
@@ -32,9 +40,61 @@ void sendMsgs(MM_SMCP_CMD_TYPE cmdTypeRaw, int packNumberIn, char* orig, const c
 
 void closeSocket(){
 	close(sock);
+	sock = -1;
+}
+
+void reconnect() {
+	struct timeval now;
+	gettimeofday(&now, NULL);
+	if((now.tv_sec - timeReconn.tv_sec) > 60 || sock < 0) {
+		timeReconn = now;
+
+		//reconnect
+		if(isInited) {
+			if(sock > 0) {
+				closeSocket();
+			}
+			openSocket(m_sock_addr, m_sock_port, m_auth);
+		}
+	}
+}
+
+char *get_ip(char *host)
+{
+	struct addrinfo hints, *res;
+	struct in_addr addr;
+	int err;
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_family = AF_INET;
+
+	if ((err = getaddrinfo(host, NULL, &hints, &res)) != 0) {
+		syslog(LOG_ERR, "Can't get IP, %d", err);
+		return host;
+	}
+	addr.s_addr = ((struct sockaddr_in *)(res->ai_addr))->sin_addr.s_addr;
+	return inet_ntoa(addr);
 }
 
 int openSocket(const char* addr, unsigned short port, const char* auth) {
+	char* rAddr = (char*)malloc(strlen(addr) + 1);
+	memset(rAddr, 0, strlen(addr) + 1);
+	memcpy(rAddr, addr, strlen(addr));
+	char* ip = get_ip(rAddr);
+	if(ip != rAddr) {
+		free(rAddr);
+		syslog(LOG_INFO, "ip got====---=== %s", ip);
+	}
+	if(!isInited) {
+		isInited = true;
+		m_sock_addr = addr;
+		m_sock_port = port;
+		m_auth = auth;
+	}
+
+	syslog(LOG_INFO, "OPEN SOCKET: %s", ip);
+
 	struct sockaddr_in sockaddr;
 	struct sigaction handler;
 
@@ -47,7 +107,7 @@ int openSocket(const char* addr, unsigned short port, const char* auth) {
 	/* Set up the server address structure */
 	memset(&sockaddr, 0, sizeof(sockaddr));
 	sockaddr.sin_family = AF_INET;
-	sockaddr.sin_addr.s_addr = inet_addr(addr);
+	sockaddr.sin_addr.s_addr = inet_addr(ip);
 	sockaddr.sin_port = htons(port);
 
 	/* Bind to the local address */
@@ -247,6 +307,7 @@ void SIGIOHandler(int signum, siginfo_t *info, void *uap)
 		else if (recvMsgSize == 0)
 		{
 			closeSocket();
+			reconnect();
 			didReceiveData("connection closed");
 			return;
 		}
@@ -267,6 +328,12 @@ void sendMsgs(MM_SMCP_CMD_TYPE cmdTypeRaw, int packNumberIn, char* orig, const c
 	//send 1v1 msg( chat and roger)
 	//
 	syslog(LOG_ALERT, "sending msg 1v1 content: %s --- receiver: %s", orig, receiver);
+
+	if(sock < 0) {
+		syslog(LOG_ERR, "sending msg error, socket not avaliable");
+		reconnect();
+		return;
+	}
 	MOMO_SENDING_MSG msg;
 	msg.upPackNumber = packNumberIn;
 	msg.msg = orig;

@@ -10,6 +10,7 @@ extern int openSocket(const char* addr, unsigned short port, const char* auth);
 
 extern void closeSocket();
 extern void setHeartBeatTimer();
+extern void reconnect();
 extern void sendMsg1V1(char* msg, const char* receiver);
 
 typedef struct 
