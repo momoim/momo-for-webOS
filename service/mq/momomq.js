@@ -169,6 +169,7 @@ MomoMQ.prototype.connectReal = function(host) {
 						//send roger
 						if (income.kind == 'sms') {
 							var chat = income.data;
+							/* //now send roger on ui
 							var roger = {
 								client_id: 7,
 								sender: that.nodeService.authInfo.user.id,
@@ -188,6 +189,7 @@ MomoMQ.prototype.connectReal = function(host) {
 									contentType: 'text/plain'
 								});
 							}
+							*/
 						}
 					}
 					console.log('on subscribed message:' + message.data.toString());

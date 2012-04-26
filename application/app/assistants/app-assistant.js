@@ -407,7 +407,9 @@ AppAssistant.prototype = {
 			}
 
 			Global.hasNewUnread = true;
-			Global.sendRogerInbox(income.sender.id, income.id);
+			if(income.sender.id != Global.authInfo.user.id) {
+				Global.sendRogerInbox(income.sender.id, income.id);
+			}
 		} else {
 			//TODO string compare?
 			if(income.sender.id != Global.authInfo.user.id) {
