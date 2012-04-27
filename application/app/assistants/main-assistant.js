@@ -238,24 +238,28 @@ var MainAssistant = Class.create({
 
 	},
 	launchBackground: function() {
-		//launch dashboard on background
-		var stageName = Global.runningStage;
+		var version = Mojo.Environment.DeviceInfo.platformVersionMajor;
+		Mojo.Log.error('majon version of device: ' + version);
+		if (version < 2) {
+			//launch dashboard on background
+			var stageName = Global.runningStage;
 
-		var appController = Mojo.Controller.getAppController();
-		var dashboardController = appController.getStageController(stageName);
+			var appController = Mojo.Controller.getAppController();
+			var dashboardController = appController.getStageController(stageName);
 
-		if (!dashboardController) {
-			var f = function(stageController) {
-				stageController.indicateNewContent(true);
-				stageController.pushScene('running');
-			};
+			if (!dashboardController) {
+				var f = function(stageController) {
+					stageController.indicateNewContent(true);
+					stageController.pushScene('running');
+				};
 
-			appController.createStageWithCallback({
-				name: stageName,
-				lightweight: true,
-                icon: 'images/dashboard_running.png'
-			},
-			f, 'dashboard');
+				appController.createStageWithCallback({
+					name: stageName,
+					lightweight: true,
+					icon: 'images/dashboard_running.png'
+				},
+				f, 'dashboard');
+			}
 		}
 	},
 	handleCommand: function(event) {
