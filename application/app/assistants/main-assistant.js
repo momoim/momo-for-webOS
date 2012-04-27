@@ -252,7 +252,8 @@ var MainAssistant = Class.create({
 
 			appController.createStageWithCallback({
 				name: stageName,
-				lightweight: true
+				lightweight: true,
+                icon: 'images/dashboard_running.png'
 			},
 			f, 'dashboard');
 		}

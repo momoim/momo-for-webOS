@@ -42,6 +42,8 @@
 @recording_bg: "../images/low/recording_bg.png";
 @recording_img_bg: "../images/low/recording.png";
 @about_logo: "../images/splash-icon.png";
+@running_icon: "../images/running_icon.png";
+@dashboard_running: "../images/dashboard_running.png";
 .breakP(){word-wrap: break-word; word-break: break-all;}
 .reset(){margin:0;padding:0}
 .border-radius (@radius: 5px) {
@@ -141,8 +143,11 @@ p{
     -webkit-animation-iteration-count: infinite;
     -webkit-animation-timing-function: linear;
 }
-.dashboard-icon-momo{
+.dashboard-icon-momo,.dashboard-icon-running{
     background: @dashboard_icon_momo;
+}
+.running-icon{
+    .background(@dashboard_running, center, center);
 }
 .menu-btn{
     width: @button_wh;
