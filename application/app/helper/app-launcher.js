@@ -1,13 +1,17 @@
 var AppLauncher = {
 	launch: function(action, data, onSuccess, onFailure, method) {
+		var params = {
+			"action": action,
+			"data": data
+		};
+		if (!action) {
+			params = null;
+		}
 		new Mojo.Service.Request("palm://com.palm.applicationManager", {
-			method: method ? method : "open",
+			method: method ? method: "open",
 			parameters: {
 				id: Mojo.appInfo.id,
-				params: {
-					"action": action,
-					"data": data
-				}
+				params: params
 			},
 			onSuccess: function(response) {
 				if (onSuccess) {
@@ -31,16 +35,15 @@ var AppLauncher = {
 	onUnreadList: function(data) {
 		AppLauncher.launch('onUnreadList', data);
 	},
-	onDashClick: function(which, appController) {
-		AppLauncher.launch('onDashClick', which, function() {
-			appController.closeStage(Global.dashStage);
-		},
+	onDashClick: function(which) {
+		AppLauncher.launch('onDashClick', which, function() {},
 		function(response) {
 			NotifyHelper.instance().banner(response);
-		}, 'launch');
+		},
+		'launch');
 	},
 	onMsgSendError: function(chat) {
-		AppLauncher.launch("onMsgSendError", JSON.stringify(chat));
+		AppLauncher.launch('onMsgSendError', JSON.stringify(chat));
 	}
 };
 

@@ -52,8 +52,7 @@ DashboardAssistant.prototype = {
         this.createStage(launchArgs);
     },
     createStage: function(launchArgs){
-		var app = this.controller.stageController.getAppController();
-		AppLauncher.onDashClick(this.delivery, app);
+		AppLauncher.onDashClick(this.delivery);
     },
     stageActivate: function(event){
         this.controller.stageController.indicateNewContent(false); // no more flashy
@@ -63,5 +62,8 @@ DashboardAssistant.prototype = {
     deactivate: function(event){
     },
     cleanup: function(event){
-    }
+    },
+	killSelf: function() {
+		this.controller.window.close();
+	}
 }

@@ -1,6 +1,7 @@
 var Global = {
 	mainStage: 'mainStage',
 	dashStage: 'dashboardStage',
+	runningStage: 'runningStage',
 	//是否有新未读，回到主列表跳转到第一条
 	hasNewUnread: false,
 	//正在转换的录音文件，用于转换完发送
@@ -39,7 +40,7 @@ var Global = {
 			var version = Mojo.Environment.DeviceInfo.platformVersionMajor;
 			Mojo.Log.error('majon version of device: ' + version);
 			if (version < 2) {
-				if(Global.AmrHelper && Global.AmrHelper.reconnectSocket) {
+				if (Global.AmrHelper && Global.AmrHelper.reconnectSocket) {
 					Global.AmrHelper.reconnectSocket();
 				}
 			}
@@ -78,9 +79,9 @@ var Global = {
 	sendRoger: function(roger) {
 		Mojo.Log.error('sending roger : ' + JSON.stringify(roger));
 		var all = {
-					kind: 'roger',
-					data: roger
-				};
+			kind: 'roger',
+			data: roger
+		};
 		new Mojo.Service.Request("palm://momo.im.app.service.node/", {
 			method: "chatSend",
 			parameters: {
@@ -150,6 +151,15 @@ var Global = {
 				break;
 			}
 		}
+		//whether there is not main stage
+		//if has logined
+		function fail() {}
+		function success(info) {
+			Mojo.Log.info('get auth info success');
+			Global.authInfo = info;
+			//that.setWakeup();
+		};
+		DBHelper.instance().get('authInfo', success, fail);
 	},
 	update: function(income) {
 		for (var now in Global.updateList) {
@@ -207,14 +217,26 @@ AppAssistant.prototype = {
 			DBHelper.instance().add('configs', Global.configs);
 		});
 	},
+	clearBackground: function() {
+		var stageName = Global.runningStage;
+		this.clearNotify(stageName);
+	},
+	clearMsg: function() {
+		var stageName = Global.dashStage;
+		this.clearNotify(stageName);
+	},
+	clearNotify: function(stageName) {
+		var appController = Mojo.Controller.getAppController();
+		appController.closeStage(stageName);
+	},
 	handleLaunch: function(launchParams) {
-		Mojo.Log.info('handleLaunch');
+		Mojo.Log.error('handleLaunch: ' + JSON.stringify(launchParams));
 		var that = this;
 		var cardStageController = this.controller.getStageController(Global.mainStage);
 		var appController = Mojo.Controller.getAppController();
 		if (!launchParams || launchParams.action === 'onDashClick') {
 			//
-			Mojo.Log.info('no launch params');
+			Mojo.Log.error('no launch params');
 			var pushMainScene = function(stageController) {
 				function fail() {
 					if (!Global.logining) {
@@ -229,6 +251,8 @@ AppAssistant.prototype = {
 					});
 					//stageController.pushScene('recorder');
 				};
+				that.clearBackground();
+				that.clearMsg();
 				DBHelper.instance().get('authInfo', success, fail);
 			};
 			//Mojo.Log.error("Create Main Stage");                                                                                   
@@ -362,6 +386,7 @@ AppAssistant.prototype = {
 		}
 	},
 	onNewIncome: function(messageStr) {
+		var that = this;
 		var message = JSON.parse(messageStr);
 		var income = message.data;
 		if (!income.other) {
@@ -373,7 +398,7 @@ AppAssistant.prototype = {
 		//Mojo.Log.error('onNewIncome================:' + messageStr);
 		// store to database
 		RabbitDB.instance().addTalk(income);
-		if(income.sender.id == Global.authInfo.user.id) {
+		if (income.sender.id == Global.authInfo.user.id) {
 			ChatSender.instance().removeSendingChat(message);
 		}
 
@@ -407,12 +432,12 @@ AppAssistant.prototype = {
 			}
 
 			Global.hasNewUnread = true;
-			if(income.sender.id != Global.authInfo.user.id) {
+			if (income.sender.id != Global.authInfo.user.id) {
 				Global.sendRogerInbox(income.sender.id, income.id);
 			}
 		} else {
 			//TODO string compare?
-			if(income.sender.id != Global.authInfo.user.id) {
+			if (income.sender.id != Global.authInfo.user.id) {
 				Global.sendRogerRead(income.id);
 			}
 		}
