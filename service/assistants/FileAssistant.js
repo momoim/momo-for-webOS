@@ -250,10 +250,13 @@ onFileUpload.prototype = {
 					};
 				}
 
+				/*
 				NodeService.instance().send(future, {
 					chat: actionData,
 					auth: that.authInfo
 				});
+				*/
+				NodeService.instance().sendMsgFail(actionData);
 			}
 			break;
 		default:

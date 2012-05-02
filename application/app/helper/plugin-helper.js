@@ -31,9 +31,7 @@ var PluginHelper = {
 				Global.AmrHelper.isReady = true;
 			};
 			//whether to init plugin for opensocket or not
-			var version = Mojo.Environment.DeviceInfo.platformVersionMajor;
-			Mojo.Log.error('majon version of device: ' + version);
-			if (version < 2) {
+			if (Global.pluginAble()) {
 				PluginHelper.initializePlugin();
 			}
 		} else {

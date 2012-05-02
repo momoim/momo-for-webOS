@@ -35,12 +35,14 @@ var MainAssistant = Class.create({
 		Mojo.Event.listen(this.list, Mojo.Event.dragStart, this.dragStart.bind(this));
 
 		//start service
-		that.controller.serviceRequest("palm://momo.im.app.service.node/", {
-			method: "chatInit",
-			parameters: Global.authInfo,
-			onSuccess: that.onInitSuccess.bind(that),
-			onFailure: function(fail) {}
-		});
+		if (!Global.pluginAble()) {
+			that.controller.serviceRequest("palm://momo.im.app.service.node/", {
+				method: "chatInit",
+				parameters: Global.authInfo,
+				onSuccess: that.onInitSuccess.bind(that),
+				onFailure: function(fail) {}
+			});
+		}
 
 		this.onClickReal = this.onClick.bind(this);
 
@@ -238,9 +240,7 @@ var MainAssistant = Class.create({
 
 	},
 	launchBackground: function() {
-		var version = Mojo.Environment.DeviceInfo.platformVersionMajor;
-		Mojo.Log.error('majon version of device: ' + version);
-		if (version < 2) {
+		if (Global.pluginAble()) {
 			//launch dashboard on background
 			var stageName = Global.runningStage;
 

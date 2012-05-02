@@ -67,7 +67,7 @@ var ConvDetailAssistant = Class.create({
 
 		//录音辅助类
 		try {
-			this.captureHelper = new CaptureHelper();
+			//this.captureHelper = new CaptureHelper();
 		} catch(e) {
 			//TODO plugin recorder
 		}
@@ -89,11 +89,10 @@ var ConvDetailAssistant = Class.create({
 			//that.list.mojo.revealItem(result.length - 1, false);
 			that.updateScroller();
 			//发送已读
-			if(result.length > 0) {
+			if (result.length > 0) {
 				Global.sendRogerRead(result[result.length - 1].id);
 			}
 		});
-
 
 		this.elTextField = this.controller.document.getElementById('comment-content');
 		this.elButtonRecord = this.controller.document.getElementById('audio-recorder');
@@ -168,6 +167,7 @@ var ConvDetailAssistant = Class.create({
 	},
 	onClick: function(event) {
 		Mojo.Log.info(this.TAG, 'onClick: ' + event.target.outerHTML);
+		var that = this;
 		var target = event.target;
 		if (target.hasAttribute('data-action')) {
 			var action = target.getAttribute('data-action');
@@ -242,7 +242,38 @@ var ConvDetailAssistant = Class.create({
 					},
 					onFailure: function(fail) {
 						Mojo.Log.warn('file info get fail:' + JSON.stringify(fail));
-						chatFileFailed();
+						if (Global.AmrHelper) {
+							var what = Global.AmrHelper.fileInfo(idUrl);
+							Mojo.Log.error('file info get from amrhelper: ' + what);
+							if (what === "ok") {
+								Mojo.Log.error('file info get from amrhelper: success ');
+								chatFileSuccess();
+							} else {
+								//download from internet
+								that.controller.serviceRequest('palm://com.palm.downloadmanager/', {
+									method: 'download',
+									parameters: {
+										target: fileSrc,
+										targetDir: Setting.cache.file,
+										targetFilename: target.getAttribute('file-name'),
+										keepFilenameOnRedirect: false,
+										subscribe: true
+									},
+									onSuccess: function(resp) {
+										Mojo.Log.error(Object.toJSON(resp))
+										if(resp.completed && resp.completionStatusCode === 200) {
+											chatFileSuccess();
+										}
+									},
+									onFailure: function(e) {
+										Mojo.Log.error(Object.toJSON(e))
+										chatFileFailed();
+									}
+								});
+							}
+						} else {
+							chatFileFailed();
+						}
 					}
 				});
 				break;
@@ -308,7 +339,38 @@ var ConvDetailAssistant = Class.create({
 					},
 					onFailure: function(fail) {
 						Mojo.Log.warn('file info get fail:' + JSON.stringify(fail));
-						fileFailed();
+						if (Global.AmrHelper) {
+							var what = Global.AmrHelper.fileInfo(idUrl);
+							Mojo.Log.error('file info get from amrhelper: ' + what);
+							if (what === "ok") {
+								Mojo.Log.error('file info get from amrhelper: success ');
+								fileSuccess();
+							} else {
+								//download from internet
+								that.controller.serviceRequest('palm://com.palm.downloadmanager/', {
+									method: 'download',
+									parameters: {
+										target: audioSrc,
+										targetDir: Setting.cache.audio,
+										targetFilename: dataID + '.amr',
+										keepFilenameOnRedirect: false,
+										subscribe: true
+									},
+									onSuccess: function(resp) {
+										Mojo.Log.error(Object.toJSON(resp))
+										if(resp.completed && resp.completionStatusCode === 200) {
+											fileSuccess();
+										}
+									},
+									onFailure: function(e) {
+										Mojo.Log.error(Object.toJSON(e))
+										fileFailed();
+									}
+								});
+							}
+						} else {
+							fileFailed();
+						}
 					}
 				});
 				break;
@@ -364,18 +426,28 @@ var ConvDetailAssistant = Class.create({
 		Global.configs.lastSwitcher = 'sound';
 		DBHelper.instance().add('configs', Global.configs);
 	},
+	isNotRecordable: function() {
+		return (!this.captureHelper && (!Global.AmrHelper || ! Global.AmrHelper.startRecord));
+	},
 	onRecordStart: function() {
-		if(!this.captureHelper) return;
 		var self = this;
-		if(Global.audioPlayer) {
+		if (this.isNotRecordable()) return;
+
+		if (Global.audioPlayer) {
 			Global.audioPlayer.pause();
 		}
 		self.controller.get('recording').style.display = 'block';
+
 		//start recording
 		self.audioFile = 'temply_' + guidGenerator();
-		this.captureHelper.startRecording(self.audioFile, function(response) {
-			Mojo.Log.info(self.TAG, 'startAudioCapture.');
-		});
+		if (this.captureHelper) {
+			this.captureHelper.startRecording(self.audioFile, function(response) {
+				Mojo.Log.info(self.TAG, 'startAudioCapture.');
+			});
+		} else {
+			var wavfile = VR_FOLDER + self.audioFile + VR_EXTENSION;
+			Global.AmrHelper.startRecord(wavfile);
+		}
 		this.t60 = setTimeout(self.onRecordEnd.bind(self), 60000);
 	},
 	//this is called by the plugin
@@ -404,16 +476,21 @@ var ConvDetailAssistant = Class.create({
 					path: infile,
 				},
 				onSuccess: function() {},
-				onFailure: function() {}
+				onFailure: function() {
+					Global.AmrHelper.delFile(infile);
+				}
 			});
 			chated.data.content.audio.url = outfile;
 		} else {
 			chated.data.content.audio.url = infile;
 		}
+		Mojo.Log.error('sending audio');
 		ChatSender.instance().sendChat(chated);
 	},
 	onRecordEnd: function() {
-		if(!this.captureHelper) return;
+		if (this.isNotRecordable()) {
+			return;
+		}
 		if (this.t60) {
 			clearTimeout(this.t60);
 		}
@@ -426,9 +503,34 @@ var ConvDetailAssistant = Class.create({
 		var amrfile = VR_FOLDER + self.audioFile + VR_EXTENSION_AMR;
 		var audiofile = wavfile;
 		//reset recording file
-		self.audioFile = '';
+		if (this.captureHelper || Global.AmrHelper.recordEnding) {
+			Mojo.Log.error('on plugin record ended really!-----+');
+			self.audioFile = '';
+		}
 
-		var duration = this.captureHelper.stopRecording();
+		var duration = 1500;
+		if (this.captureHelper) {
+			duration = this.captureHelper.stopRecording();
+		} else {
+			if (!Global.AmrHelper.recordEnding) {
+				Global.AmrHelper.onRecordEnding = function(duration) {
+					setTimeout(function() {
+						Mojo.Log.error('on plugin record ended!-----+');
+						//record ended really
+						Global.AmrHelper.recordEnding = true;
+						self.onRecordEnd(duration);
+					}.bind(self), 20);
+				};
+				if (self.audioFile != '') {
+					Global.AmrHelper.stopRecord();
+				}
+				return;
+			} else {
+				Global.AmrHelper.recordEnding = false;
+			}
+			duration = Global.AmrHelper.getDuration(wavfile);
+			Mojo.Log.error('wav duration got: ' + duration);
+		}
 		if (duration < 1000) {
 			NotifyHelper.instance().banner('Hey! too short!');
 			new Mojo.Service.Request("palm://momo.im.app.service.node/", {
@@ -460,6 +562,7 @@ var ConvDetailAssistant = Class.create({
 			try {
 				var amred = Global.AmrHelper.wave2amr(wavfile, amrfile, duration + '');
 				//var amred = Global.AmrHelper.wave2amr(wavfile, amrfile);
+				Mojo.Log.error('amr convert result: ' + amred);
 				if (amred == 'ok') {
 					//NotifyHelper.instance().banner('amr converting');
 					//waiting for c plugin to call sendAudioFromPlugin
@@ -469,13 +572,15 @@ var ConvDetailAssistant = Class.create({
 							url: amrfile,
 							duration: duration
 						}
-					}, self.incomeItem));
+					},
+					self.incomeItem));
 				} else {
 					//NotifyHelper.instance().banner('amr convert wrong: ' + amred);
 					sendAudio();
 
 				}
 			} catch(e) {
+				Mojo.Log.error('amr convert fail: ' + JSON.stringify(e));
 				//NotifyHelper.instance().banner('a:' + e);
 				sendAudio();
 				//self.list.innerHTML = e + '';
@@ -523,8 +628,13 @@ ConvAdapter.prototype = {
 		if (!item.other) {
 			item.other = (item.sender.id == Global.authInfo.user.id ? item.receiver[0] : item.sender);
 		}
-		that.items.push(item);
-		Mojo.Log.info('add item to chat list: ' + that.items.length);
+		if(that.items[that.items.length - 1].id == item.id) {
+			that.items[that.items.length - 1] = item;
+			Mojo.Log.error('item replace for existing');
+		} else {
+			that.items.push(item);
+			Mojo.Log.info('add item to chat list: ' + that.items.length);
+		}
 	},
 	setItems: function(items) {
 		Mojo.Log.info('setting items=====' + items.length);

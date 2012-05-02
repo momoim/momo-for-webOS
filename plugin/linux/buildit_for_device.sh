@@ -22,6 +22,8 @@ SRCDIRAMR="../src/amr";
 SRCDIROPENCORE=${SRCDIRAMR}/openamr/opencore/codecs_v2/audio/gsm_amr
 
 SRCDIRPROXY="../src/proxy";
+SRCDIRRECORD="../src/record";
+SRCDIRFILE="../src/file";
 
 SRCAMR="";
 for name in "`find ${SRCDIROPENCORE}/common -name \"*.cpp\"`"
@@ -60,13 +62,25 @@ do
 		SRCAMR+=$name
 done
 
+for name in "`find ${SRCDIRRECORD} -name \"*.cpp\"`"
+do
+		SRCAMR+=" "
+		SRCAMR+=$name
+done
+
+for name in "`find ${SRCDIRFILE} -name \"*.cpp\"`"
+do
+		SRCAMR+=" "
+		SRCAMR+=$name
+done
+
 #echo $SRCAMR;
 
 #######################################################################
 ### List the libraries needed.                                      ###
 ### LIBS="-l<libname>"                                              ###
 #######################################################################
-export LIBS="-lSDL -lGLESv2 -lpdl -lpthread"
+export LIBS="-lSDL -lGLESv2 -lpdl -lpthread -lasound"
 
 #######################################################################
 ### Name your output executable                                     ###
@@ -116,9 +130,10 @@ INCLUDEDIRDECINC="${SRCDIROPENCORE}/dec/include"
 INCLUDEDIRNB="${SRCDIRAMR}/openamr/amrnb"
 INCLUDEDIRWAVE="${SRCDIRAMR}/wave2amr"
 INCLUDEDIRPROXY="${SRCDIRPROXY}"
+INCLUDEDIRRECORD="${SRCDIRRECORD}"
 LIBDIR="${PalmPDK}/device/lib"
 
-CPPFLAGS="-I${INCLUDEDIR} -I${INCLUDEDIR}/SDL --sysroot=$SYSROOT -I${INCLUDEDIRAC} -I${INCLUDEDIROSCL} -I${INCLUDEDIRENC} -I${INCLUDEDIRDEC} -I${INCLUDEDIRENCINC} -I${INCLUDEDIRDECINC} -I${INCLUDEDIRNB} -I${INCLUDEDIRWAVE} -I${INCLUDEDIRPROXY} -I."
+CPPFLAGS="-I${INCLUDEDIR} -I${INCLUDEDIR}/SDL --sysroot=$SYSROOT -I${INCLUDEDIRAC} -I${INCLUDEDIROSCL} -I${INCLUDEDIRENC} -I${INCLUDEDIRDEC} -I${INCLUDEDIRENCINC} -I${INCLUDEDIRDECINC} -I${INCLUDEDIRNB} -I${INCLUDEDIRWAVE} -I${INCLUDEDIRPROXY} -I${INCLUDEDIRRECORD} -I${SRCDIRFILE} -I."
 echo $CPPFLAGS
 LDFLAGS="-L${LIBDIR} -Wl,--allow-shlib-undefined"
 SRCDIR="../src"
@@ -141,7 +156,8 @@ if [ "$OUTFILE" == "" ];then
 	exit 1
 fi
 echo "Building for Device"
-echo "$CC $DEVICEOPTS $CPPFLAGS $LDFLAGS $LIBS -o $BUILDDIR/$OUTFILE $SRCDIR/$SRC $SRCAMR"
+echo "$CC $DEVICEOPTS $CPPFLAGS $LDFLAGS $LIBS -o $BUILDDIR/$OUTFILE $SRCDIR/$SRC "
+######$SRCAMR
 $CC $DEVICEOPTS $CPPFLAGS $LDFLAGS $LIBS -o $BUILDDIR/$OUTFILE $SRCDIR/$SRC $SRCAMR
 
 echo -e "\nPutting binary into $BUILDDIR.\n"

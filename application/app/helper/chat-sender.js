@@ -65,21 +65,24 @@ ChatSender.prototype.sendChat = function(chat) {
 
 	that.prepareChat(chat, function(chat) {
 		that.addSendingChat(chat);
-		new Mojo.Service.Request("palm://momo.im.app.service.node/", {
-			method: "chatSend",
-			parameters: {
-				auth: Global.authInfo,
-				//chat: JSON.stringify(chat)
-				chat: chat
-			},
-			onSuccess: function() {},
-			onFailure: function(fail) {
-				Mojo.Log.error('send chat fail' + JSON.stringify(chat));
-				Global.keepAuth();
-				//send with plugin
-				that.sendWithPlugin(chat, chat.data.receiver[0].id);
-			}
-		});
+		if (Global.pluginAble()) {
+			//send with plugin
+			that.sendWithPlugin(chat, chat.data.receiver[0].id);
+		} else {
+			new Mojo.Service.Request("palm://momo.im.app.service.node/", {
+				method: "chatSend",
+				parameters: {
+					auth: Global.authInfo,
+					//chat: JSON.stringify(chat)
+					chat: chat
+				},
+				onSuccess: function() {},
+				onFailure: function(fail) {
+					Mojo.Log.error('send chat fail' + JSON.stringify(chat));
+					Global.keepAuth();
+				}
+			});
+		}
 	}.bind(that), function(chat) {
 		//TODO resending
 	}.bind(that));
@@ -114,6 +117,11 @@ ChatSender.prototype.prepareChat = function(total, onPrepared, onPrepareFail) {
 				},
 				onSuccess: function(resp) {
 					Mojo.Log.error('on file upload' + JSON.stringify(resp));
+					var pResult = JSON.parse(resp.data);
+					total.data.content.picture = {
+						url: pResult.src
+					};
+					onPrepared(total);
 				},
 				onFailure: function(e) {
 					Mojo.Log.error('on file upload fail' + JSON.stringify(e));
@@ -141,7 +149,7 @@ ChatSender.prototype.prepareChat = function(total, onPrepared, onPrepareFail) {
 				}
 			});
 		} else if (content.hasOwnProperty('audio')) {
-			Mojo.Log.info(this.TAG, 'prepare audio ====' + content.audio.url);
+			Mojo.Log.error(this.TAG, 'prepare audio ====' + content.audio.url);
 			var idUrl = Setting.cache.audio + total.data.id + '.amr';
 			new Mojo.Service.Request("palm://momo.im.app.service.node/", {
 				method: "onFileRename",
@@ -150,47 +158,13 @@ ChatSender.prototype.prepareChat = function(total, onPrepared, onPrepareFail) {
 					path2: idUrl
 				},
 				onSuccess: function() {
-					//NotifyHelper.instance().banner('audio renamed!===');
-					new Mojo.Service.Request("palm://momo.im.app.service.node/", {
-						method: "onFileUpload",
-						parameters: {
-							file: idUrl,
-							authInfo: Global.authInfo,
-							action: 'send-msg',
-							data: total
-						},
-						onSuccess: function(resp) {
-							Mojo.Log.warn('on file upload' + JSON.stringify(resp));
-						},
-						onFailure: function(e) {
-							Mojo.Log.error('on file upload fail' + JSON.stringify(e) + ' audio: ' + idUrl + ' trying to upload with ui.');
-
-							new interfaces.Momo().postFileUpload(that.controller, idUrl, {
-								onSuccess: function(resp) {
-									Mojo.Log.error('audio Success : ' + ' --' + resp.httpCode + '==' + Object.toJSON(resp));
-									if (resp.httpCode != 200) return;
-									var audioUrl = JSON.parse(resp.responseString).src;
-									if (!audioUrl || audioUrl === '') {
-										//FIXME do what ? onPrepareFail(total);
-									} else {
-										total.data.content.audio = {
-											url: audioUrl,
-											duration: total.data.content.audio.duration
-										};
-										onPrepared(total);
-									}
-								},
-								onFailure: function(e) {
-									Mojo.Log.error('Failure : ' + Object.toJSON(e));
-									onPrepareFail(total);
-								}
-							});
-						}
-					});
+					that.onAudioRenameSuccess(total, idUrl, onPrepared, onPrepareFail);
 				},
 				onFailure: function(fail) {
 					Mojo.Log.error('audio:' + Object.toJSON(fail));
-					NotifyHelper.instance().banner('audio:' + Object.toJSON(fail));
+					//NotifyHelper.instance().banner('audio:' + Object.toJSON(fail));
+					Global.AmrHelper.renameFile(content.audio.url, idUrl);
+					that.onAudioRenameSuccess(total, idUrl, onPrepared, onPrepareFail);
 				}
 			});
 		} else if (content.hasOwnProperty('file')) {
@@ -204,6 +178,14 @@ ChatSender.prototype.prepareChat = function(total, onPrepared, onPrepareFail) {
 				},
 				onSuccess: function(resp) {
 					Mojo.Log.warn('on file upload' + JSON.stringify(resp));
+					var fResult = JSON.parse(resp.data);
+					total.data.content.file = {
+						url: fResult.src,
+						mime: fResult.mime,
+						name: fResult.name,
+						size: fResult.size
+					};
+					onPrepared(total);
 				},
 				onFailure: function(e) {
 					Mojo.Log.error('on file upload fail' + JSON.stringify(e));
@@ -241,6 +223,53 @@ ChatSender.prototype.prepareChat = function(total, onPrepared, onPrepareFail) {
 	}
 };
 
+ChatSender.prototype.onAudioRenameSuccess = function(total, idUrl, onPrepared, onPrepareFail) {
+	var that = ChatSender.instance();
+	//NotifyHelper.instance().banner('audio renamed!===');
+	new Mojo.Service.Request("palm://momo.im.app.service.node/", {
+		method: "onFileUpload",
+		parameters: {
+			file: idUrl,
+			authInfo: Global.authInfo,
+			action: 'send-msg',
+			data: total
+		},
+		onSuccess: function(resp) {
+			Mojo.Log.error('on file upload' + JSON.stringify(resp));
+			var aResult = JSON.parse(resp.data);
+			total.data.content.audio = {
+				url: aResult.src,
+				duration: total.data.content.audio.duration
+			};
+			onPrepared(total);
+		},
+		onFailure: function(e) {
+			Mojo.Log.error('on file upload fail' + JSON.stringify(e) + ' audio: ' + idUrl + ' trying to upload with ui.');
+
+			new interfaces.Momo().postFileUpload(that.controller, idUrl, {
+				onSuccess: function(resp) {
+					Mojo.Log.error('audio Success : ' + ' --' + resp.httpCode + '==' + Object.toJSON(resp));
+					if (resp.httpCode != 200) return;
+					var audioUrl = JSON.parse(resp.responseString).src;
+					if (!audioUrl || audioUrl === '') {
+						//FIXME do what ? onPrepareFail(total);
+					} else {
+						total.data.content.audio = {
+							url: audioUrl,
+							duration: total.data.content.audio.duration
+						};
+						onPrepared(total);
+					}
+				},
+				onFailure: function(e) {
+					Mojo.Log.error('Failure : ' + Object.toJSON(e));
+					onPrepareFail(total);
+				}
+			});
+		}
+	});
+};
+
 ChatSender.prototype.sendWithPlugin = function(content, who) {
 	if (Global.AmrHelper && Global.AmrHelper.sendMsg) {
 		Mojo.Log.error('send content fail trying plugin: ' + JSON.stringify(content).length);
@@ -263,7 +292,6 @@ ChatSender.prototype.sendWithPlugin = function(content, who) {
 				}
 				var frame = content.substring(i, next);
 				//Mojo.Log.error('content args index: ' + i + ' frame: ' + frame);
-
 				args.push(frame);
 				i = next;
 			}

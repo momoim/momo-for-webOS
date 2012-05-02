@@ -30,7 +30,9 @@ var AppLauncher = {
 		AppLauncher.launch('onNewIncome', JSON.stringify(data), onSuccess, onFailure);
 	},
 	onKeepAlive: function() {
-		AppLauncher.launch('keep-alive', {});
+		if(!Global.pluginAble()) {
+			AppLauncher.launch('keep-alive', {});
+		}
 	},
 	onUnreadList: function(data) {
 		AppLauncher.launch('onUnreadList', data);

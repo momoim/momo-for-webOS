@@ -10,6 +10,8 @@
 #include "PDL.h"
 #include "amr/wave2amr/wav_amr.h"
 #include "proxy/mqproxy.h"
+#include "file/filee.h"
+#include "record/record.h"
 
 #define WHAT_AMR_COMPRESS 101
 #define WHAT_AMR_THREAD 102
@@ -23,6 +25,7 @@ typedef struct
 } MOMO_WaveAmrAudio;
 
 #ifdef WIN32
+#include "sysstat.h"
 extern "C" 
 #endif
 
@@ -65,10 +68,10 @@ PDL_bool wave_to_amr(PDL_JSParameters *params) {
 		syslog(LOG_ALERT, "wave to amr param num: %s", outfile);
 		MOMO_WaveAmrAudio* audio = (MOMO_WaveAmrAudio*)malloc(sizeof(MOMO_WaveAmrAudio));
 		int lenIn = strlen(infile) + 1;
-		syslog(LOG_ALERT, "wave to amr param copied===>: %d", lenIn);
+		//syslog(LOG_ALERT, "wave to amr param copied===>: %d", lenIn);
 		audio->infile = (char*)malloc(lenIn);
 		memcpy(audio->infile, infile, lenIn);
-		syslog(LOG_ALERT, "wave to amr param copied===>: %s", audio->infile);
+		//syslog(LOG_ALERT, "wave to amr param copied===>: %s", audio->infile);
 
 		int lenOut = strlen(outfile) + 1;
 		audio->outfile = (char*)malloc(lenOut);
@@ -86,13 +89,29 @@ PDL_bool wave_to_amr(PDL_JSParameters *params) {
 		syslog(LOG_ALERT, "wave to amr event pushed thread");
 
 
-		syslog(LOG_ALERT, "wave to amr ending");
+		//syslog(LOG_ALERT, "wave to amr ending");
 
 
 		return PDL_TRUE;
 	}
 	PDL_JSReply(params, "fail: unknown");
 	return PDL_FALSE;
+}
+
+PDL_bool get_duration(PDL_JSParameters *params) {
+	mkdirs();
+	syslog(LOG_ALERT, "get duration callled!!");
+	int num = PDL_GetNumJSParams(params);
+	if(num > 0) {
+		int duration = wav_duration(PDL_GetJSParamString(params, 0));
+		char d[16] = {0};
+		sprintf(d, "%d", duration);
+		PDL_JSReply(params, d);
+	} else {
+		PDL_JSReply(params, "0");
+	}
+
+	return PDL_TRUE;
 }
 
 PDL_bool open_socket(PDL_JSParameters *params) {
@@ -126,6 +145,30 @@ PDL_bool re_connect(PDL_JSParameters *params)
 	return PDL_TRUE;
 }
 
+PDL_bool start_record(PDL_JSParameters *params) {
+	mkdirs();
+	syslog(LOG_ALERT, "start record callled!!");
+	int num = PDL_GetNumJSParams(params);
+	PDL_Err err = PDL_JSReply(params, "ok");
+	if(num > 0) {
+		char path[256] = {0};
+		const char* orig = PDL_GetJSParamString(params, 0);
+		memcpy(path, orig, strlen(orig));
+		startRecord(path);
+	}
+
+	return PDL_TRUE;
+}
+
+PDL_bool stop_record(PDL_JSParameters *params)
+{
+	syslog(LOG_ALERT, "stop record callled!!");
+	PDL_Err err = PDL_JSReply(params, "ok");
+	stopRecord();
+
+	return PDL_TRUE;
+}
+
 PDL_bool sendMsg(PDL_JSParameters *params) {
 	int num = PDL_GetNumJSParams(params);
 	syslog(LOG_ALERT, "sendMsg callled!!args : %d", num);
@@ -148,6 +191,50 @@ PDL_bool sendMsg(PDL_JSParameters *params) {
 	return PDL_TRUE;
 }
 
+/*
+ * file about
+ * */
+PDL_bool rename_file(PDL_JSParameters *params) {
+	mkdirs();
+	syslog(LOG_ALERT, "rename file callled!!");
+	int num = PDL_GetNumJSParams(params);
+	PDL_Err err = PDL_JSReply(params, "ok");
+	if(num > 1) {
+		onFileRename(PDL_GetJSParamString(params, 0), PDL_GetJSParamString(params, 1));
+	}
+
+	return PDL_TRUE;
+}
+
+PDL_bool delete_file(PDL_JSParameters *params) {
+	mkdirs();
+	syslog(LOG_ALERT, "del file callled!!");
+	int num = PDL_GetNumJSParams(params);
+	PDL_Err err = PDL_JSReply(params, "ok");
+	if(num > 0) {
+		onFileDel(PDL_GetJSParamString(params, 0));
+	}
+
+	return PDL_TRUE;
+}
+
+PDL_bool file_info(PDL_JSParameters *params) {
+	mkdirs();
+	syslog(LOG_ALERT, "get file callled!!");
+	int num = PDL_GetNumJSParams(params);
+	if(num > 0) {
+		int result = onFileInfo(PDL_GetJSParamString(params, 0));
+		if(result == 0) {
+			PDL_JSReply(params, "ok");
+			return PDL_TRUE;
+		}
+	}
+
+	PDL_JSReply(params, "fail");
+	return PDL_TRUE;
+}
+
+//test function
 PDL_bool JSHandlerFunc(PDL_JSParameters *params) {
 	syslog(LOG_ALERT, "foo callled!!");
 	int num = PDL_GetNumJSParams(params);
@@ -163,10 +250,16 @@ int plugin_client_init() {
 	int ret = 0;
 	ret += PDL_RegisterJSHandler("foo", JSHandlerFunc);
 	ret += PDL_RegisterJSHandler("wave2amr", wave_to_amr);
+	ret += PDL_RegisterJSHandler("getDuration", get_duration);
 	ret += PDL_RegisterJSHandler("openSocket", open_socket);
 	ret += PDL_RegisterJSHandler("closeSocket", close_socket);
 	ret += PDL_RegisterJSHandler("reconnectSocket", re_connect);
 	ret += PDL_RegisterJSHandler("sendMsg", sendMsg);
+	ret += PDL_RegisterJSHandler("startRecord", start_record);
+	ret += PDL_RegisterJSHandler("stopRecord", stop_record);
+	ret += PDL_RegisterJSHandler("renameFile", rename_file);
+	ret += PDL_RegisterJSHandler("delFile", delete_file);
+	ret += PDL_RegisterJSHandler("fileInfo", file_info);
 	return ret;
 }
 
@@ -202,7 +295,7 @@ void plugin_start() {
 			if(event.user.code == WHAT_AMR_THREAD) {
 				MOMO_WaveAmrAudio* audio = (MOMO_WaveAmrAudio*) event.user.data1;
 				syslog(LOG_ALERT, "thread starting: infile===>%s", audio->infile);
-				syslog(LOG_ALERT, "thread starting: what===>%s", (char*)event.user.data2);
+				//syslog(LOG_ALERT, "thread starting: what===>%s", (char*)event.user.data2);
 				pthread_t thread;
 				pthread_create(&thread, NULL, compress, event.user.data1);
 				syslog(LOG_ALERT, "wave to amr event thread created");
@@ -251,6 +344,9 @@ int main(int argc, char** argv)
 	signal(SIGKILL, sighandler);
 
 	openlog("momo.im.app.plugin.amr", LOG_PID, LOG_USER);
+
+	//create folders.
+	mkdirs();
 
 	int ret = plugin_initialize();
 	if (ret == PDL_NOERROR) {

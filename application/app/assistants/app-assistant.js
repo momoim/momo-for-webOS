@@ -13,16 +13,24 @@ var Global = {
 			sound: true
 		}
 	},
+	pluginAble: function() {
+		var version = Mojo.Environment.DeviceInfo.platformVersionMajor;
+		//Mojo.Log.error('majon version of device: ' + version);
+		//return (version < 2);
+		return true;
+	},
 	keepAuth: function() {
 		function fail() {}
 		function success(info) {
 			Global.authInfo = info;
-			new Mojo.Service.Request("palm://momo.im.app.service.node/", {
-				method: "chatInit",
-				parameters: Global.authInfo,
-				onSuccess: function() {},
-				onFailure: function(fail) {}
-			});
+			if (!Global.pluginAble()) {
+				new Mojo.Service.Request("palm://momo.im.app.service.node/", {
+					method: "chatInit",
+					parameters: Global.authInfo,
+					onSuccess: function() {},
+					onFailure: function(fail) {}
+				});
+			}
 		};
 		DBHelper.instance().get('authInfo', success, fail);
 	},
@@ -30,19 +38,18 @@ var Global = {
 		function fail() {}
 		function success(info) {
 			Global.authInfo = info;
-			new Mojo.Service.Request("palm://momo.im.app.service.node/", {
-				method: "chatForce",
-				parameters: Global.authInfo,
-				onSuccess: function() {},
-				onFailure: function(fail) {}
-			});
 
-			var version = Mojo.Environment.DeviceInfo.platformVersionMajor;
-			Mojo.Log.error('majon version of device: ' + version);
-			if (version < 2) {
+			if (Global.pluginAble()) {
 				if (Global.AmrHelper && Global.AmrHelper.reconnectSocket) {
 					Global.AmrHelper.reconnectSocket();
 				}
+			} else {
+				new Mojo.Service.Request("palm://momo.im.app.service.node/", {
+					method: "chatForce",
+					parameters: Global.authInfo,
+					onSuccess: function() {},
+					onFailure: function(fail) {}
+				});
 			}
 		};
 		DBHelper.instance().get('authInfo', success, fail);
@@ -82,19 +89,22 @@ var Global = {
 			kind: 'roger',
 			data: roger
 		};
-		new Mojo.Service.Request("palm://momo.im.app.service.node/", {
-			method: "chatSend",
-			parameters: {
-				auth: Global.authInfo,
-				chat: all
-			},
-			onSuccess: function() {},
-			onFailure: function(fail) {
-				Global.keepAuth();
-				Mojo.Log.error('sending roger read fail try plugin');
-				ChatSender.instance().sendWithPlugin(all, roger.receiver);
-			}
-		});
+		if (Global.pluginAble()) {
+			ChatSender.instance().sendWithPlugin(all, roger.receiver);
+		} else {
+			new Mojo.Service.Request("palm://momo.im.app.service.node/", {
+				method: "chatSend",
+				parameters: {
+					auth: Global.authInfo,
+					chat: all
+				},
+				onSuccess: function() {},
+				onFailure: function(fail) {
+					Global.keepAuth();
+					//Mojo.Log.error('sending roger read fail try plugin');
+				}
+			});
+		}
 	},
 	menu: function(controller) {
 		//Menu
@@ -230,7 +240,7 @@ AppAssistant.prototype = {
 		appController.closeStage(stageName);
 	},
 	handleLaunch: function(launchParams) {
-		Mojo.Log.error('handleLaunch: ' + JSON.stringify(launchParams));
+		//Mojo.Log.error('handleLaunch: ' + JSON.stringify(launchParams));
 		var that = this;
 		var cardStageController = this.controller.getStageController(Global.mainStage);
 		var appController = Mojo.Controller.getAppController();
@@ -297,26 +307,7 @@ AppAssistant.prototype = {
 				}
 				break;
 			case 'onMsgSendError':
-				//Mojo.Log.error('on msg send error trying to send with http');
-				new interfaces.Momo().postSendMessage(JSON.parse(launchParams.data).data, {
-					onSuccess: function(resp) {
-						//Mojo.Log.error('on msg send error trying to send with http success');// + resp.responseText);
-						var c = resp.responseJSON;
-						if (c) {
-							if (! (c.kind)) {
-								c = {
-									kind: 'im',
-									data: c
-								};
-							}
-							that.onNewIncome(JSON.stringify(c));
-						}
-					},
-					onFailure: function(e) {
-						Mojo.Log.error('on msg send error trying to send with http fail' + JSON.stringify(e));
-						NotifyHelper.instance().banner('msg send fail');
-					}
-				});
+				that.onChatToSend(launchParams);
 				break;
 			case 'onConnError':
 				Mojo.Log.info('onConnError: ' + launchParams.data);
@@ -330,6 +321,9 @@ AppAssistant.prototype = {
 	},
 	onKeepAlive: function() {
 		//Mojo.Log.info('keeping alive');
+		if (Global.pluginAble()) {
+			return;
+		}
 		var that = this;
 
 		new Mojo.Service.Request("palm://momo.im.app.service.node/", {
@@ -384,6 +378,29 @@ AppAssistant.prototype = {
 				mainStage.delegateToSceneAssistant('refreshDataFromDB');
 			}
 		}
+	},
+	onChatToSend: function(launchParams) {
+		var that = this;
+		//Mojo.Log.error('on msg send error trying to send with http');
+		new interfaces.Momo().postSendMessage(JSON.parse(launchParams.data).data, {
+			onSuccess: function(resp) {
+				//Mojo.Log.error('on msg send error trying to send with http success');// + resp.responseText);
+				var c = resp.responseJSON;
+				if (c) {
+					if (! (c.kind)) {
+						c = {
+							kind: 'im',
+							data: c
+						};
+					}
+					that.onNewIncome(JSON.stringify(c));
+				}
+			},
+			onFailure: function(e) {
+				Mojo.Log.error('on msg send error trying to send with http fail' + JSON.stringify(e));
+				NotifyHelper.instance().banner('msg send fail');
+			}
+		});
 	},
 	onNewIncome: function(messageStr) {
 		var that = this;
