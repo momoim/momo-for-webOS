@@ -42,6 +42,13 @@ var AppFormatter = {
 		}
 		return '未支持的类型';
 	},
+    type: function(n, model) {
+		if (!n) return 'text';
+        if(model['content']['audio']){
+		    return 'audio';
+        }
+		return 'text';
+	},
 	htmlSafe: function(what) {
 		// FIXME: try this out: 
 		// http://stackoverflow.com/questions/3066574/converting-html-to-its-safe-entities-with-javascript
@@ -70,8 +77,15 @@ var AppFormatter = {
 				return '<img src="' + gmap + '"/>';
 			} else if (now == 'audio') {
 				var audio = n[now];
+                var second = audio['duration']/1000;
+                var time = Math.round(second);
+                if(time >= 60){
+                    var minutes = Math.floor(time/60);
+                    var second = Math.round((second) % 60);
+                    time = minutes + '′' + second;
+                }
 				//preload="auto"
-				return '<img src="images/audio.png" width="72px;" data-action="chat-audio" data-id="' + model['id'] + '" audio-src="' + audio['url'] + '"/>';
+				return '<img src="images/chat/chat_bg_audio_normal.png" width="28" height="30" data-action="chat-audio" data-id="' + model['id'] + '" audio-src="' + audio['url'] + '"/><span class="audio-time">' + time + '″</span>';
 				//+ '<audio src="'+ audio['url'] +'" id="audio-' + model['id'] + '"/>';
 			} else if (now == 'file') {
 				var file = n[now];
