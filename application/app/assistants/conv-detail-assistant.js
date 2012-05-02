@@ -28,7 +28,8 @@ var ConvDetailAssistant = Class.create({
 			formatters: {
 				content: AppFormatter.contentDetail.bind(that),
 				sender: AppFormatter.sender.bind(that),
-				timestamp: AppFormatter.time.bind(that)
+				timestamp: AppFormatter.time.bind(that),
+                receiver: AppFormatter.type.bind(that)
 			},
 			uniquenessProperty: 'id',
 			fixedHeightItems: false,
@@ -278,7 +279,10 @@ var ConvDetailAssistant = Class.create({
 				});
 				break;
 			case 'chat-audio':
+                var parent = target.parentNode.parentNode;
+                parent.className = 'detail-content audio actived';
 				var audioSrc = target.getAttribute('audio-src');
+				target.setAttribute('src', 'images/chat/record_end.png');
 				Mojo.Log.info(this.TAG, 'chat audio click: ' + audioSrc);
 				if (!Global.audioPlayer) {
 					Global.audioPlayer = new Audio();
@@ -320,6 +324,7 @@ var ConvDetailAssistant = Class.create({
 										Mojo.Log.warn('file not exists donwload fail:' + idUrl);
 										fileFailed();
 										//NotifyHelper.instance().banner(Object.toJSON(response.error));
+				                        target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
 									} else {
 										Mojo.Log.warn('file not exists donwload success:' + idUrl);
 										fileSuccess();
@@ -328,6 +333,7 @@ var ConvDetailAssistant = Class.create({
 								},
 								onFailure: function(fail) {
 									fileFailed();
+				                    target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
 									//NotifyHelper.instance().banner('cache service fail');
 								}
 							});

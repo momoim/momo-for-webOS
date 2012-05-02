@@ -291,6 +291,12 @@ p{
 .conv-list-detail-item{
     padding: 5px;
     list-style: none;
+    .audio-time{
+        float: right;
+        line-height: 28px;
+        vertical-align: middle;
+        margin-left: 20px;
+    }
     .mo-chat-detail-item-avatar{
         float: left;
         margin-right: 2px;
@@ -306,14 +312,21 @@ p{
             position: relative;
             float: left;
             margin: 0 10px;
-            padding: 2px;
-            max-width: 230px;
-            background: #E1E1E1;
-            .border-radius;
+            max-width: 200px;
+	        border-width: 12px 12px 14px;
+	        -webkit-border-image: url(../images/chat/text_bg.png) 12 12 14 12 stretch stretch;
+	        -webkit-transition-property: opacity;
+	        -webkit-transition-duration: 0.5s;
+            &.audio{
+	            -webkit-border-image: url(../images/chat/audio_bg.png) 12 12 14 12 stretch stretch;
+            }
+            &.actived{
+	            -webkit-border-image: url(../images/chat/audio_bg_active.png) 12 12 14 12 stretch stretch;
+            }
         }
-        p{
+        .content{
             margin: 0;
-            padding: 5px;
+            padding: 0;
             min-height: 12px;
         }
     }
@@ -323,17 +336,32 @@ p{
         .detail-content{
             .arrow{
                 position: absolute;
-                top: 10px;
-                left: -11px;
+                top: 0;
+                left: -22px;
                 display: inline-block;
-                width: 11px;
-                height: 10px;
-                background: @arrow_other;
+                width: 12px;
+                height: 23px;
+                background: url(../images/chat/arrow_text.png) no-repeat;
+            }
+            &.audio{
+                .arrow{
+                    background: url(../images/chat/arrow_audio.png) no-repeat;
+                }
+                &.actived{
+                    .arrow{
+                        background: url(../images/chat/arrow_audio_ac.png) no-repeat;
+                    }
+                }
             }
         }
     }
 }
 .is-said{
+    .audio-time{
+        float: left;
+        margin-left: 0;
+        margin-right: 20px;
+    }
     .mo-chat-detail-item-avatar{
         float: right;
         margin-left: 2px;
@@ -347,15 +375,27 @@ p{
     .mo-chat-detail-item{
         .detail-content{
             float: right;
-            background: #C4E7FF;
+	        -webkit-border-image: url(../images/chat/text_bg_other.png) 12 12 14 12 stretch stretch;
+            &.audio{
+	            -webkit-border-image: url(../images/chat/audio_bg_other.png) 12 12 14 12 stretch stretch;
+                .arrow{
+                    background: url(../images/chat/arrow_audio_other.png) no-repeat;
+                }
+            }
+            &.actived{
+	            -webkit-border-image: url(../images/chat/audio_bg_active_other.png) 12 12 14 12 stretch stretch;
+                .arrow{
+                     background: url(../images/chat/arrow_audio_ac_other.png) no-repeat;
+                }
+            }
             .arrow{
                 position: absolute;
-                top: 10px;
-                right: -11px;
+                top: 0;
+                right: -23px;
                 display: inline-block;
-                width: 11px;
-                height: 10px;
-                background: @arrow_is;
+                width: 12px;
+                height: 23px;
+                background: url(../images/chat/arrow_text_other.png) no-repeat;
             }
         }
     }

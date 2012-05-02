@@ -1,0 +1,77 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+    <link media="all" rel="stylesheet" href="momo.css" type="text/css" />
+    <style type="text/css">
+        .r-top-left,.r-top-right,.r-bottom-left,.r-bottom-right{
+            width: 10px;
+            height: 10px;
+            border: 0;
+        }
+        .r-top-bg,.r-bottom-bg{
+            border:0;
+            height: 10px;
+        }
+        .r-left-bg,.r-right-bg{
+            border:0;
+            width: 10px;
+        }
+        .r-top-left{
+            .background(@chat_bg);
+        }
+        .r-top-bg{
+            background:url(../images/chat/text_top.png) repeat-x;
+        }
+        .r-top-right{
+            .background(@chat_bg, -60px, 0);
+        }
+        .r-left-bg{
+            background:url(../images/chat/text_left.png) repeat-y;
+        }
+        .r-right-bg{
+            background:url(../images/chat/text_right.png) repeat-y;
+        }
+        .r-ct{
+            background:url(../images/chat/text_ct.png) repeat-x #d7eff7;
+        }
+        .r-bottom-left{
+            .background(@chat_bg, 0, -57px);
+        }
+        .r-bottom-bg{
+            background:url(../images/chat/text_bottom.png) repeat-x;
+        }
+        .r-bottom-right{
+            .background(@chat_bg, -60px, -57px);
+        } 
+    </style>
+</head>
+<body>
+    <div class="conv-list-detail-item">
+    	<div class="mo-chat-detail-item">
+    	    <div class="detail-content">
+    	        <span class="arrow"></span>
+    	        <div class="content">#{-contentFormatted}</div></td>
+    	    </div> 
+        </div>
+    </div>
+    <table>
+        <tr>
+            <td class="r-top-left"></td>
+            <td class="r-top-bg"></td>
+            <td class="r-top-right"></td>
+        </tr>
+        <tr>
+            <td class="r-left-bg"></td>
+            <td class="r-ct"><div class="content">#{-contentFormatted}</div></td>
+            <td class="r-right-bg"></td>
+        </tr>
+        <tr>
+            <td class="r-bottom-left"></td>
+            <td class="r-bottom-bg"></td>
+            <td class="r-bottom-right"></td>
+        </tr>
+    </table>	
+</body>
+</html>
