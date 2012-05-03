@@ -38,9 +38,15 @@ void didConnected(const char* auth);
 void SIGIOHandler(int, siginfo_t *info, void *uap); /* Function to handle SIGIO */
 void sendMsgs(MM_SMCP_CMD_TYPE cmdTypeRaw, int packNumberIn, char* orig, const char* receiver);
 
-void closeSocket(){
+void closeSocketOnly() {
 	close(sock);
 	sock = -1;
+}
+
+void closeSocket(){
+	syslog(LOG_ALERT, "closeSocket");
+	//sendMsgs(SMCP_SYS_LOGOUT, 0, NULL, NULL);
+	closeSocketOnly();
 }
 
 void reconnect() {
@@ -52,7 +58,7 @@ void reconnect() {
 		//reconnect
 		if(isInited) {
 			if(sock > 0) {
-				closeSocket();
+				closeSocketOnly();
 			}
 			openSocket(m_sock_addr, m_sock_port, m_auth);
 		}
@@ -71,22 +77,29 @@ char *get_ip(char *host)
 
 	if ((err = getaddrinfo(host, NULL, &hints, &res)) != 0) {
 		syslog(LOG_ERR, "Can't get IP, %d", err);
-		//return host;
-		return "121.207.242.119";
+		return host;
+		//return "121.207.242.119";
 	}
 	addr.s_addr = ((struct sockaddr_in *)(res->ai_addr))->sin_addr.s_addr;
 	return inet_ntoa(addr);
 }
 
 int openSocket(const char* addr, unsigned short port, const char* auth) {
-	char* rAddr = (char*)malloc(strlen(addr) + 1);
-	memset(rAddr, 0, strlen(addr) + 1);
+	int hostLen = strlen(addr) + 1;
+	if(hostLen < 16) {
+		hostLen = 16;
+	}
+	char* rAddr = (char*)malloc(hostLen);
+	memset(rAddr, 0, hostLen);
 	memcpy(rAddr, addr, strlen(addr));
 	char* ip = get_ip(rAddr);
-	if(ip != rAddr) {
-		free(rAddr);
-		syslog(LOG_INFO, "ip got====---=== %s", ip);
+	if(ip == rAddr) {
+		syslog(LOG_INFO, "ip not got, set it default %s", ip);
+		char def[16] = "121.207.242.119";
+		ip = def;
 	}
+	free(rAddr);
+	syslog(LOG_INFO, "ip got====---=== %s", ip);
 	if(!isInited) {
 		isInited = true;
 		m_sock_addr = addr;
@@ -285,11 +298,13 @@ void SIGIOHandler(int signum, siginfo_t *info, void *uap)
 				syslog(LOG_ALERT, "recving msg type: %d, timestamp: %d", cmdType, timeStamp);
 
 				if(cmdType == SMCP_IM_DELIVER) {
+					//syslog(LOG_ALERT, "====>recving msg type 16129: contentlength: %d", contentLength);
+					//syslog(LOG_ALERT, "====>recving msg type 16129 content: %s", buffer);
 					char* body = (char*)malloc(contentLength + 1);
 					memcpy(body, buffer, contentLength);
 					char* last = body + contentLength;
 					memset(last, 0, 1);
-					syslog(LOG_ALERT, "length: %d, recving msg conetnt!!!: %s", contentLength, body);
+					syslog(LOG_ALERT, "length: %d, 16129 recving msg conetnt!!!: %s", contentLength, body);
 
 					//return;
 					//call js
@@ -307,7 +322,7 @@ void SIGIOHandler(int signum, siginfo_t *info, void *uap)
 		}
 		else if (recvMsgSize == 0)
 		{
-			closeSocket();
+			closeSocketOnly();
 			reconnect();
 			didReceiveData("connection closed");
 			return;
@@ -328,7 +343,7 @@ int currentUpPackNum = 0;
 void sendMsgs(MM_SMCP_CMD_TYPE cmdTypeRaw, int packNumberIn, char* orig, const char* receiver) {
 	//send 1v1 msg( chat and roger)
 	//
-	syslog(LOG_ALERT, "sending msg 1v1 content: %s --- receiver: %s", orig, receiver);
+	syslog(LOG_ALERT, "sending msg content: %s --- receiver: %s", orig, receiver);
 
 	if(sock < 0) {
 		syslog(LOG_ERR, "sending msg error, socket not avaliable");

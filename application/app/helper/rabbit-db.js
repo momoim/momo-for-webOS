@@ -108,7 +108,7 @@ RabbitDB.prototype = {
 						var result = [];
 						for(var i = 0; i < rs.rows.length; ++i) {
 							var row = rs.rows.item(i);
-							var isOut = (row.state == RabbitDB.state.sent);
+							var isOut = (row.state == RabbitDB.state.sent || row.state == RabbitDB.state.sending);
 
 							var item = {};
 							item.id = row.id;
@@ -147,7 +147,7 @@ RabbitDB.prototype = {
 						var result = [];
 						for(var i = 0; i < rs.rows.length; ++i) {
 							var row = rs.rows.item(i);
-							var isOut = (row.state == 2);
+							var isOut = (row.state == RabbitDB.state.sent || row.state == RabbitDB.state.sending);
 
 							var item = {};
 							item.id = row.id;

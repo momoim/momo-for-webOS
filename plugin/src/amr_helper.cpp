@@ -31,6 +31,8 @@ extern "C"
 
 void cleanup(int sig) {
 	syslog(LOG_INFO, "Cleanup caused by: %d", sig);
+	syslog(LOG_INFO, "try to close socket");
+	closeSocket();
 	closelog();
 	PDL_Quit();
 }

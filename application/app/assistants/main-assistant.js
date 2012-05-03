@@ -113,6 +113,7 @@ var MainAssistant = Class.create({
 				Mojo.Log.error('refreshClick: trying to refresh unread: ' + response.responseText);
 				AppLauncher.onUnreadList(response.responseText);
 				loading.className = "ignore";
+				//Mojo.Log.error('----<QUEUE: ' + Global.authInfo.queueName);
 			}.bind(that),
 			onFailure: function(response) {
 				Mojo.Log.info('refreshClick: trying to refresh unread fail: ' + response.responseText);
