@@ -71,7 +71,8 @@ char *get_ip(char *host)
 
 	if ((err = getaddrinfo(host, NULL, &hints, &res)) != 0) {
 		syslog(LOG_ERR, "Can't get IP, %d", err);
-		return host;
+		//return host;
+		return "121.207.242.119";
 	}
 	addr.s_addr = ((struct sockaddr_in *)(res->ai_addr))->sin_addr.s_addr;
 	return inet_ntoa(addr);
@@ -397,6 +398,9 @@ void sendMsgs(MM_SMCP_CMD_TYPE cmdTypeRaw, int packNumberIn, char* orig, const c
 
 	int r = send(sock, buf, index - buf, 0);
 	syslog(LOG_ALERT, "msg send result: %d", r);
+	if(r == -1) {
+		reconnect();
+	}
 }
 void sendMsg1V1(char* orig, const char* receiver) {
 	sendMsgs(SMCP_IM_1V1, currentUpPackNum, orig, receiver);

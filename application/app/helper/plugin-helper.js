@@ -52,7 +52,7 @@ var PluginHelper = {
 					return;
 				}
 				msg.data.timestamp = parseInt(timestamp);
-				Mojo.Log.error('on plugin msg: ' + body + ' ..' + timestamp);
+				Mojo.Log.error('on plugin msg: ' + JSON.stringify(msg));
 				//call by launch
 				AppLauncher.onNewIncome(msg);
 			};

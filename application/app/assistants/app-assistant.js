@@ -245,8 +245,7 @@ AppAssistant.prototype = {
 		var cardStageController = this.controller.getStageController(Global.mainStage);
 		var appController = Mojo.Controller.getAppController();
 		if (!launchParams || launchParams.action === 'onDashClick') {
-			//
-			Mojo.Log.error('no launch params');
+			//Mojo.Log.error('no launch params');
 			var pushMainScene = function(stageController) {
 				function fail() {
 					if (!Global.logining) {
@@ -307,6 +306,9 @@ AppAssistant.prototype = {
 				}
 				break;
 			case 'onMsgSendError':
+				that.onMsgSendError(launchParams);
+				break;
+			case 'onChatToSend':
 				that.onChatToSend(launchParams);
 				break;
 			case 'onConnError':
@@ -381,6 +383,11 @@ AppAssistant.prototype = {
 	},
 	onChatToSend: function(launchParams) {
 		var that = this;
+		Mojo.Log.error('on chat prepare from service');
+		ChatSender.instance().sendChat(JSON.parse(launchParams.data));
+	},
+	onMsgSendError: function(launchParams) {
+		var that = this;
 		//Mojo.Log.error('on msg send error trying to send with http');
 		new interfaces.Momo().postSendMessage(JSON.parse(launchParams.data).data, {
 			onSuccess: function(resp) {
@@ -413,6 +420,18 @@ AppAssistant.prototype = {
 			return;
 		}
 		//Mojo.Log.error('onNewIncome================:' + messageStr);
+		var uid = Global.authInfo.user.id;
+		var isOut = (uid == income.sender.id);
+		if(isOut) {
+			if(income.state !== RabbitDB.state.sending || income.hasOwnProperty('timestamp')) {
+				income.state = RabbitDB.state.sent;
+				//Mojo.Log.error('onNewIncome================: not sending');
+			} else {
+				//Mojo.Log.error('onNewIncome================: sending' + income.timestamp);
+			}
+		} else {
+			income.state = RabbitDB.state.income;
+		}
 		// store to database
 		RabbitDB.instance().addTalk(income);
 		if (income.sender.id == Global.authInfo.user.id) {

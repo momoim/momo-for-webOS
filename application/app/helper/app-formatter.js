@@ -1,5 +1,8 @@
 var AppFormatter = {
 	time: function(time, model) {
+		if(model && model.state === RabbitDB.state.sending) {
+			return '发送中';
+		}
 		return AppFormatter.timeSince(parseInt(time) * 1000);
 	},
 	timeSince: function(time) {
@@ -85,7 +88,7 @@ var AppFormatter = {
                     time = minutes + '′' + second;
                 }
 				//preload="auto"
-				return '<img src="images/chat/chat_bg_audio_normal.png" width="28" height="30" data-action="chat-audio" data-id="' + model['id'] + '" audio-src="' + audio['url'] + '"/><span class="audio-time" data-type="audio-time">' + time + '″</span>'; 
+				return '<img src="images/chat/chat_bg_audio_normal.png" width="28" height="30" id="audio_data_' + model['id'] + '" data-action="chat-audio" data-id="' + model['id'] + '" audio-src="' + audio['url'] + '"/><span class="audio-time" data-type="audio-time">' + time + '″</span>'; 
 				//+ '<audio src="'+ audio['url'] +'" id="audio-' + model['id'] + '"/>';
 			} else if (now == 'file') {
 				var file = n[now];

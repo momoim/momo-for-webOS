@@ -8,6 +8,7 @@ var ConvDetailAssistant = Class.create({
 	setup: function() {
 		var that = this;
         that.isplay = false;
+        that.audioPlayId = 0;
 		//Menu
 		Global.menu(this.controller);
 		//init ui
@@ -30,7 +31,7 @@ var ConvDetailAssistant = Class.create({
 				content: AppFormatter.contentDetail.bind(that),
 				sender: AppFormatter.sender.bind(that),
 				timestamp: AppFormatter.time.bind(that),
-                receiver: AppFormatter.type.bind(that)
+				receiver: AppFormatter.type.bind(that)
 			},
 			uniquenessProperty: 'id',
 			fixedHeightItems: false,
@@ -178,10 +179,8 @@ var ConvDetailAssistant = Class.create({
                 break;
             }else{
                 tempParentNode = tempParentNode.parentNode;
-                Mojo.Log.error('parent================>' + tempParentNode.outerHTML);
             }
         }
-        Mojo.Log.error('target================>' + target);
 		if (target.hasAttribute('data-action')) {
 			var action = target.getAttribute('data-action');
 			var dataID = target.getAttribute('data-id');
@@ -274,7 +273,7 @@ var ConvDetailAssistant = Class.create({
 									},
 									onSuccess: function(resp) {
 										Mojo.Log.error(Object.toJSON(resp))
-										if(resp.completed && resp.completionStatusCode === 200) {
+										if (resp.completed && resp.completionStatusCode === 200) {
 											chatFileSuccess();
 										}
 									},
@@ -291,19 +290,32 @@ var ConvDetailAssistant = Class.create({
 				});
 				break;
 			case 'chat-audio':
-                var parent = target.parentNode.parentNode;
+				var parent = target.parentNode.parentNode;
+				parent.className = 'detail-content audio actived';
 				var audioSrc = target.getAttribute('audio-src');
                 parent.className = 'detail-content audio actived';
 				target.setAttribute('src', 'images/chat/record_end.png');
 				Mojo.Log.info(this.TAG, 'chat audio click: ' + audioSrc);
+                var currentAudioId = target.getAttribute('data-id');
+                if(currentAudioId != that.audioPlayId && that.audioPlayId != 0){
+                    var tempAudioId = that.audioPlayId;
+                    var audioid = 'audio_data_' + tempAudioId;
+                    var preAudio = that.controller.document.getElementById(audioid);
+                    preAudio.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
+                    preAudio.parentNode.parentNode.className = 'detail-content audio';
+                    Global.audioPlayer.pause();
+                    that.isplay = false;
+                }
 				if (!Global.audioPlayer) {
                     Global.audioPlayer = new Audio();
                     Global.audioPlayer.addEventListener("ended", function(){
                         parent.className = 'detail-content audio';
 				        target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
                         that.isplay = false;
+                        that.audioPlayId = 0;
                     }, true);
 				}
+                that.audioPlayId = currentAudioId;
                 if(that.isplay){
                     Global.audioPlayer.pause();
                     parent.className = 'detail-content audio';
@@ -408,7 +420,6 @@ var ConvDetailAssistant = Class.create({
                         }
                     });
                 }
-				
 				break;
 			default:
 				break;
@@ -420,7 +431,7 @@ var ConvDetailAssistant = Class.create({
 			var params = {
 				defaultKind: 'image',
 				onSelect: function(file) {
-					Mojo.Log.warn(self.TAG, JSON.stringify(file) + '------------' + file.fullPath);
+					Mojo.Log.error(self.TAG, JSON.stringify(file) + '------------' + file.fullPath);
 					if (file.attachmentType == 'image') {
 						self.sendChat({
 							picture: {
@@ -428,9 +439,20 @@ var ConvDetailAssistant = Class.create({
 							}
 						});
 					} else {
+						function GetFilename(url) {
+							if (url) {
+								var m = url.toString().match(/.*\/(.+?)\./);
+								if (m && m.length > 1) {
+									return m[1];
+								}
+							}
+							return "";
+						}
 						self.sendChat({
 							file: {
-								url: file.fullPath
+								url: file.fullPath,
+								name: GetFilename(file.fullPath),
+								size: file.size
 							}
 						});
 					}
@@ -664,13 +686,16 @@ ConvAdapter.prototype = {
 		if (!item.other) {
 			item.other = (item.sender.id == Global.authInfo.user.id ? item.receiver[0] : item.sender);
 		}
-		if(that.items[that.items.length - 1].id == item.id) {
-			that.items[that.items.length - 1] = item;
-			Mojo.Log.error('item replace for existing');
-		} else {
-			that.items.push(item);
-			Mojo.Log.info('add item to chat list: ' + that.items.length);
+		for (var index = that.items.length - 1; index >= 0 && that.items.length - index < 15; --index) {
+			var todo = that.items[index];
+			if (todo.id === item.id) {
+				that.items[index] = item;
+				Mojo.Log.error('item replace for existing');
+				return;
+			}
 		}
+		that.items.push(item);
+		Mojo.Log.info('add item to chat list: ' + that.items.length);
 	},
 	setItems: function(items) {
 		Mojo.Log.info('setting items=====' + items.length);
