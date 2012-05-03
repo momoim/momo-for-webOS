@@ -7,6 +7,7 @@ var ConvDetailAssistant = Class.create({
 	},
 	setup: function() {
 		var that = this;
+        that.isplay = false;
 		//Menu
 		Global.menu(this.controller);
 		//init ui
@@ -167,9 +168,20 @@ var ConvDetailAssistant = Class.create({
 		ChatSender.instance().sendChat(chat);
 	},
 	onClick: function(event) {
-		Mojo.Log.info(this.TAG, 'onClick: ' + event.target.outerHTML);
+		Mojo.Log.error(this.TAG, 'onClick: ' + event.target.outerHTML);
 		var that = this;
 		var target = event.target;
+        var tempParentNode = target;
+        for(var i = 0; i < 5; i++){
+            if(tempParentNode.hasAttribute('data-type') && tempParentNode.getAttribute('data-type') == 'audio'){
+                target = tempParentNode.querySelector('.content > img');
+                break;
+            }else{
+                tempParentNode = tempParentNode.parentNode;
+                Mojo.Log.error('parent================>' + tempParentNode.outerHTML);
+            }
+        }
+        Mojo.Log.error('target================>' + target);
 		if (target.hasAttribute('data-action')) {
 			var action = target.getAttribute('data-action');
 			var dataID = target.getAttribute('data-id');
@@ -280,105 +292,123 @@ var ConvDetailAssistant = Class.create({
 				break;
 			case 'chat-audio':
                 var parent = target.parentNode.parentNode;
-                parent.className = 'detail-content audio actived';
 				var audioSrc = target.getAttribute('audio-src');
+                parent.className = 'detail-content audio actived';
 				target.setAttribute('src', 'images/chat/record_end.png');
 				Mojo.Log.info(this.TAG, 'chat audio click: ' + audioSrc);
 				if (!Global.audioPlayer) {
-					Global.audioPlayer = new Audio();
+                    Global.audioPlayer = new Audio();
+                    Global.audioPlayer.addEventListener("ended", function(){
+                        parent.className = 'detail-content audio';
+				        target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
+                        that.isplay = false;
+                    }, true);
 				}
-				var idUrl = Setting.cache.audio + dataID + '.amr';
-				function fileFailed() {
-					Global.audioPlayer.volume = 1;
-					Global.audioPlayer.pause();
-					Global.audioPlayer.src = audioSrc;
-					Global.audioPlayer.load();
-					Global.audioPlayer.play();
-				}
-				function fileSuccess() {
-					Global.audioPlayer.volume = 1;
-					Global.audioPlayer.pause();
-					Global.audioPlayer.src = idUrl;
-					Global.audioPlayer.load();
-					Global.audioPlayer.play();
-				}
-				Mojo.Log.warn('try to get audio file to play');
-				new Mojo.Service.Request("palm://momo.im.app.service.node/", {
-					method: "onFileInfo",
-					parameters: {
-						path: idUrl
-					},
-					onSuccess: function(response) {
-						if (response.error) {
-							Mojo.Log.warn('file not exists:' + idUrl);
-							//fileFailed();
-							//NotifyHelper.instance().banner(Object.toJSON(response.error));
-							new Mojo.Service.Request("palm://momo.im.app.service.node/", {
-								method: "onFileDownload",
-								parameters: {
-									path: idUrl,
-									url: audioSrc
-								},
-								onSuccess: function(response) {
-									if (response.error) {
-										Mojo.Log.warn('file not exists donwload fail:' + idUrl);
-										fileFailed();
-										//NotifyHelper.instance().banner(Object.toJSON(response.error));
-				                        target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
-									} else {
-										Mojo.Log.warn('file not exists donwload success:' + idUrl);
-										fileSuccess();
-										//NotifyHelper.instance().banner('cache success');
-									}
-								},
-								onFailure: function(fail) {
-									fileFailed();
-				                    target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
-									//NotifyHelper.instance().banner('cache service fail');
-								}
-							});
-						} else {
-							Mojo.Log.warn('file exists:' + idUrl);
-							fileSuccess();
-							//NotifyHelper.instance().banner('cache get success');
-						}
-					},
-					onFailure: function(fail) {
-						Mojo.Log.warn('file info get fail:' + JSON.stringify(fail));
-						if (Global.AmrHelper) {
-							var what = Global.AmrHelper.fileInfo(idUrl);
-							Mojo.Log.error('file info get from amrhelper: ' + what);
-							if (what === "ok") {
-								Mojo.Log.error('file info get from amrhelper: success ');
-								fileSuccess();
-							} else {
-								//download from internet
-								that.controller.serviceRequest('palm://com.palm.downloadmanager/', {
-									method: 'download',
-									parameters: {
-										target: audioSrc,
-										targetDir: Setting.cache.audio,
-										targetFilename: dataID + '.amr',
-										keepFilenameOnRedirect: false,
-										subscribe: true
-									},
-									onSuccess: function(resp) {
-										Mojo.Log.error(Object.toJSON(resp))
-										if(resp.completed && resp.completionStatusCode === 200) {
-											fileSuccess();
-										}
-									},
-									onFailure: function(e) {
-										Mojo.Log.error(Object.toJSON(e))
-										fileFailed();
-									}
-								});
-							}
-						} else {
-							fileFailed();
-						}
-					}
-				});
+                if(that.isplay){
+                    Global.audioPlayer.pause();
+                    parent.className = 'detail-content audio';
+				    target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
+                    that.isplay = false;
+                }else{
+                    that.isplay = true;
+                    var idUrl = Setting.cache.audio + dataID + '.amr';
+                    function fileFailed() {
+                        Global.audioPlayer.volume = 1;
+                        Global.audioPlayer.pause();
+                        Global.audioPlayer.src = audioSrc;
+                        Global.audioPlayer.load();
+                        Global.audioPlayer.play();
+                    }
+                    function fileSuccess() {
+                        Global.audioPlayer.volume = 1;
+                        Global.audioPlayer.pause();
+                        Global.audioPlayer.src = idUrl;
+                        Global.audioPlayer.load();
+                        Global.audioPlayer.play();
+                    }
+                    Mojo.Log.warn('try to get audio file to play');
+                    new Mojo.Service.Request("palm://momo.im.app.service.node/", {
+                        method: "onFileInfo",
+                        parameters: {
+                            path: idUrl
+                        },
+                        onSuccess: function(response) {
+                            if (response.error) {
+                                Mojo.Log.warn('file not exists:' + idUrl);
+                                //fileFailed();
+                                //NotifyHelper.instance().banner(Object.toJSON(response.error));
+                                new Mojo.Service.Request("palm://momo.im.app.service.node/", {
+                                    method: "onFileDownload",
+                                    parameters: {
+                                        path: idUrl,
+                                        url: audioSrc
+                                    },
+                                    onSuccess: function(response) {
+                                        parent.className = 'detail-content audio';
+                                        if (response.error) {
+                                            Mojo.Log.warn('file not exists donwload fail:' + idUrl);
+                                            fileFailed();
+                                            //NotifyHelper.instance().banner(Object.toJSON(response.error));
+                                            target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
+                                        } else {
+                                            Mojo.Log.warn('file not exists donwload success:' + idUrl);
+                                            fileSuccess();
+                                            target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
+                                            //NotifyHelper.instance().banner('cache success');
+                                        }
+                                    },
+                                    onFailure: function(fail) {
+                                        parent.className = 'detail-content audio';
+                                        fileFailed();
+                                        target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
+                                        //NotifyHelper.instance().banner('cache service fail');
+                                    }
+                                });
+                            } else {
+                                Mojo.Log.warn('file exists:' + idUrl);
+                                fileSuccess();
+                                
+                                //NotifyHelper.instance().banner('cache get success');
+                            }
+                        },
+                        onFailure: function(fail) {
+                            Mojo.Log.warn('file info get fail:' + JSON.stringify(fail));
+                            if (Global.AmrHelper) {
+                                var what = Global.AmrHelper.fileInfo(idUrl);
+                                Mojo.Log.error('file info get from amrhelper: ' + what);
+                                if (what === "ok") {
+                                    Mojo.Log.error('file info get from amrhelper: success ');
+                                    fileSuccess();
+                                } else {
+                                    //download from internet
+                                    that.controller.serviceRequest('palm://com.palm.downloadmanager/', {
+                                        method: 'download',
+                                        parameters: {
+                                            target: audioSrc,
+                                            targetDir: Setting.cache.audio,
+                                            targetFilename: dataID + '.amr',
+                                            keepFilenameOnRedirect: false,
+                                            subscribe: true
+                                        },
+                                        onSuccess: function(resp) {
+                                            Mojo.Log.error(Object.toJSON(resp))
+                                            if(resp.completed && resp.completionStatusCode === 200) {
+                                                fileSuccess();
+                                            }
+                                        },
+                                        onFailure: function(e) {
+                                            Mojo.Log.error(Object.toJSON(e))
+                                            fileFailed();
+                                        }
+                                    });
+                                }
+                            } else {
+                                fileFailed();
+                            }
+                        }
+                    });
+                }
+				
 				break;
 			default:
 				break;
