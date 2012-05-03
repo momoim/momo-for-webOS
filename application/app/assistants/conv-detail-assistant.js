@@ -634,13 +634,16 @@ ConvAdapter.prototype = {
 		if (!item.other) {
 			item.other = (item.sender.id == Global.authInfo.user.id ? item.receiver[0] : item.sender);
 		}
-		if(that.items[that.items.length - 1].id == item.id) {
-			that.items[that.items.length - 1] = item;
-			Mojo.Log.error('item replace for existing');
-		} else {
-			that.items.push(item);
-			Mojo.Log.info('add item to chat list: ' + that.items.length);
+		for(var index = that.items.length -1; index >= 0 && that.items.length - index < 15; --index) {
+			var todo = that.items[index];
+			if(todo.id === item.id) {
+				that.items[index] = item;
+				Mojo.Log.error('item replace for existing');
+				return;
+			}
 		}
+		that.items.push(item);
+		Mojo.Log.info('add item to chat list: ' + that.items.length);
 	},
 	setItems: function(items) {
 		Mojo.Log.info('setting items=====' + items.length);

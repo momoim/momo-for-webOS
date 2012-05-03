@@ -1,5 +1,8 @@
 var AppFormatter = {
 	time: function(time, model) {
+		if(model && model.state === RabbitDB.state.sending) {
+			return '发送中';
+		}
 		return AppFormatter.timeSince(parseInt(time) * 1000);
 	},
 	timeSince: function(time) {

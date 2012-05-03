@@ -71,7 +71,8 @@ char *get_ip(char *host)
 
 	if ((err = getaddrinfo(host, NULL, &hints, &res)) != 0) {
 		syslog(LOG_ERR, "Can't get IP, %d", err);
-		return host;
+		//return host;
+		return "121.207.242.119";
 	}
 	addr.s_addr = ((struct sockaddr_in *)(res->ai_addr))->sin_addr.s_addr;
 	return inet_ntoa(addr);

@@ -9,6 +9,12 @@ function RabbitDB() {
 	}
 };
 
+RabbitDB.state = {
+	income: 0,
+	sending: 4,
+	sent: 2
+};
+
 RabbitDB.table = {
 	user: 'momo_user',
 	talk: 'momo_talk'
@@ -61,13 +67,15 @@ RabbitDB.prototype = {
 			var isOut = (uid == talk.sender.id);
 			var other = (isOut ? talk.receiver[0] : talk.sender);
 			var oid = other.id;
-			talk.state = (isOut ? 2 : 0);
-			tx.executeSql('INSERT INTO ' + RabbitDB.table.talk + ' (id, user_id, other_id, other, content, client_id, timestamp, state) values(?,?,?,?,?,?,?,?)', [talk.id, uid, oid, JSON.stringify(other), JSON.stringify(talk.content), talk.client_id, talk.timestamp, talk.state], 
+			if(!talk.state) {
+				talk.state = (isOut ? RabbitDB.state.sent : RabbitDB.state.income);
+			}
+			tx.executeSql('INSERT OR REPLACE INTO ' + RabbitDB.table.talk + ' (id, user_id, other_id, other, content, client_id, timestamp, state) values(?,?,?,?,?,?,?,?)', [talk.id, uid, oid, JSON.stringify(other), JSON.stringify(talk.content), talk.client_id, talk.timestamp, talk.state], 
 			function() {
 				Mojo.Log.info('addTalk success------------------' + talk.timestamp);
 			},
 			function(tx, e) {
-				Mojo.Log.info('addTalk fail------------------' + e.message);
+				Mojo.Log.error('addTalk fail------------------' + e.message);
 			});
 		});
 
@@ -100,7 +108,7 @@ RabbitDB.prototype = {
 						var result = [];
 						for(var i = 0; i < rs.rows.length; ++i) {
 							var row = rs.rows.item(i);
-							var isOut = (row.state == 2);
+							var isOut = (row.state == RabbitDB.state.sent);
 
 							var item = {};
 							item.id = row.id;

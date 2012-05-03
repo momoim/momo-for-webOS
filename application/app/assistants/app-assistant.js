@@ -420,6 +420,18 @@ AppAssistant.prototype = {
 			return;
 		}
 		//Mojo.Log.error('onNewIncome================:' + messageStr);
+		var uid = Global.authInfo.user.id;
+		var isOut = (uid == income.sender.id);
+		if(isOut) {
+			if(income.state !== RabbitDB.state.sending || income.hasOwnProperty('timestamp')) {
+				income.state = RabbitDB.state.sent;
+				Mojo.Log.error('onNewIncome================: not sending');
+			} else {
+				Mojo.Log.error('onNewIncome================: sending' + income.timestamp);
+			}
+		} else {
+			income.state = RabbitDB.state.income;
+		}
 		// store to database
 		RabbitDB.instance().addTalk(income);
 		if (income.sender.id == Global.authInfo.user.id) {
