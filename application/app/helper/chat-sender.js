@@ -88,6 +88,13 @@ ChatSender.prototype.sendChat = function(chat) {
 	}.bind(that));
 };
 
+/**
+ * 是否网络地址，防止重复上传
+ */
+ChatSender.isHttpUrl = function(url) {
+	return url && url.indexOf("http") != -1;
+};
+
 ChatSender.prototype.prepareChat = function(total, onPrepared, onPrepareFail) {
 	//NotifyHelper.instance().banner('prepareChat');
 	var that = this;
@@ -106,6 +113,11 @@ ChatSender.prototype.prepareChat = function(total, onPrepared, onPrepareFail) {
 		} else if (content.hasOwnProperty('picture')) {
 			var localUrl = content.picture.url;
 			Mojo.Log.error(this.TAG, 'prepare picture ====' + localUrl);
+			if(ChatSender.isHttpUrl(localUrl)) {
+				Mojo.Log.error(this.TAG, 'url is internet just send it');
+				onPrepared(total);
+				return;
+			}
 			new Mojo.Service.Request("palm://momo.im.app.service.node/", {
 				method: "onFileUpload",
 				parameters: {
@@ -150,6 +162,12 @@ ChatSender.prototype.prepareChat = function(total, onPrepared, onPrepareFail) {
 			});
 		} else if (content.hasOwnProperty('audio')) {
 			Mojo.Log.error(this.TAG, 'prepare audio ====' + content.audio.url);
+			var currUrl = content.audio.url; 
+			if(ChatSender.isHttpUrl(currUrl)) {
+				Mojo.Log.error(this.TAG, 'url is internet just send it');
+				onPrepared(total);
+				return;
+			}
 			var idUrl = Setting.cache.audio + total.data.id + '.amr';
 			new Mojo.Service.Request("palm://momo.im.app.service.node/", {
 				method: "onFileRename",
@@ -168,6 +186,12 @@ ChatSender.prototype.prepareChat = function(total, onPrepared, onPrepareFail) {
 				}
 			});
 		} else if (content.hasOwnProperty('file')) {
+			var fileNow = content.file.url; 
+			if(ChatSender.isHttpUrl(fileNow)) {
+				Mojo.Log.error(this.TAG, 'url is internet just send it');
+				onPrepared(total);
+				return;
+			}
 			new Mojo.Service.Request("palm://momo.im.app.service.node/", {
 				method: "onFileUpload",
 				parameters: {

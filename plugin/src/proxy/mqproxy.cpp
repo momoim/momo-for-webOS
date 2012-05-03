@@ -397,6 +397,9 @@ void sendMsgs(MM_SMCP_CMD_TYPE cmdTypeRaw, int packNumberIn, char* orig, const c
 
 	int r = send(sock, buf, index - buf, 0);
 	syslog(LOG_ALERT, "msg send result: %d", r);
+	if(r == -1) {
+		reconnect();
+	}
 }
 void sendMsg1V1(char* orig, const char* receiver) {
 	sendMsgs(SMCP_IM_1V1, currentUpPackNum, orig, receiver);

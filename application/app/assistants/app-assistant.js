@@ -307,6 +307,9 @@ AppAssistant.prototype = {
 				}
 				break;
 			case 'onMsgSendError':
+				that.onMsgSendError(launchParams);
+				break;
+			case 'onChatToSend':
 				that.onChatToSend(launchParams);
 				break;
 			case 'onConnError':
@@ -380,6 +383,11 @@ AppAssistant.prototype = {
 		}
 	},
 	onChatToSend: function(launchParams) {
+		var that = this;
+		Mojo.Log.error('on chat prepare from service');
+		ChatSender.instance().sendChat(JSON.parse(launchParams.data));
+	},
+	onMsgSendError: function(launchParams) {
 		var that = this;
 		//Mojo.Log.error('on msg send error trying to send with http');
 		new interfaces.Momo().postSendMessage(JSON.parse(launchParams.data).data, {

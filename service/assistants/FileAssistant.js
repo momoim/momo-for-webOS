@@ -73,10 +73,10 @@ onFileDownload.prototype = {
 			if (err) {
 				console.log('onfiledownload ======> ' + filePath + ' err: ' + JSON.stringify(err));
 				fs.writeFile(filePath, '', function(err) {
-					if(err) {
+					if (err) {
 						console.log('create file err: ' + JSON.stringify(err));
 					} else {
-						console.log('file created ' + filePath); 
+						console.log('file created ' + filePath);
 					}
 				});
 				var host = url.parse(fileUrl).hostname;
@@ -256,7 +256,14 @@ onFileUpload.prototype = {
 					auth: that.authInfo
 				});
 				*/
-				NodeService.instance().sendMsgFail(actionData);
+				//NodeService.instance().sendMsgFail(actionData);
+				PalmCall.call('palm://com.palm.applicationManager', 'open', {
+					'id': Setting.APP_ID,
+					'params': {
+						'action': 'onChatToSend',
+						'data': JSON.stringify(actionData)
+					}
+				});
 			}
 			break;
 		default:
