@@ -29,7 +29,7 @@ var ConvDetailAssistant = Class.create({
 				content: AppFormatter.contentDetail.bind(that),
 				sender: AppFormatter.sender.bind(that),
 				timestamp: AppFormatter.time.bind(that),
-                receiver: AppFormatter.type.bind(that)
+				receiver: AppFormatter.type.bind(that)
 			},
 			uniquenessProperty: 'id',
 			fixedHeightItems: false,
@@ -262,7 +262,7 @@ var ConvDetailAssistant = Class.create({
 									},
 									onSuccess: function(resp) {
 										Mojo.Log.error(Object.toJSON(resp))
-										if(resp.completed && resp.completionStatusCode === 200) {
+										if (resp.completed && resp.completionStatusCode === 200) {
 											chatFileSuccess();
 										}
 									},
@@ -279,8 +279,8 @@ var ConvDetailAssistant = Class.create({
 				});
 				break;
 			case 'chat-audio':
-                var parent = target.parentNode.parentNode;
-                parent.className = 'detail-content audio actived';
+				var parent = target.parentNode.parentNode;
+				parent.className = 'detail-content audio actived';
 				var audioSrc = target.getAttribute('audio-src');
 				target.setAttribute('src', 'images/chat/record_end.png');
 				Mojo.Log.info(this.TAG, 'chat audio click: ' + audioSrc);
@@ -324,7 +324,7 @@ var ConvDetailAssistant = Class.create({
 										Mojo.Log.warn('file not exists donwload fail:' + idUrl);
 										fileFailed();
 										//NotifyHelper.instance().banner(Object.toJSON(response.error));
-				                        target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
+										target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
 									} else {
 										Mojo.Log.warn('file not exists donwload success:' + idUrl);
 										fileSuccess();
@@ -333,7 +333,7 @@ var ConvDetailAssistant = Class.create({
 								},
 								onFailure: function(fail) {
 									fileFailed();
-				                    target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
+									target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
 									//NotifyHelper.instance().banner('cache service fail');
 								}
 							});
@@ -364,7 +364,7 @@ var ConvDetailAssistant = Class.create({
 									},
 									onSuccess: function(resp) {
 										Mojo.Log.error(Object.toJSON(resp))
-										if(resp.completed && resp.completionStatusCode === 200) {
+										if (resp.completed && resp.completionStatusCode === 200) {
 											fileSuccess();
 										}
 									},
@@ -390,7 +390,7 @@ var ConvDetailAssistant = Class.create({
 			var params = {
 				defaultKind: 'image',
 				onSelect: function(file) {
-					Mojo.Log.warn(self.TAG, JSON.stringify(file) + '------------' + file.fullPath);
+					Mojo.Log.error(self.TAG, JSON.stringify(file) + '------------' + file.fullPath);
 					if (file.attachmentType == 'image') {
 						self.sendChat({
 							picture: {
@@ -398,9 +398,20 @@ var ConvDetailAssistant = Class.create({
 							}
 						});
 					} else {
+						function GetFilename(url) {
+							if (url) {
+								var m = url.toString().match(/.*\/(.+?)\./);
+								if (m && m.length > 1) {
+									return m[1];
+								}
+							}
+							return "";
+						}
 						self.sendChat({
 							file: {
-								url: file.fullPath
+								url: file.fullPath,
+								name: GetFilename(file.fullPath),
+								size: file.size
 							}
 						});
 					}
@@ -634,9 +645,9 @@ ConvAdapter.prototype = {
 		if (!item.other) {
 			item.other = (item.sender.id == Global.authInfo.user.id ? item.receiver[0] : item.sender);
 		}
-		for(var index = that.items.length -1; index >= 0 && that.items.length - index < 15; --index) {
+		for (var index = that.items.length - 1; index >= 0 && that.items.length - index < 15; --index) {
 			var todo = that.items[index];
-			if(todo.id === item.id) {
+			if (todo.id === item.id) {
 				that.items[index] = item;
 				Mojo.Log.error('item replace for existing');
 				return;

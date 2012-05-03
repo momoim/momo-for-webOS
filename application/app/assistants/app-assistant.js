@@ -425,9 +425,9 @@ AppAssistant.prototype = {
 		if(isOut) {
 			if(income.state !== RabbitDB.state.sending || income.hasOwnProperty('timestamp')) {
 				income.state = RabbitDB.state.sent;
-				Mojo.Log.error('onNewIncome================: not sending');
+				//Mojo.Log.error('onNewIncome================: not sending');
 			} else {
-				Mojo.Log.error('onNewIncome================: sending' + income.timestamp);
+				//Mojo.Log.error('onNewIncome================: sending' + income.timestamp);
 			}
 		} else {
 			income.state = RabbitDB.state.income;
