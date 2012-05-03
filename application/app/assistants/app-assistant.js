@@ -245,8 +245,7 @@ AppAssistant.prototype = {
 		var cardStageController = this.controller.getStageController(Global.mainStage);
 		var appController = Mojo.Controller.getAppController();
 		if (!launchParams || launchParams.action === 'onDashClick') {
-			//
-			Mojo.Log.error('no launch params');
+			//Mojo.Log.error('no launch params');
 			var pushMainScene = function(stageController) {
 				function fail() {
 					if (!Global.logining) {
