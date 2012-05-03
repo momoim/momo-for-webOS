@@ -49,6 +49,8 @@ var AppFormatter = {
 		if (!n) return 'text';
         if(model['content']['audio']){
 		    return 'audio';
+        }else if(model['content']['file']){
+		    return 'audio file';
         }
 		return 'text';
 	},
@@ -72,7 +74,7 @@ var AppFormatter = {
 				}
 				var regex = /_\d{2,4}.jpg/g;
 				var orig = pUrl.replace(regex, '.jpg');
-				return '<a href="' + orig + '"><img src="' + pUrl + '"/></a>';
+				return '<a href="' + orig + '"><img src="' + pUrl + '" class="chat-img"/></a>';
 			} else if (now == 'location') {
 				var location = n[now];
 				var latlng = location['latitude'] + ',' + location['longitude'];
@@ -88,7 +90,7 @@ var AppFormatter = {
                     time = minutes + '′' + second;
                 }
 				//preload="auto"
-				return '<img src="images/chat/chat_bg_audio_normal.png" width="28" height="30" data-action="chat-audio" data-id="' + model['id'] + '" audio-src="' + audio['url'] + '"/><span class="audio-time">' + time + '″</span>';
+				return '<img src="images/chat/chat_bg_audio_normal.png" width="28" height="30" id="audio_data_' + model['id'] + '" data-action="chat-audio" data-id="' + model['id'] + '" audio-src="' + audio['url'] + '"/><span class="audio-time" data-type="audio-time">' + time + '″</span>'; 
 				//+ '<audio src="'+ audio['url'] +'" id="audio-' + model['id'] + '"/>';
 			} else if (now == 'file') {
 				var file = n[now];
