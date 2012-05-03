@@ -49,6 +49,8 @@ var AppFormatter = {
 		if (!n) return 'text';
         if(model['content']['audio']){
 		    return 'audio';
+        }else if(model['content']['file']){
+		    return 'audio file';
         }
 		return 'text';
 	},

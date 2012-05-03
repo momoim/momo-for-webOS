@@ -313,12 +313,21 @@ p{
             float: left;
             margin: 0 10px;
             max-width: 200px;
-	        border-width: 12px 12px 14px;
+	        border-width: 11px 12px 12px;
 	        -webkit-border-image: url(../images/chat/text_bg.png) 12 12 14 12 stretch stretch;
 	        -webkit-transition-property: opacity;
 	        -webkit-transition-duration: 0.5s;
             &.audio{
 	            -webkit-border-image: url(../images/chat/audio_bg.png) 12 12 14 12 stretch stretch;
+                .content{
+                    height: 5px;
+                }
+            }
+            &.file{
+                .content{
+                    height: auto;
+                    min-height: 12px;
+                }
             }
             &.actived{
 	            -webkit-border-image: url(../images/chat/audio_bg_active.png) 12 12 14 12 stretch stretch;
@@ -350,6 +359,7 @@ p{
                 }
                 &.actived{
                     .arrow{
+                        left: -21px;
                         background: url(../images/chat/arrow_audio_ac.png) no-repeat;
                     }
                 }
@@ -386,7 +396,7 @@ p{
             &.actived{
 	            -webkit-border-image: url(../images/chat/audio_bg_active_other.png) 12 12 14 12 stretch stretch;
                 .arrow{
-                     background: url(../images/chat/arrow_audio_ac_other.png) no-repeat;
+                    background: url(../images/chat/arrow_audio_ac_other.png) no-repeat;
                 }
             }
             .arrow{
