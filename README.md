@@ -1,4 +1,4 @@
-momo for webOS2.x
+momo for webOS
 ===
 
 *************

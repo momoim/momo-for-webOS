@@ -7,6 +7,7 @@
 #include <sys/time.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <pthread.h>
 
 #include <signal.h>
 #include <unistd.h>
@@ -19,7 +20,7 @@
 #include <syslog.h>
 
 #include "mqproxy.h"
-#define MAX_BUFFER_LEN 2048
+#define MAX_BUFFER_LEN 65536
 
 #define ntohll(x) ( ( (uint64_t)(ntohl( (uint32_t)((x << 32) >> 32) )) << 32) | ntohl( ((uint32_t)(x >> 32)) ) )                                        
 #define htonll(x) ntohll(x)
@@ -34,6 +35,10 @@ unsigned short m_sock_port;
 const char* m_auth;
 bool isInited = false;
 
+char buffered[65536]={0};
+int bufferedSize = 0;
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
 void didConnected(const char* auth);
 void SIGIOHandler(int, siginfo_t *info, void *uap); /* Function to handle SIGIO */
 void sendMsgs(MM_SMCP_CMD_TYPE cmdTypeRaw, int packNumberIn, char* orig, const char* receiver);
@@ -45,7 +50,7 @@ void closeSocketOnly() {
 
 void closeSocket(){
 	syslog(LOG_ALERT, "closeSocket");
-	//sendMsgs(SMCP_SYS_LOGOUT, 0, NULL, NULL);
+	sendMsgs(SMCP_SYS_LOGOUT, 0, NULL, NULL);
 	closeSocketOnly();
 }
 
@@ -60,6 +65,8 @@ void reconnect() {
 			if(sock > 0) {
 				closeSocketOnly();
 			}
+			//reset buffed size
+			bufferedSize = 0;
 			openSocket(m_sock_addr, m_sock_port, m_auth);
 		}
 	}
@@ -210,133 +217,264 @@ void didReceiveData(const char *theData){
 	}
 }
 
-void SIGIOHandler(int signum, siginfo_t *info, void *uap)
-{
-	syslog(LOG_ALERT, "sigio called");
+int onIOBuffer(int recvMsgSize, char* echoBuffer, char* buffer) {
+	syslog(LOG_ALERT, "welll recving msg onIOBuffer: %d --------------->", recvMsgSize);
+	if(recvMsgSize < 8) {
+		return recvMsgSize;// return echoBuffer;
+	}
+	//head
+	buffer = (char*)echoBuffer;
+	int byteCount = 0;
+
+	//cmd
+	MM_SMCP_CMD_TYPE cmdType = (MM_SMCP_CMD_TYPE)(ntohs(*(uint16_t*)buffer));
+	buffer += sizeof(uint16_t);
+	byteCount += sizeof(uint16_t);
+	syslog(LOG_ALERT, "welll recving msg type: %d --------------->", cmdType);
+
+	//flags
+	uint16_t packHead = ntohs(*(uint16_t*)buffer);
+	buffer += sizeof(uint16_t);
+	byteCount += sizeof(uint16_t);
+	syslog(LOG_ALERT, "welll recving msg flags: %d --------------->", packHead);
+
+	uint64_t uid = 0;
+	if (packHead & 0x20) {
+		if (recvMsgSize < byteCount + sizeof(uint64_t) + sizeof(uint32_t)) return recvMsgSize;//return echoBuffer;
+
+		uid = ntohll(*(uint64_t*)buffer);
+		buffer += sizeof(uint64_t);
+		byteCount += sizeof(uint64_t);
+		syslog(LOG_ALERT, "welll recving msg uid: %d --------------->", uid);
+	}
+
+	uint64_t timeStamp = 0;
+	if (packHead & 0x10) {
+		if (recvMsgSize < byteCount + sizeof(uint64_t) + sizeof(uint32_t)) return recvMsgSize;//return echoBuffer;
+
+		timeStamp = ntohll(*(uint64_t*)buffer);
+		buffer += sizeof(uint64_t);
+		byteCount += sizeof(uint64_t);
+		syslog(LOG_ALERT, "welll recving msg timestamp: %d --------------->", timeStamp);
+	}
+
+	//下行包序号
+	int downPackNumber = 0;
+	if (packHead & 0x8) {
+		if (recvMsgSize < byteCount + sizeof(uint32_t) + sizeof(uint32_t)) return recvMsgSize;//return echoBuffer;
+
+		downPackNumber = ntohl(*(uint32_t*)buffer);
+		buffer += sizeof(uint32_t);
+		byteCount += sizeof(uint32_t);
+		syslog(LOG_ALERT, "welll recving msg pack num: %d --------------->", downPackNumber);
+	}
+
+	//上行包序号
+	int upPackNumber = 0;
+	if (packHead & 0x4) {
+		if (recvMsgSize < byteCount + sizeof(uint32_t) + sizeof(uint32_t)) return recvMsgSize;//return echoBuffer;
+
+		upPackNumber = ntohl(*(uint32_t*)buffer);
+		buffer += sizeof(uint32_t);
+		byteCount += sizeof(uint32_t);
+		syslog(LOG_ALERT, "welll recving msg up pack num: %d --------------->", upPackNumber);
+	}
+
+	//是否加密
+	bool isEncrypted = false;
+	if (packHead & 0x2) {
+		isEncrypted = true;
+	}
+
+	//是否压缩
+	bool isCompress = false;
+	if (packHead & 0x1) {
+		isCompress = true;
+		syslog(LOG_ALERT, "welll isCompressed @@@@@@@@@@@@");
+	}
+
+	//length
+	if (recvMsgSize < byteCount + 4) return recvMsgSize;//return echoBuffer;
+	int contentLength = ntohl(*(uint32_t*)buffer);
+	buffer += sizeof(uint32_t);
+	byteCount += sizeof(uint32_t);
+	syslog(LOG_ALERT, "welll recving msg content length: %d --------------->", contentLength);
+
+	//check content
+	if(recvMsgSize >= byteCount + contentLength) {
+		syslog(LOG_ALERT, "recving msg type: %d, timestamp: %d", cmdType, timeStamp);
+
+		if(cmdType == SMCP_IM_DELIVER) {
+			//syslog(LOG_ALERT, "recving msg type: %d, strlen: %d", cmdType, strlen((char*)buffer));
+			//syslog(LOG_ALERT, "recving msg type: %d, strlen: %s", cmdType, (char*)buffer);
+			//syslog(LOG_ALERT, "====>recving msg type 16129: contentlength: %d", contentLength);
+			//syslog(LOG_ALERT, "====>recving msg type 16129 content: %s", buffer);
+			char* body = (char*)malloc(contentLength + 1);
+			memcpy(body, buffer, contentLength);
+			char* last = body + contentLength;
+			memset(last, 0, 1);
+			syslog(LOG_ALERT, "welll length: %d, recving msg conetnt!!!: %s", contentLength, body);
+
+			//return;
+			//call js
+			const char* results[2];
+			results[0] = body;
+			char time[16] = {0};
+			sprintf(time, "%d", timeStamp);
+			results[1] = time;
+			PDL_CallJS("onProxyMsg", results, 2);
+			free(body);
+		} else {
+			syslog(LOG_ALERT, "welll not an im delivery");
+		}
+		buffer += contentLength;
+		int between = (char*)buffer - echoBuffer;
+		syslog(LOG_ALERT, "welll read %d length and received : %d", between, recvMsgSize);
+		int left = recvMsgSize - between;
+		if(left > 0) {
+			syslog(LOG_ALERT, "need to be used next loop %d", left);
+
+			MM_SMCP_CMD_TYPE cmdTypeTest = (MM_SMCP_CMD_TYPE)(ntohs(*(uint16_t*)buffer));
+			//syslog(LOG_ALERT, "welll recving msg type left1111: %d --------------->", cmdTypeTest);
+			//return NULL;
+			return left;
+			//return (char*)buffer;
+			/*
+			char* todo = (char*)malloc(left);
+			memcpy(todo, buffer, left);
+			onIOBuffer(left, todo);
+			free(todo);
+			*/
+
+			/*
+				 memcpy(echoBuffer, buffer, left);
+				 memset(echoBuffer + left, 0, 1);
+				 syslog(LOG_ALERT, "need to be used next loop copied!----%s", echoBuffer);
+				 */
+		} else {
+			syslog(LOG_ALERT, "welll all data done");
+			//return NULL;
+			return 0;
+		}
+	} else {
+		syslog(LOG_ALERT, "welll not enough content : %d", contentLength);
+		int rd = ((char*)buffer - echoBuffer);
+		syslog(LOG_ALERT, "welll not enough current : %d", recvMsgSize - rd);
+		return recvMsgSize;//return echoBuffer;
+	}
+}
+
+void onSIGIO() {
+	pthread_mutex_lock(&mutex);
+	syslog(LOG_ALERT, "----+---->welll sigio called");
 	struct sockaddr_in serveraddr;    /* Address of datagram source */
 	int recvMsgSize;                  /* Size of datagram */
 	char echoBuffer[MAX_BUFFER_LEN]={0};  /* Datagram buffer */
+	int left = 0;
 
 	do  /* As long as there is input... */
 	{
-		if ((recvMsgSize = recv(sock, echoBuffer, MAX_BUFFER_LEN, 0)) > 0)
+		if(bufferedSize > 0) {
+			syslog(LOG_ALERT, "welll still buffer to be filled: %d", bufferedSize);
+			memcpy(echoBuffer, buffered, bufferedSize);
+		}
+		if(left > 0) {
+			//syslog(LOG_ALERT, "need to be used left loop data!----%s", echoBuffer);
+			syslog(LOG_ALERT, "need to be used left loop data length!----%d", left);
+		}
+		int readCount = MAX_BUFFER_LEN - left - bufferedSize;
+		syslog(LOG_ALERT, "welll data will be read: %d", readCount);
+		recvMsgSize = recv(sock, echoBuffer + left + bufferedSize, readCount, 0);
+		if(recvMsgSize <= 0) {
+			if(left > 0) {
+				memcpy(buffered, echoBuffer, left);
+				bufferedSize = left;
+				syslog(LOG_ALERT, "welll still buffer to be filled on left : %d", bufferedSize);
+			}
+			left = 0;
+			break;
+		}
+		syslog(LOG_ALERT, "welll msg read length!----%d, left %d", recvMsgSize, left);
+		recvMsgSize += left;
+		recvMsgSize += bufferedSize;
+		left = 0;
+		bufferedSize = 0;
+		if (recvMsgSize > 0)
 		{
-			if(recvMsgSize < 8) break;
-
-			//head
-			uint8_t* buffer = (uint8_t*)echoBuffer;
-			int byteCount = 0;
-
-			//cmd
-			MM_SMCP_CMD_TYPE cmdType = (MM_SMCP_CMD_TYPE)(ntohs(*(uint16_t*)buffer));
-			buffer += sizeof(uint16_t);
-			byteCount += sizeof(uint16_t);
-
-			//flags
-			uint16_t packHead = ntohs(*(uint16_t*)buffer);
-			buffer += sizeof(uint16_t);
-			byteCount += sizeof(uint16_t);
-
-			uint64_t uid = 0;
-			if (packHead & 0x20) {
-				if (recvMsgSize < byteCount + sizeof(uint64_t) + sizeof(uint32_t)) break;
-
-				uid = ntohll(*(uint64_t*)buffer);
-				buffer += sizeof(uint64_t);
-				byteCount += sizeof(uint64_t);
+			if(recvMsgSize < 8) {
+				syslog(LOG_ALERT, "welll short than 8, %d, keep this data for next use", recvMsgSize);
+				bufferedSize = recvMsgSize;
+				memcpy(buffered, echoBuffer, recvMsgSize);
+				break;
+			} else {
+				syslog(LOG_ALERT, "welll this all loop msg size %d", recvMsgSize);
 			}
 
-			uint64_t timeStamp = 0;
-			if (packHead & 0x10) {
-				if (recvMsgSize < byteCount + sizeof(uint64_t) + sizeof(uint32_t)) break;
+			char* handled = echoBuffer;
+			int sized = recvMsgSize;
+			int todo = 0;
+			char* lastLoop;
+			char* buffering;
+			do {
+				lastLoop = handled;
+				todo = onIOBuffer(sized, handled, buffering);
+				if(todo > 0) {
+					if(todo != sized) {
+						handled += (sized - todo);
+						sized = todo;//handled - lastLoop;
+						syslog(LOG_ALERT, "welll left sized after last loop=================>%d", sized);
+					} else {
+						bufferedSize = sized;
+						memcpy(buffered, handled, sized);
+						syslog(LOG_ALERT, "welll all left sized =================>%d, %d", sized, handled - lastLoop);
 
-				timeStamp = ntohll(*(uint64_t*)buffer);
-				buffer += sizeof(uint64_t);
-				byteCount += sizeof(uint64_t);
-			}
-
-			//下行包序号
-			int downPackNumber = 0;
-			if (packHead & 0x8) {
-				if (recvMsgSize < byteCount + sizeof(uint32_t) + sizeof(uint32_t)) break;
-
-				downPackNumber = ntohl(*(uint32_t*)buffer);
-				buffer += sizeof(uint32_t);
-				byteCount += sizeof(uint32_t);
-			}
-
-			//上行包序号
-			int upPackNumber = 0;
-			if (packHead & 0x4) {
-				if (recvMsgSize < byteCount + sizeof(uint32_t) + sizeof(uint32_t)) break;
-
-				upPackNumber = ntohl(*(uint32_t*)buffer);
-				buffer += sizeof(uint32_t);
-				byteCount += sizeof(uint32_t);
-			}
-
-			//是否加密
-			bool isEncrypted = false;
-			if (packHead & 0x2) {
-				isEncrypted = true;
-			}
-
-			//是否压缩
-			bool isCompress = false;
-			if (packHead & 0x1) {
-				isCompress = true;
-			}
-
-			//length
-			if (recvMsgSize < byteCount + 4) break;
-			int contentLength = ntohl(*(uint32_t*)buffer);
-			buffer += sizeof(uint32_t);
-			byteCount += sizeof(uint32_t);
-
-			//check content
-			if(recvMsgSize >= byteCount + contentLength) {
-				syslog(LOG_ALERT, "recving msg type: %d, timestamp: %d", cmdType, timeStamp);
-
-				if(cmdType == SMCP_IM_DELIVER) {
-					//syslog(LOG_ALERT, "====>recving msg type 16129: contentlength: %d", contentLength);
-					//syslog(LOG_ALERT, "====>recving msg type 16129 content: %s", buffer);
-					char* body = (char*)malloc(contentLength + 1);
-					memcpy(body, buffer, contentLength);
-					char* last = body + contentLength;
-					memset(last, 0, 1);
-					syslog(LOG_ALERT, "length: %d, 16129 recving msg conetnt!!!: %s", contentLength, body);
-
-					//return;
-					//call js
-					const char* results[2];
-					results[0] = body;
-					char time[16] = {0};
-					sprintf(time, "%d", timeStamp);
-					results[1] = time;
-					PDL_CallJS("onProxyMsg", results, 2);
-					free(body);
+						MM_SMCP_CMD_TYPE cmdTypeTest = (MM_SMCP_CMD_TYPE)(ntohs(*(uint16_t*)buffered));
+						syslog(LOG_ALERT, "welll recving msg type left1111: %d --------------->", cmdTypeTest);
+						break;
+					}
 				} else {
-					syslog(LOG_ALERT, "not an im delivery");
+					break;
 				}
+			} while (true);
+			if(todo > 0 && sized > 0) {
+				//left = sized;
+				syslog(LOG_ALERT, "welll recving msg handled lefting : %d --------------->total %d", sized, recvMsgSize);
+				//memcpy(echoBuffer, handled, left);
+				//syslog(LOG_INFO, "left buffer copied!");
 			}
+			continue;
 		}
 		else if (recvMsgSize == 0)
 		{
-			closeSocketOnly();
-			reconnect();
-			didReceiveData("connection closed");
-			return;
+			//closeSocketOnly();
+			//reconnect();
+			//didReceiveData("connection closed");
+			//return;
+			syslog(LOG_ALERT, "no more data");
+			break;
 		}
 		else
 		{
 			/* Only acceptable error: recvfrom() would have blocked */
 			if (errno != EWOULDBLOCK){
 				printf("recvfrom() failed");
-				return;
+				//return;
+				break;
 			}
 		}
 	}  while (recvMsgSize > 0);
+	syslog(LOG_ALERT, "welll done sigio! %d", bufferedSize);
 	/* Nothing left to receive */
+	pthread_mutex_unlock(&mutex);
+}
+
+void SIGIOHandler(int signum, siginfo_t *info, void *uap)
+{
+	//TODO send user event sigio or muliti called
+		SDL_Event event;
+		event.type = SDL_USEREVENT;
+		event.user.code = 103;
+		SDL_PushEvent(&event);
 }
 
 int currentUpPackNum = 0;

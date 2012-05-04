@@ -388,7 +388,7 @@ AppAssistant.prototype = {
 	},
 	onMsgSendError: function(launchParams) {
 		var that = this;
-		//Mojo.Log.error('on msg send error trying to send with http');
+		Mojo.Log.error('on msg send error trying to send with http');
 		new interfaces.Momo().postSendMessage(JSON.parse(launchParams.data).data, {
 			onSuccess: function(resp) {
 				//Mojo.Log.error('on msg send error trying to send with http success');// + resp.responseText);
@@ -434,7 +434,7 @@ AppAssistant.prototype = {
 		}
 		// store to database
 		RabbitDB.instance().addTalk(income);
-		if (income.sender.id == Global.authInfo.user.id) {
+		if (isOut && income.state == RabbitDB.state.sent) {
 			ChatSender.instance().removeSendingChat(message);
 		}
 

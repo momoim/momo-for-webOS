@@ -15,6 +15,7 @@
 
 #define WHAT_AMR_COMPRESS 101
 #define WHAT_AMR_THREAD 102
+#define WHAT_SIGIO 103
 
 typedef struct 
 {
@@ -332,6 +333,8 @@ void plugin_start() {
 				audio->duration = NULL;
 				free(audio);
 				audio = NULL;
+			} else if(event.user.code == WHAT_SIGIO) {
+				onSIGIO();
 			}
 		}
 	} while (event.type != SDL_QUIT);

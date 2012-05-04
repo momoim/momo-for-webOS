@@ -70,7 +70,8 @@ var PluginHelper = {
 				},
 				"heartbeat": 60,
 				//TODO "compress": "gzip",
-				"receive_audio": true,
+				"receive_audio": false,
+				"text_no_ack": true,
 				"version": "1.1.1"
 			};
 			//Global.AmrHelper.openSocket(Setting.proxy, 9191, JSON.stringify(auth));

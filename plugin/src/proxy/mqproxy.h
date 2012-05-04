@@ -12,6 +12,7 @@ extern void closeSocket();
 extern void setHeartBeatTimer();
 extern void reconnect();
 extern void sendMsg1V1(char* msg, const char* receiver);
+extern void onSIGIO();
 
 typedef struct 
 {
