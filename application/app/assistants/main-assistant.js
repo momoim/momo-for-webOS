@@ -55,7 +55,7 @@ var MainAssistant = Class.create({
 			this.willSwitch = null;
 		}
 
-		this.refreshClick();
+		//this.refreshClick();
 	},
 	onInitSuccess: function(result) {
 		var that = this;

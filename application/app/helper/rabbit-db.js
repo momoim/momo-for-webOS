@@ -70,6 +70,10 @@ RabbitDB.prototype = {
 			if(!talk.state) {
 				talk.state = (isOut ? RabbitDB.state.sent : RabbitDB.state.income);
 			}
+			if(talk.state == RabbitDB.state.sending) {
+				//current time
+				talk.timestamp = (new Date().getTime()/1000);
+			}
 			tx.executeSql('INSERT OR REPLACE INTO ' + RabbitDB.table.talk + ' (id, user_id, other_id, other, content, client_id, timestamp, state) values(?,?,?,?,?,?,?,?)', [talk.id, uid, oid, JSON.stringify(other), JSON.stringify(talk.content), talk.client_id, talk.timestamp, talk.state], 
 			function() {
 				Mojo.Log.info('addTalk success------------------' + talk.timestamp);
