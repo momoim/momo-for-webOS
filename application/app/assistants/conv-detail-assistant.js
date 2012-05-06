@@ -7,8 +7,8 @@ var ConvDetailAssistant = Class.create({
 	},
 	setup: function() {
 		var that = this;
-        that.isplay = false;
-        that.audioPlayId = 0;
+		that.isplay = false;
+		that.audioPlayId = 0;
 		//Menu
 		Global.menu(this.controller);
 		//init ui
@@ -83,6 +83,7 @@ var ConvDetailAssistant = Class.create({
 		this.keyUpHandlerReal = this.keyUpHandler.bind(this);
 		this.onClickReal = this.onClick.bind(this);
 		this.onMouseUpReal = this.onMouseUp.bind(this);
+		this.onTextFocusChange = this.onTextFocus.bind(this);
 
 		//init data
 		RabbitDB.instance().getTalkList(that.incomeItem.id, function(result) {
@@ -98,6 +99,7 @@ var ConvDetailAssistant = Class.create({
 		});
 
 		this.elTextField = this.controller.document.getElementById('comment-content');
+
 		this.elButtonRecord = this.controller.document.getElementById('audio-recorder');
 		if (Global.configs.lastSwitcher == 'sound') {
 			this.switchToSound();
@@ -172,15 +174,15 @@ var ConvDetailAssistant = Class.create({
 		Mojo.Log.error(this.TAG, 'onClick: ' + event.target.outerHTML);
 		var that = this;
 		var target = event.target;
-        var tempParentNode = target;
-        for(var i = 0; i < 5; i++){
-            if(tempParentNode.hasAttribute('data-type') && tempParentNode.getAttribute('data-type') == 'audio'){
-                target = tempParentNode.querySelector('.content > img');
-                break;
-            }else{
-                tempParentNode = tempParentNode.parentNode;
-            }
-        }
+		var tempParentNode = target;
+		for (var i = 0; i < 5; i++) {
+			if (tempParentNode && tempParentNode.hasAttribute && tempParentNode.hasAttribute('data-type') && tempParentNode.getAttribute('data-type') == 'audio') {
+				target = tempParentNode.querySelector('.content > img');
+				break;
+			} else if(tempParentNode) {
+				tempParentNode = tempParentNode.parentNode;
+			}
+		}
 		if (target.hasAttribute('data-action')) {
 			var action = target.getAttribute('data-action');
 			var dataID = target.getAttribute('data-id');
@@ -293,133 +295,134 @@ var ConvDetailAssistant = Class.create({
 				var parent = target.parentNode.parentNode;
 				parent.className = 'detail-content audio actived';
 				var audioSrc = target.getAttribute('audio-src');
-                parent.className = 'detail-content audio actived';
+				parent.className = 'detail-content audio actived';
 				target.setAttribute('src', 'images/chat/record_end.png');
 				Mojo.Log.info(this.TAG, 'chat audio click: ' + audioSrc);
-                var currentAudioId = target.getAttribute('data-id');
-                if(currentAudioId != that.audioPlayId && that.audioPlayId != 0){
-                    var tempAudioId = that.audioPlayId;
-                    var audioid = 'audio_data_' + tempAudioId;
-                    var preAudio = that.controller.document.getElementById(audioid);
-                    preAudio.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
-                    preAudio.parentNode.parentNode.className = 'detail-content audio';
-                    Global.audioPlayer.pause();
-                    that.isplay = false;
-                }
-				if (!Global.audioPlayer) {
-                    Global.audioPlayer = new Audio();
-                    Global.audioPlayer.addEventListener("ended", function(){
-                        parent.className = 'detail-content audio';
-				        target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
-                        that.isplay = false;
-                        that.audioPlayId = 0;
-                    }, true);
+				var currentAudioId = target.getAttribute('data-id');
+				if (currentAudioId != that.audioPlayId && that.audioPlayId != 0) {
+					var tempAudioId = that.audioPlayId;
+					var audioid = 'audio_data_' + tempAudioId;
+					var preAudio = that.controller.document.getElementById(audioid);
+					preAudio.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
+					preAudio.parentNode.parentNode.className = 'detail-content audio';
+					Global.audioPlayer.pause();
+					that.isplay = false;
 				}
-                that.audioPlayId = currentAudioId;
-                if(that.isplay){
-                    Global.audioPlayer.pause();
-                    parent.className = 'detail-content audio';
-				    target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
-                    that.isplay = false;
-                }else{
-                    that.isplay = true;
-                    var idUrl = Setting.cache.audio + dataID + '.amr';
-                    function fileFailed() {
-                        Global.audioPlayer.volume = 1;
-                        Global.audioPlayer.pause();
-                        Global.audioPlayer.src = audioSrc;
-                        Global.audioPlayer.load();
-                        Global.audioPlayer.play();
-                    }
-                    function fileSuccess() {
-                        Global.audioPlayer.volume = 1;
-                        Global.audioPlayer.pause();
-                        Global.audioPlayer.src = idUrl;
-                        Global.audioPlayer.load();
-                        Global.audioPlayer.play();
-                    }
-                    Mojo.Log.warn('try to get audio file to play');
-                    new Mojo.Service.Request("palm://momo.im.app.service.node/", {
-                        method: "onFileInfo",
-                        parameters: {
-                            path: idUrl
-                        },
-                        onSuccess: function(response) {
-                            if (response.error) {
-                                Mojo.Log.warn('file not exists:' + idUrl);
-                                //fileFailed();
-                                //NotifyHelper.instance().banner(Object.toJSON(response.error));
-                                new Mojo.Service.Request("palm://momo.im.app.service.node/", {
-                                    method: "onFileDownload",
-                                    parameters: {
-                                        path: idUrl,
-                                        url: audioSrc
-                                    },
-                                    onSuccess: function(response) {
-                                        parent.className = 'detail-content audio';
-                                        if (response.error) {
-                                            Mojo.Log.warn('file not exists donwload fail:' + idUrl);
-                                            fileFailed();
-                                            //NotifyHelper.instance().banner(Object.toJSON(response.error));
-                                            target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
-                                        } else {
-                                            Mojo.Log.warn('file not exists donwload success:' + idUrl);
-                                            fileSuccess();
-                                            target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
-                                            //NotifyHelper.instance().banner('cache success');
-                                        }
-                                    },
-                                    onFailure: function(fail) {
-                                        parent.className = 'detail-content audio';
-                                        fileFailed();
-                                        target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
-                                        //NotifyHelper.instance().banner('cache service fail');
-                                    }
-                                });
-                            } else {
-                                Mojo.Log.warn('file exists:' + idUrl);
-                                fileSuccess();
-                                
-                                //NotifyHelper.instance().banner('cache get success');
-                            }
-                        },
-                        onFailure: function(fail) {
-                            Mojo.Log.warn('file info get fail:' + JSON.stringify(fail));
-                            if (Global.AmrHelper) {
-                                var what = Global.AmrHelper.fileInfo(idUrl);
-                                Mojo.Log.error('file info get from amrhelper: ' + what);
-                                if (what === "ok") {
-                                    Mojo.Log.error('file info get from amrhelper: success ');
-                                    fileSuccess();
-                                } else {
-                                    //download from internet
-                                    that.controller.serviceRequest('palm://com.palm.downloadmanager/', {
-                                        method: 'download',
-                                        parameters: {
-                                            target: audioSrc,
-                                            targetDir: Setting.cache.audio,
-                                            targetFilename: dataID + '.amr',
-                                            keepFilenameOnRedirect: false,
-                                            subscribe: true
-                                        },
-                                        onSuccess: function(resp) {
-                                            Mojo.Log.error(Object.toJSON(resp))
-                                            if(resp.completed && resp.completionStatusCode === 200) {
-                                                fileSuccess();
-                                            }
-                                        },
-                                        onFailure: function(e) {
-                                            Mojo.Log.error(Object.toJSON(e))
-                                            fileFailed();
-                                        }
-                                    });
-                                }
-                            } else {
-                                fileFailed();
-                            }
-                        }
-                    });
-                }
+				if (!Global.audioPlayer) {
+					Global.audioPlayer = new Audio();
+					Global.audioPlayer.addEventListener("ended", function() {
+						parent.className = 'detail-content audio';
+						target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
+						that.isplay = false;
+						that.audioPlayId = 0;
+					},
+					true);
+				}
+				that.audioPlayId = currentAudioId;
+				if (that.isplay) {
+					Global.audioPlayer.pause();
+					parent.className = 'detail-content audio';
+					target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
+					that.isplay = false;
+				} else {
+					that.isplay = true;
+					var idUrl = Setting.cache.audio + dataID + '.amr';
+					function fileFailed() {
+						Global.audioPlayer.volume = 1;
+						Global.audioPlayer.pause();
+						Global.audioPlayer.src = audioSrc;
+						Global.audioPlayer.load();
+						Global.audioPlayer.play();
+					}
+					function fileSuccess() {
+						Global.audioPlayer.volume = 1;
+						Global.audioPlayer.pause();
+						Global.audioPlayer.src = idUrl;
+						Global.audioPlayer.load();
+						Global.audioPlayer.play();
+					}
+					Mojo.Log.warn('try to get audio file to play');
+					new Mojo.Service.Request("palm://momo.im.app.service.node/", {
+						method: "onFileInfo",
+						parameters: {
+							path: idUrl
+						},
+						onSuccess: function(response) {
+							if (response.error) {
+								Mojo.Log.warn('file not exists:' + idUrl);
+								//fileFailed();
+								//NotifyHelper.instance().banner(Object.toJSON(response.error));
+								new Mojo.Service.Request("palm://momo.im.app.service.node/", {
+									method: "onFileDownload",
+									parameters: {
+										path: idUrl,
+										url: audioSrc
+									},
+									onSuccess: function(response) {
+										parent.className = 'detail-content audio';
+										if (response.error) {
+											Mojo.Log.warn('file not exists donwload fail:' + idUrl);
+											fileFailed();
+											//NotifyHelper.instance().banner(Object.toJSON(response.error));
+											target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
+										} else {
+											Mojo.Log.warn('file not exists donwload success:' + idUrl);
+											fileSuccess();
+											target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
+											//NotifyHelper.instance().banner('cache success');
+										}
+									},
+									onFailure: function(fail) {
+										parent.className = 'detail-content audio';
+										fileFailed();
+										target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
+										//NotifyHelper.instance().banner('cache service fail');
+									}
+								});
+							} else {
+								Mojo.Log.warn('file exists:' + idUrl);
+								fileSuccess();
+
+								//NotifyHelper.instance().banner('cache get success');
+							}
+						},
+						onFailure: function(fail) {
+							Mojo.Log.warn('file info get fail:' + JSON.stringify(fail));
+							if (Global.AmrHelper) {
+								var what = Global.AmrHelper.fileInfo(idUrl);
+								Mojo.Log.error('file info get from amrhelper: ' + what);
+								if (what === "ok") {
+									Mojo.Log.error('file info get from amrhelper: success ');
+									fileSuccess();
+								} else {
+									//download from internet
+									that.controller.serviceRequest('palm://com.palm.downloadmanager/', {
+										method: 'download',
+										parameters: {
+											target: audioSrc,
+											targetDir: Setting.cache.audio,
+											targetFilename: dataID + '.amr',
+											keepFilenameOnRedirect: false,
+											subscribe: true
+										},
+										onSuccess: function(resp) {
+											Mojo.Log.error(Object.toJSON(resp))
+											if (resp.completed && resp.completionStatusCode === 200) {
+												fileSuccess();
+											}
+										},
+										onFailure: function(e) {
+											Mojo.Log.error(Object.toJSON(e))
+											fileFailed();
+										}
+									});
+								}
+							} else {
+								fileFailed();
+							}
+						}
+					});
+				}
 				break;
 			default:
 				break;
@@ -590,7 +593,7 @@ var ConvDetailAssistant = Class.create({
 			Mojo.Log.error('wav duration got: ' + duration);
 		}
 		if (duration < 1000) {
-			NotifyHelper.instance().banner('Hey! too short!');
+			NotifyHelper.instance().banner('Hey! too short!', true);
 			new Mojo.Service.Request("palm://momo.im.app.service.node/", {
 				method: "onFileDel",
 				parameters: {
@@ -652,17 +655,44 @@ var ConvDetailAssistant = Class.create({
 			this.onRecordEnd();
 		}
 	},
+	onTextFocus: function() {
+		var that = this;
+		//focus changed if virtual keyboard, need to resize list widget
+		if (that.elTextField) {
+			var listScroller = that.controller.get(that.idList + '-scroller');
+			var t = setTimeout(function() {
+				clearTimeout(t);
+				var textTop = that.controller.get('sendButton').viewportOffset().top;
+				var height = textTop + 'px';
+				listScroller.setStyle({
+					'height': height,
+					'maxHeight': height
+				});
+				//NotifyHelper.instance().banner('height: ' + textTop, true);
+				//TODO whether to scroll bottom (maybe on middle)
+				that.updateScroller();
+			},
+			700);
+		}
+	},
 	activate: function(event) {
 		var that = this;
 
 		this.controller.document.addEventListener("keyup", this.keyUpHandlerReal, true);
 		this.controller.document.addEventListener("click", this.onClickReal, true);
 		this.controller.document.addEventListener("mouseup", this.onMouseUpReal, true);
+
+		//TODO orientation change to resize list, code below dunt work!!
+		//this.controller.document.addEventListener('orientationchange', this.onTextFocusChange);
+		//focus event
+		Mojo.Event.listenForFocusChanges(this.elTextField, this.onTextFocusChange);
 	},
 	deactivate: function(event) {
 		this.controller.document.removeEventListener("keyup", this.keyUpHandlerReal, true);
 		this.controller.document.removeEventListener("click", this.onClickReal, true);
 		this.controller.document.removeEventListener("mouseup", this.onMouseUpReal, true);
+		//this.controller.document.removeEventListener('orientationchange', this.onTextFocusChange);
+		//TODO stop focus change listener?
 	},
 	cleanup: function(event) {
 		Global.talking = '';

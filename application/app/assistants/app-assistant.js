@@ -512,7 +512,7 @@ AppAssistant.prototype = {
 			//stage.sendEventToCommanders(backEvent);
 
 			//and i try this
-			if(stage.activeScene() != stage.getScenes()[0]) {
+			if(stage.getScenes().length > 0 && stage.activeScene() != stage.getScenes()[0]) {
 				stage.popScene();
 			} else {
 				//and why this not work too? what the fuck
