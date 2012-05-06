@@ -19,6 +19,9 @@ var Global = {
 		//return (version < 2);
 		return true;
 	},
+	backAble: function() {
+		return Mojo.Environment.DeviceInfo.keyboardAvailable;
+	},
 	keepAuth: function() {
 		function fail() {}
 		function success(info) {
@@ -110,12 +113,12 @@ var Global = {
 		//Menu
 		var menuItems = [
 		Mojo.Menu.editItem, {
-			label: Global.configs.background ? '关闭后台运行': '开启后台运行',
+			label: '后台运行',
 			icon: Global.configs.background ? 'toggle-on': 'toggle-off',
 			command: 'cmdToggleBackground'
 		},
 		{
-			label: Global.alertSound() ? '关闭声音提醒': '开启声音提醒',
+			label: '声音提醒',
 			icon: Global.alertSound() ? 'toggle-on': 'toggle-off',
 			command: 'cmdToggleAlertSound'
 		},
@@ -128,6 +131,14 @@ var Global = {
 			label: '退出',
 			command: 'cmdLogout'
 		}];
+
+		if(!Global.backAble()) {
+			//add back to menu
+			menuItems.splice(0, 0, {
+				label: '后退',
+				command: 'cmdBack'
+			});
+		}
 
 		if (Global.menuModels) {
 			Global.menuModels.items = menuItems;
@@ -495,6 +506,18 @@ AppAssistant.prototype = {
 			Global.toggleBackground();
 		} else if (event.command === 'cmdToggleAlertSound') {
 			Global.toggleAlertSound();
+		} else if (event.command === 'cmdBack') {
+			//why this dunt work?
+			//var backEvent = Mojo.Event.make(Mojo.Event.back);
+			//stage.sendEventToCommanders(backEvent);
+
+			//and i try this
+			if(stage.activeScene() != stage.getScenes()[0]) {
+				stage.popScene();
+			} else {
+				//and why this not work too? what the fuck
+				stage.deactivate();
+			}
 		}
 	}
 };
