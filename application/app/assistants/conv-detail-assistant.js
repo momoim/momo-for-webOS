@@ -38,7 +38,7 @@ var ConvDetailAssistant = Class.create({
 			fixedHeightItems: false,
 			hasNoWidgets: true
 		},
-		that.modelList = new ConvAdapter());
+		that.modelList = new ConvDetailAdapter());
 		that.list = that.controller.get(that.idList);
 
 		Mojo.Event.listen(this.list, Mojo.Event.listTap, this.listWasTapped.bind(this));
@@ -712,11 +712,11 @@ var ConvDetailAssistant = Class.create({
 	}
 });
 
-function ConvAdapter() {
+function ConvDetailAdapter() {
 	this.items = [];
 }
 
-ConvAdapter.prototype = {
+ConvDetailAdapter.prototype = {
 	addItem: function(item) {
 		var that = this;
 		if (!item.other) {
