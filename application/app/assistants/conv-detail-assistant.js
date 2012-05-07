@@ -24,6 +24,7 @@ var ConvDetailAssistant = Class.create({
 		});
 
 		that.controller.setupWidget(that.idList, {
+			swipeToDelete: true,
 			itemTemplate: 'templates/conv-detail-list-item',
 			listTemplate: 'templates/chat-conv-list',
 			//dividerTemplate: 'templates/photo-list-divider',
@@ -41,6 +42,7 @@ var ConvDetailAssistant = Class.create({
 		that.list = that.controller.get(that.idList);
 
 		Mojo.Event.listen(this.list, Mojo.Event.listTap, this.listWasTapped.bind(this));
+		Mojo.Event.listen(this.list, Mojo.Event.listDelete, this.itemDelete.bind(this));
 
 		this.modelComment = {
 			content: '',
@@ -140,6 +142,9 @@ var ConvDetailAssistant = Class.create({
 			NotifyHelper.instance().banner('text coppied', true);
 			this.controller.stageController.setClipboard(event.item.content.text);
 		}
+	},
+	itemDelete: function(event) {
+		RabbitDB.instance().deleteMsg(event.item.id);
 	},
 	keyUpHandler: function(event) {
 		if (Mojo.Char.isEnterKey(event.keyCode)) {
@@ -662,6 +667,7 @@ var ConvDetailAssistant = Class.create({
 			var listScroller = that.controller.get(that.idList + '-scroller');
 			var t = setTimeout(function() {
 				clearTimeout(t);
+				if(!that.controller) return;
 				var textTop = that.controller.get('sendButton').viewportOffset().top;
 				var height = textTop + 'px';
 				listScroller.setStyle({

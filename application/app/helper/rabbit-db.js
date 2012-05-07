@@ -101,6 +101,20 @@ RabbitDB.prototype = {
 			);
 		});
 	},
+	deleteMsg: function(which) {
+		this.trans(function(tx) {
+			tx.executeSql(
+				'DELETE FROM ' + RabbitDB.table.talk + " WHERE id = '" + which + "'",
+				[],
+				function(tx, rs) {
+					Mojo.Log.info('Message ' + which + ' deleted');
+				},
+				function(tx, e) {
+					Mojo.Log.error('Message delete failed' + e.message);
+				}
+			);
+		});
+	},
 	getConvList: function(onResult) {
 		this.trans(function(tx) {
 			tx.executeSql(
