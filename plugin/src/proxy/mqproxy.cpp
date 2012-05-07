@@ -30,9 +30,9 @@ int sock = -1;
 //reconnect time
 struct timeval timeReconn;
 
-const char* m_sock_addr;
+char* m_sock_addr;
 unsigned short m_sock_port;
-const char* m_auth;
+char* m_auth;
 bool isInited = false;
 
 char buffered[65536]={0};
@@ -52,6 +52,8 @@ void closeSocket(){
 	syslog(LOG_ALERT, "closeSocket");
 	sendMsgs(SMCP_SYS_LOGOUT, 0, NULL, NULL);
 	closeSocketOnly();
+	free(m_sock_addr);
+	free(m_auth);
 }
 
 void reconnect() {
@@ -67,7 +69,7 @@ void reconnect() {
 			}
 			//reset buffed size
 			bufferedSize = 0;
-			openSocket(m_sock_addr, m_sock_port, m_auth);
+			openSocket((const char*)m_sock_addr, m_sock_port, (const char*)m_auth);
 		}
 	}
 }
@@ -109,9 +111,18 @@ int openSocket(const char* addr, unsigned short port, const char* auth) {
 	syslog(LOG_INFO, "ip got====---=== %s", ip);
 	if(!isInited) {
 		isInited = true;
-		m_sock_addr = addr;
+
+		m_sock_addr = (char*)malloc(strlen(addr) + 1);
+		memcpy(m_sock_addr, addr, strlen(addr));
+		memset(m_sock_addr + strlen(addr), 0, 1);
+		//m_sock_addr = addr;
+
 		m_sock_port = port;
-		m_auth = auth;
+
+		m_auth = (char*)malloc(strlen(auth) + 1);
+		memcpy(m_auth, auth, strlen(auth) + 1);
+		memset(m_auth + strlen(auth), 0, 1);
+		//m_auth = auth;
 	}
 
 	syslog(LOG_INFO, "OPEN SOCKET: %s", ip);
