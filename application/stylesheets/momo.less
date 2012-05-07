@@ -17,7 +17,7 @@
 @border_radius : 5px;
 @zIndex_loading : 100000;
 @zIndex_header : 100;
-@moBg : url(../images/low/mo-bg.png) left top repeat-x;
+@moBg : url(../images/low/mo-bg.png) left top repeat-x #12191e;
 @avatar_bg : url(../images/low/default-avatar.png) no-repeat;
 @load_fade : url(../images/low/load-fade.png) left top repeat-x;
 @dashboard_icon_momo : url(../icon.png) center center no-repeat;
@@ -201,7 +201,7 @@ p{
 }
 #header{
     height : @header_height;
-    width : @header_weight;
+    width : 100%;
     display : block;
     background : @header_bg;
     .palm-mouse-target;
@@ -434,7 +434,7 @@ p{
     }
 }
 #recording{
-    .background(@recording_bg, 0, 0, repeat-x);
+    .background(@recording_bg, 0, 0, repeat);
     z-index:200;
     position:fixed;
     top: 0;
