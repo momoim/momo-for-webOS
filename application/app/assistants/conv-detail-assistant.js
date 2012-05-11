@@ -184,7 +184,7 @@ var ConvDetailAssistant = Class.create({
 			if (tempParentNode && tempParentNode.hasAttribute && tempParentNode.hasAttribute('data-type') && tempParentNode.getAttribute('data-type') == 'audio') {
 				target = tempParentNode.querySelector('.content > img');
 				break;
-			} else if(tempParentNode) {
+			} else if (tempParentNode) {
 				tempParentNode = tempParentNode.parentNode;
 			}
 		}
@@ -304,7 +304,7 @@ var ConvDetailAssistant = Class.create({
 				target.setAttribute('src', 'images/chat/record_end.png');
 				Mojo.Log.info(this.TAG, 'chat audio click: ' + audioSrc);
 				var currentAudioId = target.getAttribute('data-id');
-				if (currentAudioId != that.audioPlayId && that.audioPlayId != 0) {
+				if (that.audioPlayId != 0) {
 					var tempAudioId = that.audioPlayId;
 					var audioid = 'audio_data_' + tempAudioId;
 					var preAudio = that.controller.document.getElementById(audioid);
@@ -312,17 +312,33 @@ var ConvDetailAssistant = Class.create({
 					preAudio.parentNode.parentNode.className = 'detail-content audio';
 					Global.audioPlayer.pause();
 					that.isplay = false;
+					if (currentAudioId == that.audioPlayId) {
+						//stop current playing
+						//reset audioPlayId
+						that.audioPlayId = 0;
+						return;
+					}
 				}
 				if (!Global.audioPlayer) {
 					Global.audioPlayer = new Audio();
-					Global.audioPlayer.addEventListener("ended", function() {
-						parent.className = 'detail-content audio';
-						target.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
-						that.isplay = false;
-						that.audioPlayId = 0;
-					},
-					true);
 				}
+				if(that.lastEndListener) {
+					//remove old listener
+					Global.audioPlayer.removeEventListener("ended", that.lastEndListener, true);
+				}
+				that.lastEndListener = function() {
+					Mojo.Log.error('on audio ended --------->');
+					var tempAudioId = that.audioPlayId;
+					var audioid = 'audio_data_' + tempAudioId;
+					var preAudio = that.controller.document.getElementById(audioid);
+					//Mojo.Log.error('setting html audio normal: ' + preAudio.outerHTML);
+					preAudio.setAttribute('src', 'images/chat/chat_bg_audio_normal.png');
+					preAudio.parentNode.parentNode.className = 'detail-content audio';
+
+					that.isplay = false;
+					that.audioPlayId = 0;
+				};
+				Global.audioPlayer.addEventListener("ended", that.lastEndListener, true);
 				that.audioPlayId = currentAudioId;
 				if (that.isplay) {
 					Global.audioPlayer.pause();
@@ -667,7 +683,7 @@ var ConvDetailAssistant = Class.create({
 			var listScroller = that.controller.get(that.idList + '-scroller');
 			var t = setTimeout(function() {
 				clearTimeout(t);
-				if(!that.controller) return;
+				if (!that.controller) return;
 				var textTop = that.controller.get('sendButton').viewportOffset().top;
 				var height = textTop + 'px';
 				listScroller.setStyle({
