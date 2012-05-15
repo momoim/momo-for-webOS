@@ -157,7 +157,7 @@ RabbitDB.prototype = {
 	getTalkList: function(otherID, onResult) {
 		this.trans(function(tx) {
 			tx.executeSql(
-				'SELECT * FROM ' + RabbitDB.table.talk + ' WHERE user_id = ' + Global.authInfo.user.id + ' AND other_id = ' + otherID,
+				'SELECT * FROM ' + RabbitDB.table.talk + ' WHERE user_id = ' + Global.authInfo.user.id + ' AND other_id = ' + otherID + ' LIMIT 50',
 				[],
 				function(tx, rs) {
 					Mojo.Log.info('getTalkList, count: ' + rs.rows.length);

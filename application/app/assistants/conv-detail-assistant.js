@@ -119,13 +119,13 @@ var ConvDetailAssistant = Class.create({
 			listScroller.mojo.revealBottom();
 			//Mojo.Log.warn(listScroller.outerHTML);
 			var position = listScroller.mojo.getScrollPosition();
-			Mojo.Log.warn('scroller position -------->' + position.top);
+			Mojo.Log.error('scroller position -------->' + position.top + ' talking: ' + Global.talking);
 			listScroller.mojo.scrollTo(0, - 99999999, false);
 			var t = setTimeout(function() {
 				listScroller.mojo.scrollTo(0, - 99999999, false);
 				clearTimeout(t);
 			},
-			30);
+			50);
 		}
 	},
 	update: function(message) {
@@ -133,9 +133,21 @@ var ConvDetailAssistant = Class.create({
 		//NotifyHelper.instance().banner('got meesage: ' + JSON.stringify(message.content));
 		if (this.incomeItem.id == message.other.id) {
 			that.modelList.addItem(message);
-			that.controller.modelChanged(that.modelList);
-			//that.list.mojo.revealItem(that.modelList.items.length, false);
-			this.updateScroller();
+			//that.list.mojo.revealItem(that.modelList.items.length, false)
+			if (message.state == RabbitDB.state.sending) {
+				//this is just fuck mojo list model change bug.
+				that.controller.modelChanged(that.modelList);
+				that.updateScroller();
+				var t = setTimeout(function() {
+					clearTimeout(t);
+					that.controller.modelChanged(that.modelList);
+					that.updateScroller();
+				},
+				300);
+			} else {
+				that.controller.modelChanged(that.modelList);
+				that.updateScroller();
+			}
 		}
 	},
 	listWasTapped: function(event) {
@@ -178,7 +190,7 @@ var ConvDetailAssistant = Class.create({
 		ChatSender.instance().sendChat(chat);
 	},
 	onClick: function(event) {
-		Mojo.Log.error(this.TAG, 'onClick: ' + event.target.outerHTML);
+		//Mojo.Log.error(this.TAG, 'onClick: ' + event.target.outerHTML);
 		var that = this;
 		var target = event.target;
 		var tempParentNode = target;
@@ -324,7 +336,7 @@ var ConvDetailAssistant = Class.create({
 				if (!Global.audioPlayer) {
 					Global.audioPlayer = new Audio();
 				}
-				if(that.lastEndListener) {
+				if (that.lastEndListener) {
 					//remove old listener
 					Global.audioPlayer.removeEventListener("ended", that.lastEndListener, true);
 				}
@@ -461,7 +473,8 @@ var ConvDetailAssistant = Class.create({
 					if (file.attachmentType == 'image') {
 						self.sendChat({
 							picture: {
-								url: file.fullPath
+								url: file.fullPath,
+								icon: file.iconPath
 							}
 						});
 					} else {
@@ -681,6 +694,9 @@ var ConvDetailAssistant = Class.create({
 	onTextFocus: function() {
 		var that = this;
 		//focus changed if virtual keyboard, need to resize list widget
+		if (Global.backAble()) {
+			return;
+		}
 		if (that.elTextField) {
 			var listScroller = that.controller.get(that.idList + '-scroller');
 			var t = setTimeout(function() {
@@ -706,8 +722,8 @@ var ConvDetailAssistant = Class.create({
 	onMaxmize: function(event) {
 		Mojo.Log.error('on conv detail activate------------>');
 		Global.talking = this.incomeItem.id;
-		var last = this.modelList.getLastItem(); 
-		if(last) {
+		var last = this.modelList.getLastItem();
+		if (last) {
 			Mojo.Log.error('on conv detail activate------------> sending roger read');
 			Global.sendRogerRead(last.id);
 		}
@@ -780,7 +796,7 @@ ConvDetailAdapter.prototype = {
 		}
 	},
 	getLastItem: function() {
-		if(this.items.length > 0) {
+		if (this.items.length > 0) {
 			return this.items[0];
 		} else {
 			return null;

@@ -68,7 +68,21 @@ var AppFormatter = {
 			if (now == 'text' || now == 'text_long') {
 				return linkify(AppFormatter.htmlSafe(n[now]));
 			} else if (now == 'picture') {
+				var icon = n[now]['icon'];
 				var pUrl = n[now]['url'];
+				if(icon) {
+					//TODO show local thumbnail firstly
+					//icon = icon.replace(/:/g, '%3A');
+					//icon = icon.replace(/\/var\/luna\/data\/extractfs/g, '');
+					Mojo.Log.error('showing local icon : ' + icon);
+					Mojo.Log.error('showing local picture===_====_===' + icon);
+					//var iconDom = '<a href="file://' + pUrl + '"><img src="file://' + icon + '" class="chat-img"/></a>';
+					//Mojo.Log.error('showing local picture===_====_===' + iconDom);
+					var iconDom = '照片上传中..';
+					return iconDom;
+				} else {
+					//Mojo.Log.error('showing local picture===_====_=== no icon');
+				}
 				if (!pUrl) {
 					return '发送了错误的照片数据';
 				}

@@ -61,7 +61,7 @@ ChatSender.prototype.sendChat = function(chat) {
 	var that = ChatSender.instance();
 	var content = chat.data.content;
 
-	Mojo.Log.info(that.TAG, 'sendChat=---+---===== ui..' + JSON.stringify(chat));
+	//Mojo.Log.error(that.TAG, 'sendChat=---+---===== ui..' + JSON.stringify(chat));
 	chat.data.state = RabbitDB.state.sending;
 	AppLauncher.onNewIncome(chat);
 
