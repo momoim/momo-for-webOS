@@ -86,6 +86,8 @@ var ConvDetailAssistant = Class.create({
 		this.onClickReal = this.onClick.bind(this);
 		this.onMouseUpReal = this.onMouseUp.bind(this);
 		this.onTextFocusChange = this.onTextFocus.bind(this);
+		this.onMinimizeHandler = this.onMinimize.bind(this);
+		this.onMaxmizeHandler = this.onMaxmize.bind(this);
 
 		//init data
 		RabbitDB.instance().getTalkList(that.incomeItem.id, function(result) {
@@ -129,7 +131,7 @@ var ConvDetailAssistant = Class.create({
 	update: function(message) {
 		var that = this;
 		//NotifyHelper.instance().banner('got meesage: ' + JSON.stringify(message.content));
-		if (Global.talking == message.other.id) {
+		if (this.incomeItem.id == message.other.id) {
 			that.modelList.addItem(message);
 			that.controller.modelChanged(that.modelList);
 			//that.list.mojo.revealItem(that.modelList.items.length, false);
@@ -697,12 +699,27 @@ var ConvDetailAssistant = Class.create({
 			700);
 		}
 	},
+	onMinimize: function(event) {
+		Mojo.Log.error('on conv detail deactivate------------>');
+		Global.talking = '';
+	},
+	onMaxmize: function(event) {
+		Mojo.Log.error('on conv detail activate------------>');
+		Global.talking = this.incomeItem.id;
+		var last = this.modelList.getLastItem(); 
+		if(last) {
+			Mojo.Log.error('on conv detail activate------------> sending roger read');
+			Global.sendRogerRead(last.id);
+		}
+	},
 	activate: function(event) {
 		var that = this;
 
 		this.controller.document.addEventListener("keyup", this.keyUpHandlerReal, true);
 		this.controller.document.addEventListener("click", this.onClickReal, true);
 		this.controller.document.addEventListener("mouseup", this.onMouseUpReal, true);
+		Mojo.Event.listen(this.controller.stageController.document, Mojo.Event.stageDeactivate, this.onMinimizeHandler, false);
+		Mojo.Event.listen(this.controller.stageController.document, Mojo.Event.stageActivate, this.onMaxmizeHandler, false);
 
 		//TODO orientation change to resize list, code below dunt work!!
 		//this.controller.document.addEventListener('orientationchange', this.onTextFocusChange);
@@ -713,6 +730,8 @@ var ConvDetailAssistant = Class.create({
 		this.controller.document.removeEventListener("keyup", this.keyUpHandlerReal, true);
 		this.controller.document.removeEventListener("click", this.onClickReal, true);
 		this.controller.document.removeEventListener("mouseup", this.onMouseUpReal, true);
+		Mojo.Event.stopListening(this.controller.stageController.document, Mojo.Event.stageDeactivate, this.onMinimizeHandler, false);
+		Mojo.Event.stopListening(this.controller.stageController.document, Mojo.Event.stageActivate, this.onMaxmizeHandler, false);
 		//this.controller.document.removeEventListener('orientationchange', this.onTextFocusChange);
 		//TODO stop focus change listener?
 	},
@@ -758,6 +777,13 @@ ConvDetailAdapter.prototype = {
 				item.other = (item.sender.id == Global.authInfo.user.id ? item.receiver[0] : item.sender);
 			}
 			this.items.push(item);
+		}
+	},
+	getLastItem: function() {
+		if(this.items.length > 0) {
+			return this.items[0];
+		} else {
+			return null;
 		}
 	}
 };
