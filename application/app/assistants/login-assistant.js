@@ -4,7 +4,7 @@ var Login = function() {
 Login.prototype = {
 	auth: function(zone_code, mobile, password, onLoginSuccess, onLoginFailure) {
 		if (Global.deviceID == null) {
-			NotifyHelper.instance().banner('获取设备ID失败');
+            NotifyHelper.instance().banner($L(StringMap.log.deviceIDFailed));
 			return;
 		}
 		var postParams = {
@@ -29,6 +29,9 @@ LoginAssistant.prototype = {
 		var that = this;
 
 		Mojo.Log.info(this.TAG, "onSetup");
+        this.controller.get('account').innerHTML = $L(StringMap.login.account);
+        this.controller.get('login-username-label').innerHTML = $L(StringMap.login.loginUsernameLabel);
+        this.controller.get('password').innerHTML = $L(StringMap.login.password);
 
 		new Mojo.Service.Request('palm://com.palm.preferences/systemProperties', {
 			method: "Get",
@@ -57,7 +60,7 @@ LoginAssistant.prototype = {
         this.statuses =  tempCountry;
         this.controller.setupWidget('country-code',
            this.attributes = {
-               label: '国家(区号)',
+               label: $L(StringMap.login.areaCode),
                labelPlacement: Mojo.Widget.labelPlacementRight,
                choices: this.statuses,
                modelProperty:'currentStatus'
@@ -77,7 +80,7 @@ LoginAssistant.prototype = {
 		this.modelUser);
 
 		this.controller.setupWidget('login-password', {
-			hintText: $L("输入密码"),
+			hintText: $L(StringMap.login.password),
 			modelProperty: 'password'
 			//limitResize: true,
 			//autoReplace: false
@@ -90,7 +93,7 @@ LoginAssistant.prototype = {
 			type: Mojo.Widget.activityButton
 		},
 		this.modelSignin = {
-			buttonLabel: $L("登陆"),
+			buttonLabel: $L(StringMap.login.login),
 			buttonClass: 'affirmative',
 			disabled: false
 		});
@@ -105,7 +108,7 @@ LoginAssistant.prototype = {
 			type: Mojo.Widget.activityButton
 		},
 		{
-			buttonLabel: $L("注册帐号"),
+			buttonLabel: $L(StringMap.login.register),
 			buttonClass: 'secondary',
 			disabled: false
 		});

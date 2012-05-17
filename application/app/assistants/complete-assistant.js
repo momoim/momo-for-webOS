@@ -23,6 +23,10 @@ function CompleteAssistant() {
 CompleteAssistant.prototype = {
     setup: function() {
         var that = this;
+        this.controller.get('complete-title').innerHTML = $L(StringMap.complete.title);
+        this.controller.get('complete-name').innerHTML = $L(StringMap.complete.name);
+        this.controller.get('complete-password').innerHTML = $L(StringMap.complete.password);
+        this.controller.get('complete-password-sure').innerHTML = $L(StringMap.complete.passwordSure);
         /*姓名输入框*/
         this.controller.setupWidget('name', {
             modelProperty: 'realname',

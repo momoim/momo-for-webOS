@@ -33,5 +33,32 @@ var StringMap = {
 		,convLocation: '地理位置'
 		,convFile: '一个文件'
 		,convUnknown: '未支持的类型'
-	}
+	},
+    login: {
+        account: "输入账号信息"
+        ,loginUsernameLabel: "用户名"
+        ,password: "密码"
+        ,areaCode: "国家(区号)"
+        ,login: "登陆"
+        ,register: "注册账号"
+    },
+    register: {
+        registerAndGetPsw: "注册并获取密码"
+        ,resendPsw: "重发验证码"
+        ,registerTitle: "注册MOMO账号"
+        ,phoneNum: "手机号"
+        ,verifyTitle: "登陆MOMO"
+    },
+    complete: {
+        title: "完善个人信息"
+        ,name: "姓名"
+        ,password: "修改密码"
+        ,passwordSure: "确认密码"
+        ,completeInfo: "完成"
+    },
+    log: {
+        deviceIDFailed: "获取设备ID失败"
+        ,moreClickAfter: "再次点击还需"
+        ,psdSended: "验证码已发送，请稍等"
+    }
 };

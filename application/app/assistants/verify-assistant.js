@@ -32,6 +32,9 @@ function VerifyAssistant() {
 VerifyAssistant.prototype = {
     setup: function() {
         var that = this;
+        this.controller.get('verify-title').innerHTML = $L(StringMap.register.verifyTitle);
+        this.controller.get('phone-number').innerHTML = $L(StringMap.register.phoneNum);
+        this.controller.get('password').innerHTML = $L(StringMap.login.password);
         /*区号选择*/
         var country = CountryHelper.data();
         var tempCountry = [];
@@ -43,7 +46,7 @@ VerifyAssistant.prototype = {
         this.statuses =  tempCountry;
         this.controller.setupWidget('country-code',
            this.attributes = {
-               label: '国家(区号)',
+               label: $L(StringMap.login.areaCode),
                labelPlacement: Mojo.Widget.labelPlacementRight,
                choices: this.statuses,
                modelProperty:'currentStatus'
@@ -69,7 +72,7 @@ VerifyAssistant.prototype = {
                 type : Mojo.Widget.activityButton
             },
             this.model = {
-                buttonLabel: $L('登录'),
+                buttonLabel: $L(StringMap.login.login),
                 buttonClass: 'affirmative',
                 disabled: false
             }
@@ -83,7 +86,7 @@ VerifyAssistant.prototype = {
                 type : Mojo.Widget.activityButton
             },
             this.model = {
-                buttonLabel: $L('重发验证码'),
+                buttonLabel: $L(StringMap.register.resendPsw),
                 buttonClass: 'secondary',
                 disabled: false
             }
@@ -112,7 +115,7 @@ VerifyAssistant.prototype = {
             _this.controller.get('resend-verifycode').mojo.activate();
             new Signup().auth(Global['signupUser']['mobile'], Global['signupUser']['zone_code'], _this.onResendSuccess.bind(_this), _this.onResendFailure.bind(_this));
         }else{
-            NotifyHelper.instance().banner('请在' + _this.timer + '秒后再点击获取验证码');
+            NotifyHelper.instance().banner($L(StringMap.log.moreClickAfter) + _this.timer + 's');
         }
         (function timerFun(limitTime) {
             if(_this.timer == 0){
@@ -167,7 +170,7 @@ VerifyAssistant.prototype = {
     },
     onResendSuccess: function() {
 		//this.controller.stageController.pushScene('verify');
-        NotifyHelper.instance().banner("验证码已发送，请稍等");
+        NotifyHelper.instance().banner($L(StringMap.log.psdSended));
     },
     onResendFailure: function(resp) {
         var tipArray = JSON.parse(resp.request.transport.responseText).error.split(':');

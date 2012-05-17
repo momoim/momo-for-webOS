@@ -3,7 +3,7 @@ var Signup = function() {};
 Signup.prototype = {
     auth : function(mobile, zone_code, onSignupSuccess, onSignupFailure) {
         if(Global.deviceID === null){
-            NotifyHelper.instance().banner('获取设备ID失败');
+            NotifyHelper.instance().banner($L(StringMap.log.deviceIDFailed));
             return;
         }
         var postParams = {
@@ -39,6 +39,8 @@ SignupAssistant.prototype = {
     setup: function() {
         var that = this;
         /*区号选择*/
+        this.controller.get('register-title').innerHTML = $L(StringMap.register.registerTitle);
+        this.controller.get('phone-number').innerHTML = $L(StringMap.register.phoneNum);
         var country = CountryHelper.data();
         var tempCountry = [];
         for(var i = 0, len = country.length; i < len; i++){
@@ -49,7 +51,7 @@ SignupAssistant.prototype = {
         this.statuses =  tempCountry;
         this.controller.setupWidget('country-code',
            this.attributes = {
-               label: '国家(区号)',
+               label: $L(StringMap.login.areaCode),
                labelPlacement: Mojo.Widget.labelPlacementRight,
                choices: this.statuses,
                modelProperty:'currentStatus'
@@ -69,7 +71,7 @@ SignupAssistant.prototype = {
                 type : Mojo.Widget.activityButton
             },
             this.model = {
-                buttonLabel: $L('注册并获取密码'),
+                buttonLabel: $L(StringMap.register.registerAndGetPsw),
                 buttonClass: 'affirmative',
                 disabled: false
             }

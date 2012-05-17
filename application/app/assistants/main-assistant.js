@@ -5,7 +5,7 @@ var MainAssistant = Class.create({
 	},
 	setup: function() {
 		var that = this;
-
+        this.controller.get('header-title').innerHTML = $L(StringMap.main.title);
 		//for reupload
 		ChatSender.instance().setController(this.controller);
 		Global.menu(this.controller);
@@ -33,7 +33,7 @@ var MainAssistant = Class.create({
 		Mojo.Event.listen(this.list, Mojo.Event.listDelete, this.itemDelete.bind(this));
 		Mojo.Event.listen(this.list, Mojo.Event.listAdd, this.itemAdd.bind(this));
 		Mojo.Event.listen(this.list, Mojo.Event.dragStart, this.dragStart.bind(this));
-
+        
 		//start service
 		if (!Global.pluginAble()) {
 			that.controller.serviceRequest("palm://momo.im.app.service.node/", {
