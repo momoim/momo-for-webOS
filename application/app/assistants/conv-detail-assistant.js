@@ -52,7 +52,7 @@ var ConvDetailAssistant = Class.create({
 
 		//comment content textarea
 		this.controller.setupWidget('comment-content', {
-			hintText: $L('快说~'),
+			hintText: $L(StringMap.convDetail.textHint),
 			multiline: true,
 			modelProperty: 'content',
 			enterSubmits: true
@@ -65,7 +65,7 @@ var ConvDetailAssistant = Class.create({
 			type: Mojo.Widget.defaultButton
 		},
 		this.modelSignin = {
-			buttonLabel: $L("按住录音"),
+			buttonLabel: $L(StringMap.convDetail.recordButton),
 			buttonClass: 'affirmative',
 			disabled: false
 		});

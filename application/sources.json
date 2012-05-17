@@ -1,4 +1,5 @@
 [
+    {"source": "resources/string-map.js"},
     {"source": "vendors/oauth.js"},
     {"source": "vendors/date.js"},
     {"source": "vendors/ba-linkify.min.js"},

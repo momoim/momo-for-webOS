@@ -113,29 +113,29 @@ var Global = {
 		//Menu
 		var menuItems = [
 		Mojo.Menu.editItem, {
-			label: '后台运行',
+			label: $L(StringMap.menu.runBackground),
 			icon: Global.configs.background ? 'toggle-on': 'toggle-off',
 			command: 'cmdToggleBackground'
 		},
 		{
-			label: '声音提醒',
+			label: $L(StringMap.menu.soundAlert),
 			icon: Global.alertSound() ? 'toggle-on': 'toggle-off',
 			command: 'cmdToggleAlertSound'
 		},
 		{
-			label: '关于momo',
+			label: $L(StringMap.menu.about),
 			command: 'cmdAbout'
 			//,template: 'templates/menu/about'
 		},
 		{
-			label: '退出',
+			label: $L(StringMap.menu.logout),
 			command: 'cmdLogout'
 		}];
 
 		if(!Global.backAble()) {
 			//add back to menu
 			menuItems.splice(0, 0, {
-				label: '后退',
+				label: $L(StringMap.menu.back),
 				command: 'cmdBack'
 			});
 		}
