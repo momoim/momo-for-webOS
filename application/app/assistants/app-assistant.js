@@ -246,6 +246,10 @@ AppAssistant.prototype = {
 		var stageName = Global.dashStage;
 		this.clearNotify(stageName);
 	},
+	clearMain: function() {
+		var stageName = Global.mainStage;
+		this.clearNotify(stageName);
+	},
 	clearNotify: function(stageName) {
 		var appController = Mojo.Controller.getAppController();
 		appController.closeStage(stageName);
@@ -499,7 +503,15 @@ AppAssistant.prototype = {
 		if (event.command === 'cmdLogout') {
 			DBHelper.instance().remove('authInfo');
 			DBHelper.instance().remove('config');
+			Global.authInfo = null;
+			this.clearMain();
+			AppLauncher.onOpenAPP();
+			/*
+			stage.popScenesTo('login');
+			Mojo.Log.error('pop login: ' + stage.getScenes().length);
 			stage.pushScene('login');
+			Mojo.Log.error('pop login: ' + stage.getScenes().length);
+			*/
 		} else if (event.command === 'cmdAbout') {
 			stage.pushScene('about');
 		} else if (event.command === 'cmdToggleBackground') {

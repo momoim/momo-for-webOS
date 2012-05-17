@@ -25,6 +25,9 @@ var AppLauncher = {
 			}
 		});
 	},
+	onOpenAPP: function() {
+		AppLauncher.launch(null, {});
+	},
 	onNewIncome: function(data, onSuccess, onFailure) {
 		//have new msg
 		AppLauncher.launch('onNewIncome', JSON.stringify(data), onSuccess, onFailure);

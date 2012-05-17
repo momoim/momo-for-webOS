@@ -274,7 +274,7 @@ var MainAssistant = Class.create({
 		this.cleaning = true;
 		//remove callback
 		Global.updateUnRegister(this);
-		if (Global.configs.background) {
+		if (Global.authInfo && Global.configs.background) {
 			this.launchBackground();
 		}
 	}
