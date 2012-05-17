@@ -1,7 +1,7 @@
 var AppFormatter = {
 	time: function(time, model) {
 		if(model && model.state === RabbitDB.state.sending) {
-			return '发送中';
+			return $L(StringMap.chat.sending);
 		}
 		return AppFormatter.timeSince(parseInt(time) * 1000);
 	},
@@ -31,19 +31,22 @@ var AppFormatter = {
 			if (now == 'text' || now == 'text_long') {
 				return AppFormatter.htmlSafe(n[now]);
 			} else {
-				var base = '发送了';
+				var base = $L(StringMap.chat.sent);
 				if (now == 'picture') {
-					return base + '一张照片';
-				} else if (now == 'audio') {
-					return base + '一段录音';
-				} else if (now == 'location') {
-					return base + '地理位置';
-				} else if (now == 'file') {
-					return base + '一个文件';
+					return base + $L(StringMap.chat.convPicture);
+				}
+				else if (now == 'audio') {
+					return base + $L(StringMap.chat.convAudio);
+				}
+				else if (now == 'location') {
+					return base + $L(StringMap.chat.convLocation);
+				}
+				else if (now == 'file') {
+					return base + $L(StringMap.chat.convFile);
 				}
 			}
 		}
-		return '未支持的类型';
+		return $L(StringMap.chat.convUnknown);
 	},
     type: function(n, model) {
 		if (!n) return 'text';
@@ -78,13 +81,13 @@ var AppFormatter = {
 					Mojo.Log.error('showing local picture===_====_===' + icon);
 					//var iconDom = '<a href="file://' + pUrl + '"><img src="file://' + icon + '" class="chat-img"/></a>';
 					//Mojo.Log.error('showing local picture===_====_===' + iconDom);
-					var iconDom = '照片上传中..';
+					var iconDom = $L(StringMap.chat.photoUploading);
 					return iconDom;
 				} else {
 					//Mojo.Log.error('showing local picture===_====_=== no icon');
 				}
 				if (!pUrl) {
-					return '发送了错误的照片数据';
+					return $L(StringMap.chat.photoErrorData);
 				}
 				var regex = /_\d{2,4}.jpg/g;
 				var orig = pUrl.replace(regex, '.jpg');
@@ -110,21 +113,8 @@ var AppFormatter = {
 				var file = n[now];
 				return '<a href="#" data-action="chat-file" data-id="' + model['id'] + '" file-src="' + file.url + '" file-name="' + file.name + '">' + file.name + '</a>';
 			} else {
-				var base = '发送了';
-				if (now == 'picture') {
-					return base + '一张照片';
-				}
-				else if (now == 'audio') {
-					return base + '一段录音';
-				}
-				else if (now == 'location') {
-					return base + '地理位置';
-				}
-				else if (now == 'file') {
-					return base + '一个文件';
-				}
 			}
 		}
-		return '未支持的类型';
+		return $L(StringMap.chat.convUnknown);
 	}
 };

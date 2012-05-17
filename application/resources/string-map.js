@@ -22,6 +22,16 @@ var StringMap = {
 		textHint: "快说~"
 		,recordButton: "按住录音"
 		,recordingHint: "正在录音"
-		,sending: "发送中"
+	},
+	chat: {
+		sending: "发送中"
+		,photoUploading: "照片上传中.."
+		,photoErrorData: "发送了错误的照片数据"
+		,sent: "发送了"
+		,convPicture: '一张照片'
+		,convAudio: '一段录音'
+		,convLocation: '地理位置'
+		,convFile: '一个文件'
+		,convUnknown: '未支持的类型'
 	}
 };
