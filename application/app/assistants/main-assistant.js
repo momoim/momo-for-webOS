@@ -17,7 +17,7 @@ var MainAssistant = Class.create({
 			itemTemplate: 'templates/chat-conv-list-item',
 			listTemplate: 'templates/chat-conv-list',
 			//dividerTemplate: 'templates/photo-list-divider',
-			addItemLabel: "发起新的对话",
+			addItemLabel: $L("发起新的对话"),
 			formatters: {
 				content: AppFormatter.content.bind(that),
 				timestamp: AppFormatter.time.bind(that)
@@ -94,7 +94,7 @@ var MainAssistant = Class.create({
 		},
 		{
 			mode: "picker",
-			message: "找个有号码的人好吗？"
+			message: $L("找个有号码的人好吗？")
 		});
 	},
 	update: function(message) {
@@ -185,8 +185,8 @@ var MainAssistant = Class.create({
 								that.talkTo(people);
 							}
 						}.bind(that),
-						title: '选择一个手机号',
-						message: '选择您要发给 ' + name + ' 的哪个号码',
+						title: $L('选择一个手机号'),
+						message: $L('选择您要发给 ') + name + $L(' 的哪个号码'),
 						choices: choices
 					});
 				}
