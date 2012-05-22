@@ -45,9 +45,9 @@ var StringMap = {
 	register: {
 		registerAndGetPsw: 'register and get password',
 		resendPsw: 'resend password',
-		registerTitle: 'register',
+		registerTitle: 'register account',
 		phoneNum: 'phone number',
-		verifyTitle: 'login'
+		verifyTitle: 'login account'
 	},
 	complete: {
 		title: 'user info',
@@ -62,4 +62,3 @@ var StringMap = {
 		psdSended: 'password sended'
 	}
 };
-
