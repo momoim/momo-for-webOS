@@ -460,7 +460,7 @@ AppAssistant.prototype = {
 			*/
 			var timeNotEnough = false;
 			if(Global.otherClientMsgSentTime) {
-				timeNotEnough = (now.getTime() - Global.otherClientMsgSentTime.getTime() < 0.5 * 60 * 1000);
+				timeNotEnough = (now.getTime() - Global.otherClientMsgSentTime.getTime() < 5 * 60 * 1000);
 			}
 			if (Global.otherClientMsgSentTime && timeNotEnough) {
 				duntAlert = true;
