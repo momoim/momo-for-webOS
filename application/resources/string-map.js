@@ -1,64 +1,65 @@
 var StringMap = {
 	menu: {
-		runBackground: "后台运行"
-		,soundAlert: "声音提醒"
-		,about: "关于momo"
-		,logout: "退出"
-		,back: "后退"
+		runBackground: 'Run Background',
+		soundAlert: 'Sound Alert',
+		about: 'About momo',
+		logout: 'Logout!',
+		back: 'Go Back'
 	},
 	running: {
-		title: "正在运行"
-		,hint: "momo服务运行中"
+		title: 'Running',
+		hint: 'momo is running background'
 	},
 	main: {
-		title: "MO私信"
-		,newConversation: "发起新的对话"
-		,pickingHint: "找个有号码的人好吗？"
-		,pickChooseTitle: "选择一个手机号"
-		,pickChoosePrefix: "选择您要发给 "
-		,pickChooseSuffix: " 的哪个号码"
+		title: 'MO Conversations',
+		newConversation: 'New Conversation',
+		pickingHint: 'Plz pick somebody with phone number.',
+		pickChooseTitle: 'Choose phone number',
+		pickChoosePrefix: 'Which number will you send msg to ',
+		pickChooseSuffix: ' with?'
 	},
 	convDetail: {
-		textHint: "快说~"
-		,recordButton: "按住录音"
-		,recordingHint: "正在录音"
+		textHint: 'text something~',
+		recordButton: 'Hold To Record',
+		recordingHint: 'Recording'
 	},
 	chat: {
-		sending: "发送中"
-		,photoUploading: "照片上传中.."
-		,photoErrorData: "发送了错误的照片数据"
-		,sent: "发送了"
-		,convPicture: '一张照片'
-		,convAudio: '一段录音'
-		,convLocation: '地理位置'
-		,convFile: '一个文件'
-		,convUnknown: '未支持的类型'
+		sending: 'sending',
+		photoUploading: 'Photo Uploading..',
+		photoErrorData: 'Wrong Photo Data!',
+		sent: 'sent ',
+		convPicture: 'a photo',
+		convAudio: 'an audio',
+		convLocation: 'a location',
+		convFile: 'a file',
+		convUnknown: 'unsupported content'
 	},
-    login: {
-        account: "输入账号信息"
-        ,loginUsernameLabel: "用户名"
-        ,password: "密码"
-        ,areaCode: "国家(区号)"
-        ,login: "登陆"
-        ,register: "注册账号"
-    },
-    register: {
-        registerAndGetPsw: "注册并获取密码"
-        ,resendPsw: "重发验证码"
-        ,registerTitle: "注册MOMO账号"
-        ,phoneNum: "手机号"
-        ,verifyTitle: "登陆MOMO"
-    },
-    complete: {
-        title: "完善个人信息"
-        ,name: "姓名"
-        ,password: "修改密码"
-        ,passwordSure: "确认密码"
-        ,completeInfo: "完成"
-    },
-    log: {
-        deviceIDFailed: "获取设备ID失败"
-        ,moreClickAfter: "再次点击还需"
-        ,psdSended: "验证码已发送，请稍等"
-    }
+	login: {
+		account: 'account',
+		loginUsernameLabel: 'username',
+		password: 'password',
+		areaCode: 'area code',
+		login: 'login',
+		register: 'register'
+	},
+	register: {
+		registerAndGetPsw: 'register and get password',
+		resendPsw: 'resend password',
+		registerTitle: 'register',
+		phoneNum: 'phone number',
+		verifyTitle: 'login'
+	},
+	complete: {
+		title: 'user info',
+		name: 'name',
+		password: 'change password',
+		passwordSure: 'confirm password',
+		completeInfo: 'finish'
+	},
+	log: {
+		deviceIDFailed: 'Get deviceID failed',
+		moreClickAfter: 'one more click after',
+		psdSended: 'password sended'
+	}
 };
+
