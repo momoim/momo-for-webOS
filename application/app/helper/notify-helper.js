@@ -12,7 +12,12 @@ var NotifyHelper = function() {
 			'momo');
 		},
 		bannerNewMsg: function() {
-			this.banner('You just got new message.', !Global.alertSound());
+			var now = new Date();
+			var duntAlert = NotifyHelper.lastAlertTime && (now.getTime() - NotifyHelper.lastAlertTime.getTime() < 3000);
+			if(!duntAlert) {
+				this.banner('You just got new message.', !Global.alertSound());
+				NotifyHelper.lastAlertTime = now;
+			}
 		}
 	}
 };

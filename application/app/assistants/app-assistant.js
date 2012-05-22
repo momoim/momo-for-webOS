@@ -132,7 +132,7 @@ var Global = {
 			command: 'cmdLogout'
 		}];
 
-		if(!Global.backAble()) {
+		if (!Global.backAble()) {
 			//add back to menu
 			menuItems.splice(0, 0, {
 				label: $L(StringMap.menu.back),
@@ -437,14 +437,34 @@ AppAssistant.prototype = {
 		//Mojo.Log.error('onNewIncome================:' + messageStr);
 		var uid = Global.authInfo.user.id;
 		var isOut = (uid == income.sender.id);
-		if(isOut) {
-			if(income.state !== RabbitDB.state.sending || income.hasOwnProperty('timestamp')) {
-				income.state = RabbitDB.state.sent;
-				//Mojo.Log.error('onNewIncome================: not sending');
+		var now = new Date();
+		var duntAlert = false;
+		if (isOut) {
+			// dunt alert when talking with other client.
+			if (income.client_id != 7) {
+				//Mojo.Log.error('msg sent with client: ' + income.client_id);
+				Global.otherClientMsgSentTime = now;
 			} else {
-				//Mojo.Log.error('onNewIncome================: sending' + income.timestamp);
+				Global.otherClientMsgSentTime = null;
+			}
+			if (income.state !== RabbitDB.state.sending || income.hasOwnProperty('timestamp')) {
+				income.state = RabbitDB.state.sent;
 			}
 		} else {
+			/*
+			if(Global.otherClientMsgSentTime) {
+				Mojo.Log.error('alert time======>: ' + Global.otherClientMsgSentTime.getTime() + ' , now : ' + now.getTime() + ' between:  ' + (now.getTime() - Global.otherClientMsgSentTime.getTime()));
+			} else {
+				Mojo.Log.error('no other client sent');
+			}
+			*/
+			var timeNotEnough = false;
+			if(Global.otherClientMsgSentTime) {
+				timeNotEnough = (now.getTime() - Global.otherClientMsgSentTime.getTime() < 0.5 * 60 * 1000);
+			}
+			if (Global.otherClientMsgSentTime && timeNotEnough) {
+				duntAlert = true;
+			}
 			income.state = RabbitDB.state.income;
 		}
 		// store to database
@@ -463,22 +483,26 @@ AppAssistant.prototype = {
 				var dashboardController = appController.getStageController(stageName);
 
 				if (dashboardController) {
-					dashboardController.delegateToSceneAssistant('update', income);
+					dashboardController.delegateToSceneAssistant('update', income, duntAlert);
 				}
 				else {
-					var f = function(stageController) {
-						stageController.indicateNewContent(true);
-						stageController.pushScene('dashboard', income);
-					};
+					if (!duntAlert) {
+						var f = function(stageController) {
+							stageController.indicateNewContent(true);
+							stageController.pushScene('dashboard', income);
+						};
 
-					appController.createStageWithCallback({
-						name: stageName,
-						lightweight: true
-					},
-					f, 'dashboard');
+						appController.createStageWithCallback({
+							name: stageName,
+							lightweight: true
+						},
+						f, 'dashboard');
+					}
 				}
 			} else {
-				NotifyHelper.instance().bannerNewMsg();
+				if(!duntAlert) {
+					NotifyHelper.instance().bannerNewMsg();
+				}
 				//NotifyHelper.instance().banner(income.sender.name + ': ' + AppFormatter.content(income.content));
 			}
 
@@ -492,7 +516,7 @@ AppAssistant.prototype = {
 				Global.sendRogerRead(income.id);
 			}
 		}
-		//NotifyHelper.instance().banner('got meesage main: ' + JSON.stringify(income.content));
+		//update on ui
 		if (mainStage) {
 			//mainStage.delegateToSceneAssistant('update', income);
 			Global.update(income);
@@ -506,12 +530,6 @@ AppAssistant.prototype = {
 			Global.authInfo = null;
 			this.clearMain();
 			AppLauncher.onOpenAPP();
-			/*
-			stage.popScenesTo('login');
-			Mojo.Log.error('pop login: ' + stage.getScenes().length);
-			stage.pushScene('login');
-			Mojo.Log.error('pop login: ' + stage.getScenes().length);
-			*/
 		} else if (event.command === 'cmdAbout') {
 			stage.pushScene('about');
 		} else if (event.command === 'cmdToggleBackground') {
@@ -522,9 +540,8 @@ AppAssistant.prototype = {
 			//why this dunt work?
 			//var backEvent = Mojo.Event.make(Mojo.Event.back);
 			//stage.sendEventToCommanders(backEvent);
-
 			//and i try this
-			if(stage.getScenes().length > 0 && stage.activeScene() != stage.getScenes()[0]) {
+			if (stage.getScenes().length > 0 && stage.activeScene() != stage.getScenes()[0]) {
 				stage.popScene();
 			} else {
 				//and why this not work too? what the fuck
