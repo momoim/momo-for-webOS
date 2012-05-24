@@ -51,7 +51,7 @@ CompleteAssistant.prototype = {
                 type : Mojo.Widget.activityButton
             },
             this.model = {
-                buttonLabel: $L('完成'),
+                buttonLabel: $L(StringMap.complete.completeInfo),
                 buttonClass: 'affirmative',
                 disabled: false
             }
@@ -63,17 +63,17 @@ CompleteAssistant.prototype = {
     onSubmitTapped: function(tapEvent) {
         var _this = this;
         if(_this.controller.get('name').mojo.getValue() == ''){
-            NotifyHelper.instance().banner('姓名不能为空');
+            NotifyHelper.instance().banner($L(StringMap.complete.nameEmpty));
             _this.buttonSubmit.mojo.deactivate();
             return;
         }
         if(_this.controller.get('password-ensure').mojo.getValue() == ''){
-            NotifyHelper.instance().banner('确认密码不能为空');
+            NotifyHelper.instance().banner($L(StringMap.complete.passwordConfirmEmpty));
             _this.buttonSubmit.mojo.deactivate();
             return;
         }
         if(_this.controller.get('password').mojo.getValue() != _this.controller.get('password-ensure').mojo.getValue()){
-            NotifyHelper.instance().banner('两次密码输入不一致');
+            NotifyHelper.instance().banner($L(StringMap.complete.passwordNotEqual));
             _this.buttonSubmit.mojo.deactivate();
             return;
         }

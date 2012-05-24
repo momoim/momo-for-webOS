@@ -12,53 +12,56 @@ var StringMap = {
 	},
 	main: {
 		title: 'MO Conversations',
-		newConversation: 'New Conversation',
-		pickingHint: 'Plz pick somebody with phone number.',
-		pickChooseTitle: 'Choose phone number',
-		pickChoosePrefix: 'Which number will you send msg to ',
-		pickChooseSuffix: ' with?'
+		newConversation: 'Start a New Conversation',
+		pickingHint: 'Please select somebody with a phone number.',
+		pickChooseTitle: 'Select a phone number',
+		pickChoosePrefix: 'Choose to which number of ',
+		pickChooseSuffix: ' you want to send?'
 	},
 	convDetail: {
-		textHint: 'text something~',
+		textHint: 'Message content~',
 		recordButton: 'Hold To Record',
 		recordingHint: 'Recording'
 	},
 	chat: {
 		sending: 'sending',
 		photoUploading: 'Photo Uploading..',
-		photoErrorData: 'Wrong Photo Data!',
-		sent: 'sent ',
+		photoErrorData: 'Incorrect image file format!',
+		sent: 'Sent ',
 		convPicture: 'a photo',
 		convAudio: 'an audio',
 		convLocation: 'a location',
 		convFile: 'a file',
-		convUnknown: 'unsupported content'
+		convUnknown: 'Unsupported content'
 	},
 	login: {
-		account: 'account',
-		loginUsernameLabel: 'username',
-		password: 'password',
-		areaCode: 'area code',
-		login: 'login',
-		register: 'register'
+		account: 'Enter Account Information',
+		loginUsernameLabel: 'Username',
+		password: 'Password',
+		areaCode: 'Country(Country Code)',
+		login: 'Login',
+		register: 'Register'
 	},
 	register: {
-		registerAndGetPsw: 'register and get password',
-		resendPsw: 'resend password',
-		registerTitle: 'register account',
-		phoneNum: 'phone number',
-		verifyTitle: 'login account'
+		registerAndGetPsw: 'Register and get password',
+		resendPsw: 'Resend Verification Code',
+		registerTitle: 'Register MOMO account',
+		phoneNum: 'Phone Number',
+		verifyTitle: 'Login account'
 	},
 	complete: {
 		title: 'user info',
 		name: 'name',
-		password: 'change password',
-		passwordSure: 'confirm password',
-		completeInfo: 'finish'
+		password: 'Change password',
+		passwordSure: 'Password confirmation',
+		completeInfo: 'Submit',
+		nameEmpty: 'Name cannot be empty',
+		passwordConfirmEmpty: 'Password Confirmation cannot be empty',
+		passwordNotEqual: 'Password and confirmation are not equal'
 	},
 	log: {
-		deviceIDFailed: 'Get deviceID failed',
-		moreClickAfter: 'one more click after',
-		psdSended: 'password sended'
+		deviceIDFailed: 'Failed to get Device ID',
+		moreClickAfter: 'Before clicking again wait ',
+		psdSended: 'Verification code sent'
 	}
 };
