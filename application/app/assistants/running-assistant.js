@@ -4,6 +4,8 @@ RunningAssistant.prototype = {
 	setup: function() {
 		PluginHelper.createPluginAmr(this.controller.document);
 		this.onClickReal = this.onClick.bind(this);
+		this.controller.get('dashboard-title').innerHTML = $L(StringMap.running.title);
+		this.controller.get('dashboard-text').innerHTML = $L(StringMap.running.hint);
 	},
 	killSelf: function() {
 		this.controller.window.close();
