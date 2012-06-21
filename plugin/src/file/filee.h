@@ -12,8 +12,8 @@
 #include <syslog.h>
 #include <sys/stat.h>
 
-#define MOMO_RECORD "/media/internal/momo"
 #define MOMO_CACHE "/media/internal/.momo"
+#define MOMO_RECORD "/media/internal/.momo/record"
 #define MOMO_CACHE_AUDIO MOMO_CACHE"/audio"
 #define MOMO_CACHE_FILE MOMO_CACHE"/file"
 #define MOMO_CACHE_PHOTO MOMO_CACHE"/photo"

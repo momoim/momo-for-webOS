@@ -1,4 +1,4 @@
-VR_FOLDER = "/media/internal/momo/";
+VR_FOLDER = "/media/internal/.momo/record/";
 VR_EXTENSION = ".wav";
 VR_EXTENSION_AMR = ".amr";
 

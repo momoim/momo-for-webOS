@@ -8,8 +8,8 @@ void do_mkdir(const char* path) {
 };
 
 void mkdirs() {
-	do_mkdir(MOMO_RECORD);
 	do_mkdir(MOMO_CACHE);
+	do_mkdir(MOMO_RECORD);
 	do_mkdir(MOMO_CACHE_AUDIO);
 	do_mkdir(MOMO_CACHE_FILE);
 	do_mkdir(MOMO_CACHE_PHOTO);
