@@ -459,7 +459,7 @@ AppAssistant.prototype = {
 			}
 			*/
 			var timeNotEnough = false;
-			if(Global.otherClientMsgSentTime) {
+			if (Global.otherClientMsgSentTime) {
 				timeNotEnough = (now.getTime() - Global.otherClientMsgSentTime.getTime() < 5 * 60 * 1000);
 			}
 			if (Global.otherClientMsgSentTime && timeNotEnough) {
@@ -500,7 +500,7 @@ AppAssistant.prototype = {
 					}
 				}
 			} else {
-				if(!duntAlert) {
+				if (!duntAlert) {
 					NotifyHelper.instance().bannerNewMsg();
 				}
 				//NotifyHelper.instance().banner(income.sender.name + ': ' + AppFormatter.content(income.content));
@@ -523,13 +523,20 @@ AppAssistant.prototype = {
 		}
 	},
 	handleCommand: function(event) {
+		var that = this;
 		var stage = this.controller.getActiveStageController();
 		if (event.command === 'cmdLogout') {
-			DBHelper.instance().remove('authInfo');
+			DBHelper.instance().remove('authInfo', {
+				onSuccess: function() {
+					Global.authInfo = null;
+					setTimeout(function() {
+						AppLauncher.onOpenAPP();
+					},
+					10);
+					that.clearMain();
+				}
+			});
 			DBHelper.instance().remove('config');
-			Global.authInfo = null;
-			this.clearMain();
-			AppLauncher.onOpenAPP();
 		} else if (event.command === 'cmdAbout') {
 			stage.pushScene('about');
 		} else if (event.command === 'cmdToggleBackground') {
