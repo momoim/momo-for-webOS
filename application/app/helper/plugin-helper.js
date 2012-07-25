@@ -47,6 +47,7 @@ var PluginHelper = {
 		} else {
 			//register callbacks
 			Global.AmrHelper.onProxyMsg = function(body, timestamp) {
+				Mojo.Log.error('on plugin raw: ' + JSON.stringify(punycode.ucs2.decode(body)));
 				var msg = JSON.parse(body);
 				if (msg.kind !== 'sms') {
 					return;

@@ -29,7 +29,7 @@ var AppFormatter = {
 		for (var now in n) {
 			//Mojo.Log.info('content now: ' + now);
 			if (now == 'text' || now == 'text_long') {
-				return AppFormatter.htmlSafe(n[now]);
+				return ioNull.emoji.parse(AppFormatter.htmlSafe(n[now]));
 			} else {
 				var base = $L(StringMap.chat.sent);
 				if (now == 'picture') {
@@ -69,7 +69,8 @@ var AppFormatter = {
 		for (var now in n) {
 			//Mojo.Log.info('content now: ' + now);
 			if (now == 'text' || now == 'text_long') {
-				return linkify(AppFormatter.htmlSafe(n[now]));
+				var linked = linkify(AppFormatter.htmlSafe(n[now])); 
+				return ioNull.emoji.parse(linked);
 			} else if (now == 'picture') {
 				var icon = n[now]['icon'];
 				var pUrl = n[now]['url'];
