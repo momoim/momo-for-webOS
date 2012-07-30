@@ -63,7 +63,7 @@ ChatSender.prototype.sendChat = function(chat) {
 
 	//Mojo.Log.error(that.TAG, 'sendChat=---+---===== ui..' + JSON.stringify(chat));
 	chat.data.state = RabbitDB.state.sending;
-	AppLauncher.onNewIncome(chat);
+	AppLauncher.onPluginIncome(chat);
 
 	that.prepareChat(chat, function(chat) {
 		that.addSendingChat(chat);
@@ -311,6 +311,7 @@ ChatSender.prototype.sendWithPlugin = function(content, who) {
 		} else {
 			var args = [];
 			args.push(receiver);
+			content = ioNull.base64.encode(content);
 			for (var i = 0; i < content.length;) {
 				var next = i + 255;
 				if (next > content.length) {

@@ -13,7 +13,7 @@
 #include <string.h>
 #include <syslog.h>
 
-#include <alsa/asoundlib.h>
+#include "alsa/asoundlib.h"
 
 #include "../amr/wave2amr/wavreader.h"
 

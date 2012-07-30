@@ -1,3 +1,6 @@
 [submodule "application/vendors/emoji.js"]
 	path = application/vendors/emoji.js
 	url = https://github.com/ioNull/emoji.js.git
+[submodule "base64.js"]
+	path = application/vendors/base64.js
+	url = https://github.com/ioNull/base64.js

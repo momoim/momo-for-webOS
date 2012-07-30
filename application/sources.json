@@ -6,6 +6,7 @@
     {"source": "vendors/emoji.js/vendor/punycode/punycode.min.js"},
     {"source": "vendors/emoji.js/emoji-list-with-image.js"},
     {"source": "vendors/emoji.js/emoji.js"},
+    {"source": "vendors/base64.js/base64.js"},
     {"source": "global/Setting.js"},
     {"source": "app/lib/namespace.js"},
     {"source": "app/lib/net/http.js"},

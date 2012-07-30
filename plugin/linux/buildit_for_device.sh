@@ -80,7 +80,7 @@ done
 ### List the libraries needed.                                      ###
 ### LIBS="-l<libname>"                                              ###
 #######################################################################
-export LIBS="-lSDL -lGLESv2 -lpdl -lpthread -lasound"
+export LIBS="-lSDL -lGLESv2 -lpdl -lpthread -lasound -lssl -lcrypto"
 
 #######################################################################
 ### Name your output executable                                     ###

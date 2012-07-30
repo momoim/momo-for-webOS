@@ -32,6 +32,9 @@ var AppLauncher = {
 		//have new msg
 		AppLauncher.launch('onNewIncome', JSON.stringify(data), onSuccess, onFailure);
 	},
+	onPluginIncome: function(data, onSuccess, onFailure) {
+		AppLauncher.launch('onPluginIncome', ioNull.base64.encode(JSON.stringify(data)), onSuccess, onFailure);
+	},
 	onKeepAlive: function() {
 		if(!Global.pluginAble()) {
 			AppLauncher.launch('keep-alive', {});
@@ -48,7 +51,7 @@ var AppLauncher = {
 		'launch');
 	},
 	onMsgSendError: function(chat) {
-		AppLauncher.launch('onMsgSendError', JSON.stringify(chat));
+		AppLauncher.launch('onMsgSendError', ioNull.base64.encode(JSON.stringify(chat)));
 	}
 };
 

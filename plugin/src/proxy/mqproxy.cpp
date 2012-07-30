@@ -9,6 +9,12 @@
 #include <netdb.h>
 #include <pthread.h>
 
+#include <openssl/sha.h>
+#include <openssl/hmac.h>
+#include <openssl/evp.h>
+#include <openssl/bio.h>
+#include <openssl/buffer.h>
+
 #include <signal.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -42,6 +48,8 @@ static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 void didConnected(const char* auth);
 void SIGIOHandler(int, siginfo_t *info, void *uap); /* Function to handle SIGIO */
 void sendMsgs(MM_SMCP_CMD_TYPE cmdTypeRaw, int packNumberIn, char* orig, const char* receiver);
+char *base64_encode(const unsigned char *input, int length);
+char *base64_decode(char *input, int length);
 
 void closeSocketOnly() {
 	close(sock);
@@ -326,15 +334,19 @@ int onIOBuffer(int recvMsgSize, char* echoBuffer, char* buffer) {
 			memset(last, 0, 1);
 			syslog(LOG_ALERT, "welll length: %d, recving msg conetnt!!!: %s", contentLength, body);
 
+			//convert to base64
+			char* base64Body = base64_encode((const unsigned char*)body, contentLength);
+
 			//return;
 			//call js
 			const char* results[2];
-			results[0] = body;
+			results[0] = base64Body;
 			char time[16] = {0};
 			sprintf(time, "%d", timeStamp);
 			results[1] = time;
 			PDL_CallJS("onProxyMsg", results, 2);
 			free(body);
+			free(base64Body);
 		} else {
 			syslog(LOG_ALERT, "welll not an im delivery");
 		}
@@ -351,11 +363,11 @@ int onIOBuffer(int recvMsgSize, char* echoBuffer, char* buffer) {
 			return left;
 			//return (char*)buffer;
 			/*
-			char* todo = (char*)malloc(left);
-			memcpy(todo, buffer, left);
-			onIOBuffer(left, todo);
-			free(todo);
-			*/
+				 char* todo = (char*)malloc(left);
+				 memcpy(todo, buffer, left);
+				 onIOBuffer(left, todo);
+				 free(todo);
+				 */
 
 			/*
 				 memcpy(echoBuffer, buffer, left);
@@ -482,10 +494,10 @@ void onSIGIO() {
 void SIGIOHandler(int signum, siginfo_t *info, void *uap)
 {
 	//TODO send user event sigio or muliti called
-		SDL_Event event;
-		event.type = SDL_USEREVENT;
-		event.user.code = 103;
-		SDL_PushEvent(&event);
+	SDL_Event event;
+	event.type = SDL_USEREVENT;
+	event.user.code = 103;
+	SDL_PushEvent(&event);
 }
 
 int currentUpPackNum = 0;
@@ -567,5 +579,49 @@ void sendMsgs(MM_SMCP_CMD_TYPE cmdTypeRaw, int packNumberIn, char* orig, const c
 	}
 }
 void sendMsg1V1(char* orig, const char* receiver) {
-	sendMsgs(SMCP_IM_1V1, currentUpPackNum, orig, receiver);
+	char* decoded = base64_decode(orig, strlen(orig));
+	//TODO free orig?
+	sendMsgs(SMCP_IM_1V1, currentUpPackNum, decoded, receiver);
+}
+
+
+char *base64_encode(const unsigned char *input, int length)
+{
+	BIO *bmem, *b64;
+	BUF_MEM *bptr;
+
+	b64 = BIO_new(BIO_f_base64());
+	bmem = BIO_new(BIO_s_mem());
+	b64 = BIO_push(b64, bmem);
+	BIO_write(b64, input, length);
+	BIO_flush(b64);
+	BIO_get_mem_ptr(b64, &bptr);
+
+	char *buff = (char *)malloc(bptr->length);
+	memcpy(buff, bptr->data, bptr->length-1);
+	buff[bptr->length-1] = 0;
+
+	BIO_free_all(b64);
+
+	return buff;
+}
+
+char *base64_decode(char *input, int length)
+{
+	BIO *b64, *bmem;
+
+	char *buffer = (char *)malloc(length+1);
+	memset(buffer, 0, length+1);
+
+	b64 = BIO_new(BIO_f_base64());
+	BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
+	bmem = BIO_new_mem_buf(input, length);
+	bmem = BIO_push(b64, bmem);
+
+	BIO_read(bmem, buffer, length);
+	buffer[length] = '\0';
+
+	BIO_free_all(bmem);
+
+	return buffer;
 }

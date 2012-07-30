@@ -302,6 +302,8 @@ AppAssistant.prototype = {
 				break;
 			case 'onNewIncome':
 				this.onNewIncome(launchParams.data);
+			case 'onPluginIncome':
+				this.onNewIncome(ioNull.base64.decode(launchParams.data));
 				break;
 			case 'keep-alive':
 				if (cardStageController) {
@@ -404,7 +406,7 @@ AppAssistant.prototype = {
 	onMsgSendError: function(launchParams) {
 		var that = this;
 		Mojo.Log.error('on msg send error trying to send with http');
-		new interfaces.Momo().postSendMessage(JSON.parse(launchParams.data).data, {
+		new interfaces.Momo().postSendMessage(JSON.parse(ioNull.base64.decode(launchParams.data)).data, {
 			onSuccess: function(resp) {
 				//Mojo.Log.error('on msg send error trying to send with http success');// + resp.responseText);
 				var c = resp.responseJSON;

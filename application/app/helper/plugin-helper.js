@@ -46,8 +46,14 @@ var PluginHelper = {
 			PluginHelper.initTimer = setTimeout(PluginHelper.initializePlugin, 50);
 		} else {
 			//register callbacks
-			Global.AmrHelper.onProxyMsg = function(body, timestamp) {
-				Mojo.Log.error('on plugin raw: ' + JSON.stringify(punycode.ucs2.decode(body)));
+			Global.AmrHelper.onProxyMsg = function(raw, timestamp) {
+				Mojo.Log.error('on plugin raw: ' + raw);
+				raw = raw.replace(/\s/g, '');
+				//var body = Base64.decode(raw);
+				var body = ioNull.base64.decode(raw);
+				//var body = Iuppiter.Base64.decode(raw);
+				Mojo.Log.error('on plugin decode: ' + body);
+				//Mojo.Log.error('on plugin raw: ' + JSON.stringify(punycode.ucs2.decode(body)));
 				var msg = JSON.parse(body);
 				if (msg.kind !== 'sms') {
 					return;
@@ -55,7 +61,7 @@ var PluginHelper = {
 				msg.data.timestamp = parseInt(timestamp);
 				Mojo.Log.error('on plugin msg: ' + JSON.stringify(msg));
 				//call by launch
-				AppLauncher.onNewIncome(msg);
+				AppLauncher.onPluginIncome(msg);
 			};
 
 			// plug-in is ready to be used
