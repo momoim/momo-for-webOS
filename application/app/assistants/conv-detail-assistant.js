@@ -70,6 +70,10 @@ var ConvDetailAssistant = Class.create({
 			disabled: false
 		});
 
+		that.history = 'http://m.momo.im/t/chats/' + that.incomeItem.id + '?token=' + Global.authInfo.oauthToken;
+		var historyHint = $L(StringMap.convDetail.showHistory);
+		this.controller.get('header-p').innerHTML = historyHint;
+
 		//录音辅助类
 		try {
 			//this.captureHelper = new CaptureHelper();
@@ -193,6 +197,12 @@ var ConvDetailAssistant = Class.create({
 		//Mojo.Log.error(this.TAG, 'onClick: ' + event.target.outerHTML);
 		var that = this;
 		var target = event.target;
+
+		if(target.id == 'header' || target.id == 'header-p') {
+			window.open(that.history, '_blank');
+			return;
+		}
+
 		var tempParentNode = target;
 		for (var i = 0; i < 5; i++) {
 			if (tempParentNode && tempParentNode.hasAttribute && tempParentNode.hasAttribute('data-type') && tempParentNode.getAttribute('data-type') == 'audio') {

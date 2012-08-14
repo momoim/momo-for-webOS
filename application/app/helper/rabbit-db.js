@@ -157,7 +157,7 @@ RabbitDB.prototype = {
 	getTalkList: function(otherID, onResult) {
 		this.trans(function(tx) {
 			tx.executeSql(
-				'SELECT * FROM ' + RabbitDB.table.talk + ' WHERE user_id = ' + Global.authInfo.user.id + ' AND other_id = ' + otherID,
+				'SELECT * FROM ' + RabbitDB.table.talk + ' WHERE user_id = ' + Global.authInfo.user.id + ' AND other_id = ' + otherID + ' ORDER BY timestamp DESC LIMIT 50',
 				[],
 				function(tx, rs) {
 					Mojo.Log.info('getTalkList, count: ' + rs.rows.length);
@@ -181,7 +181,7 @@ RabbitDB.prototype = {
 								item.receiver = [Global.authInfo.user];
 								item.sender = item.other;
 							}
-							result.push(item);
+							result.splice(0, 0, item);
 						}
 						Mojo.Log.info('result json-----: ' + JSON.stringify(result));
 						onResult(result);

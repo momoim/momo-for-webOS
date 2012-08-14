@@ -21,7 +21,8 @@ var StringMap = {
 	convDetail: {
 		textHint: 'Message content~',
 		recordButton: 'Hold To Record',
-		recordingHint: 'Recording'
+		recordingHint: 'Recording',
+		showHistory: 'View Chat History'
 	},
 	chat: {
 		sending: 'sending',
